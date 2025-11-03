@@ -17,20 +17,26 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 20 14% 10%;
 
-    --primary: 14 100% 60%;
+    --primary: 264 100% 59%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 14 100% 55%;
+    --primary-hover: 264 100% 54%;
 
-    --secondary: 142 71% 45%;
+    --secondary: 6 100% 69%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 142 71% 40%;
+    --secondary-hover: 6 100% 64%;
 
-    --accent: 45 100% 51%;
-    --accent-foreground: 20 14% 10%;
+    --accent: 264 100% 69%;
+    --accent-foreground: 0 0% 100%;
 
-    --purple: 270 70% 60%;
+    --purple: 264 100% 59%;
     --purple-foreground: 0 0% 100%;
-    --purple-hover: 270 70% 55%;
+    --purple-hover: 264 100% 54%;
+
+    --coral: 6 100% 69%;
+    --coral-foreground: 0 0% 100%;
+    --coral-hover: 6 100% 64%;
+
+    --cream: 32 100% 97%;
 
     --muted: 32 25% 95%;
     --muted-foreground: 25 5% 45%;
@@ -40,16 +46,17 @@ All colors MUST be HSL.
 
     --border: 32 30% 90%;
     --input: 32 30% 90%;
-    --ring: 14 100% 60%;
+    --ring: 264 100% 59%;
 
-    --radius: 0.75rem;
+    --radius: 1.25rem;
     
-    --gradient-warm: linear-gradient(135deg, hsl(14 100% 60%), hsl(45 100% 51%));
-    --gradient-fresh: linear-gradient(135deg, hsl(142 71% 45%), hsl(174 72% 56%));
-    --gradient-social: linear-gradient(135deg, hsl(270 70% 60%), hsl(14 100% 60%));
-    --gradient-app-bg: linear-gradient(180deg, hsl(14 100% 60% / 0.05) 0%, hsl(32 100% 98%) 40%);
-    --shadow-soft: 0 4px 20px -4px hsl(14 100% 60% / 0.15);
-    --shadow-hover: 0 8px 30px -6px hsl(14 100% 60% / 0.25);
+    --gradient-warm: linear-gradient(135deg, hsl(264 100% 59%), hsl(6 100% 69%));
+    --gradient-purple-glow: linear-gradient(135deg, hsl(264 100% 59%), hsl(280 100% 69%));
+    --gradient-coral: linear-gradient(135deg, hsl(6 100% 69%), hsl(14 100% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(264 100% 59%) 0%, hsl(280 100% 69%) 50%, hsl(6 100% 69%) 100%);
+    --shadow-soft: 0 4px 20px -4px hsl(264 100% 59% / 0.15);
+    --shadow-hover: 0 8px 30px -6px hsl(264 100% 59% / 0.25);
+    --shadow-glow: 0 0 40px hsl(264 100% 59% / 0.4);
   }
 
   .dark {
@@ -62,20 +69,24 @@ All colors MUST be HSL.
     --popover: 20 14% 10%;
     --popover-foreground: 32 100% 98%;
 
-    --primary: 14 100% 60%;
+    --primary: 264 100% 59%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 14 100% 55%;
+    --primary-hover: 264 100% 54%;
 
-    --secondary: 142 71% 45%;
+    --secondary: 6 100% 69%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 142 71% 40%;
+    --secondary-hover: 6 100% 64%;
 
-    --accent: 45 100% 51%;
+    --accent: 264 100% 69%;
     --accent-foreground: 20 14% 10%;
 
-    --purple: 270 70% 60%;
+    --purple: 264 100% 59%;
     --purple-foreground: 0 0% 100%;
-    --purple-hover: 270 70% 55%;
+    --purple-hover: 264 100% 54%;
+
+    --coral: 6 100% 69%;
+    --coral-foreground: 0 0% 100%;
+    --coral-hover: 6 100% 64%;
 
     --muted: 20 14% 15%;
     --muted-foreground: 32 10% 65%;
@@ -85,7 +96,7 @@ All colors MUST be HSL.
 
     --border: 20 14% 20%;
     --input: 20 14% 20%;
-    --ring: 14 100% 60%;
+    --ring: 264 100% 59%;
   }
 }
 

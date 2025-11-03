@@ -9,10 +9,9 @@ const FloatingAIButton = () => {
     <Button
       onClick={() => navigate("/ai-assistant")}
       size="icon"
-      variant="purple"
-      className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-40"
+      className="fixed bottom-20 right-4 h-14 w-14 rounded-full bg-gradient-purple-glow shadow-glow hover:shadow-glow hover:scale-110 transition-all z-40 animate-pulse-glow"
     >
-      <Sparkles className="h-6 w-6" />
+      <Sparkles className="h-6 w-6 text-white" />
     </Button>
   );
 };

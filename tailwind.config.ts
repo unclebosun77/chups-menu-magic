@@ -46,6 +46,12 @@ export default {
           foreground: "hsl(var(--purple-foreground))",
           hover: "hsl(var(--purple-hover))",
         },
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          foreground: "hsl(var(--coral-foreground))",
+          hover: "hsl(var(--coral-hover))",
+        },
+        cream: "hsl(var(--cream))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -57,12 +63,14 @@ export default {
       },
       backgroundImage: {
         'gradient-warm': 'var(--gradient-warm)',
-        'gradient-fresh': 'var(--gradient-fresh)',
-        'gradient-social': 'var(--gradient-social)',
+        'gradient-purple-glow': 'var(--gradient-purple-glow)',
+        'gradient-coral': 'var(--gradient-coral)',
+        'gradient-hero': 'var(--gradient-hero)',
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',
         'hover': 'var(--shadow-hover)',
+        'glow': 'var(--shadow-glow)',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -86,10 +94,30 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "pulse-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px hsl(264 100% 59% / 0.4)",
+          },
+          "50%": {
+            boxShadow: "0 0 40px hsl(264 100% 59% / 0.6)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },
