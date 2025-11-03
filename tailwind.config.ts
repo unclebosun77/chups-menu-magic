@@ -41,6 +41,11 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        purple: {
+          DEFAULT: "hsl(var(--purple))",
+          foreground: "hsl(var(--purple-foreground))",
+          hover: "hsl(var(--purple-hover))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -53,6 +58,7 @@ export default {
       backgroundImage: {
         'gradient-warm': 'var(--gradient-warm)',
         'gradient-fresh': 'var(--gradient-fresh)',
+        'gradient-social': 'var(--gradient-social)',
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LogIn, ChefHat, MapPin } from "lucide-react";
 import heroImage from "@/assets/hero-restaurant.jpg";
 import logoIcon from "@/assets/logo-icon.png";
+import globeWatermark from "@/assets/globe-watermark.png";
 
 type Restaurant = {
   id: string;
@@ -53,9 +54,15 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Globe Watermark */}
+      <div 
+        className="fixed inset-0 opacity-5 pointer-events-none z-0 bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${globeWatermark})` }}
+      />
+      
       {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden">
+      <section className="relative h-[600px] overflow-hidden z-10">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
@@ -68,7 +75,7 @@ const Index = () => {
             Welcome to CHUPS
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl animate-fade-in">
-            Your personalized menu experience. Discover restaurants, explore menus, and order with ease.
+            A social community connecting the world through dining and shared experiences.
           </p>
           <div className="flex gap-4 animate-fade-in">
             {user ? (
@@ -87,7 +94,7 @@ const Index = () => {
       </section>
 
       {/* Featured Restaurants */}
-      <section className="py-16 container mx-auto px-4">
+      <section className="py-16 container mx-auto px-4 relative z-10">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-4xl font-bold mb-2">Featured Restaurants</h2>
@@ -151,16 +158,16 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-fresh">
+      <section className="py-16 bg-gradient-social relative z-10">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to join CHUPS?</h2>
+          <h2 className="text-4xl font-bold text-white mb-6">Join Our Global Community</h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Whether you're a restaurant owner looking to showcase your menu or a food lover ready to explore,
-            CHUPS is your perfect platform.
+            Connect with people around the world through the universal language of food. 
+            CHUPS brings together restaurant owners and food lovers in one vibrant social community.
           </p>
           {!user && (
             <Button size="lg" variant="secondary" onClick={() => navigate("/auth")} className="text-lg">
-              Sign Up Now
+              Become Part of CHUPS
             </Button>
           )}
         </div>

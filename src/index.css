@@ -28,6 +28,10 @@ All colors MUST be HSL.
     --accent: 45 100% 51%;
     --accent-foreground: 20 14% 10%;
 
+    --purple: 270 70% 60%;
+    --purple-foreground: 0 0% 100%;
+    --purple-hover: 270 70% 55%;
+
     --muted: 32 25% 95%;
     --muted-foreground: 25 5% 45%;
 
@@ -42,6 +46,7 @@ All colors MUST be HSL.
     
     --gradient-warm: linear-gradient(135deg, hsl(14 100% 60%), hsl(45 100% 51%));
     --gradient-fresh: linear-gradient(135deg, hsl(142 71% 45%), hsl(174 72% 56%));
+    --gradient-social: linear-gradient(135deg, hsl(270 70% 60%), hsl(14 100% 60%));
     --shadow-soft: 0 4px 20px -4px hsl(14 100% 60% / 0.15);
     --shadow-hover: 0 8px 30px -6px hsl(14 100% 60% / 0.25);
   }
@@ -66,6 +71,10 @@ All colors MUST be HSL.
 
     --accent: 45 100% 51%;
     --accent-foreground: 20 14% 10%;
+
+    --purple: 270 70% 60%;
+    --purple-foreground: 0 0% 100%;
+    --purple-hover: 270 70% 55%;
 
     --muted: 20 14% 15%;
     --muted-foreground: 32 10% 65%;
