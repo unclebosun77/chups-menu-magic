@@ -54,16 +54,18 @@ const Index = () => {
       {/* Layered Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple/5 to-background" />
         
-        {/* Geometric circles */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" 
+        {/* Large geometric circles */}
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-primary/20 to-accent/10 rounded-full blur-3xl animate-pulse" 
              style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-20 left-0 w-64 h-64 bg-purple/10 rounded-full blur-3xl animate-pulse" 
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-gradient-to-br from-purple/15 to-primary/10 rounded-full blur-3xl animate-pulse" 
              style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-gradient-to-br from-accent/10 to-secondary/5 rounded-full blur-3xl animate-pulse" 
+             style={{ animationDuration: '12s', animationDelay: '4s' }} />
         
         {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.02]"
+        <div className="absolute inset-0 opacity-[0.03]"
              style={{
                backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
                backgroundSize: '32px 32px'
