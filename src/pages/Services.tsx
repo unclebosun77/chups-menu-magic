@@ -1,14 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bike, UtensilsCrossed, Users, Calendar } from "lucide-react";
+import { UtensilsCrossed, Users, Calendar } from "lucide-react";
 
 const Services = () => {
   const services = [
-    {
-      icon: Bike,
-      title: "Delivery",
-      description: "Get food delivered to your door",
-      color: "bg-blue-500/10 text-blue-500",
-    },
     {
       icon: UtensilsCrossed,
       title: "Dine-In",
