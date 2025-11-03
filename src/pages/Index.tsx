@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, ChefHat, MapPin, Sparkles, Search, ShoppingBag } from "lucide-react";
+import { User, ChefHat, MapPin, Sparkles, Search, ShoppingBag } from "lucide-react";
 import heroImage from "@/assets/hero-restaurant.jpg";
-import logoIcon from "@/assets/logo-icon.png";
 import globeWatermark from "@/assets/globe-watermark.png";
 
 type Restaurant = {
@@ -69,7 +68,7 @@ const Index = () => {
           onClick={() => navigate("/auth")}
           className="fixed top-4 right-4 z-50 h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background hover:scale-110 transition-all duration-200"
         >
-          <LogIn className="h-5 w-5" />
+          <User className="h-5 w-5" />
         </Button>
       )}
       
@@ -82,7 +81,6 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80" />
         </div>
         <div className="relative h-full container mx-auto px-4 flex flex-col items-center justify-center text-center">
-          <img src={logoIcon} alt="CHUPS" className="h-32 w-32 mb-6 animate-fade-in" />
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
             Welcome to CHUPS
           </h1>
