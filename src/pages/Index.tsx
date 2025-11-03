@@ -50,12 +50,32 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="space-y-6 p-4">
-      {/* Header */}
-      <div className="pt-4">
-        <h1 className="text-3xl font-bold">Discover</h1>
-        <p className="text-muted-foreground mt-1">Find your next favorite spot</p>
+    <div className="relative min-h-screen">
+      {/* Layered Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+        
+        {/* Geometric circles */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" 
+             style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-20 left-0 w-64 h-64 bg-purple/10 rounded-full blur-3xl animate-pulse" 
+             style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]"
+             style={{
+               backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+               backgroundSize: '32px 32px'
+             }} />
       </div>
+
+      <div className="space-y-6 p-4 relative">
+        {/* Header */}
+        <div className="pt-4">
+          <h1 className="text-3xl font-bold">Discover</h1>
+          <p className="text-muted-foreground mt-1">Find your next favorite spot</p>
+        </div>
 
       {/* Personalized Recommendations */}
       <div>
@@ -162,6 +182,7 @@ const Index = () => {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );
