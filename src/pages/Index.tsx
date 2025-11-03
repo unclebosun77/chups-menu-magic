@@ -66,7 +66,7 @@ const Index = () => {
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/ai-assistant")} className="gap-2">
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Assistant</span>
+              <span className="hidden sm:inline">Ask CHUPS</span>
             </Button>
             {user ? (
               <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")} className="gap-2">
@@ -96,7 +96,7 @@ const Index = () => {
           <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/ai-assistant")}>
             <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
               <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-medium text-sm">AI Assistant</span>
+              <span className="font-medium text-sm">Ask CHUPS</span>
             </CardContent>
           </Card>
           

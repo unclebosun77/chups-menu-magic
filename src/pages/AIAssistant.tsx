@@ -157,7 +157,7 @@ const AIAssistant = () => {
                 <Sparkles className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">CHUPS AI Assistant</h1>
+                <h1 className="text-xl font-bold">Ask CHUPS</h1>
                 <p className="text-sm text-muted-foreground">Your personal dining companion</p>
               </div>
             </div>
