@@ -102,7 +102,7 @@ const Index = () => {
 
       {/* Features Section */}
       <section className="py-16 container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
           <Card className="text-center hover:shadow-hover transition-shadow">
             <CardHeader>
               <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -127,20 +127,6 @@ const Index = () => {
             <CardContent>
               <p className="text-muted-foreground">
                 Find restaurants by cuisine, location, ratings, and opening hours with advanced filters
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-hover transition-shadow">
-            <CardHeader>
-              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <ShoppingBag className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Seamless Ordering</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Browse personalized menus, place orders, and track them in real-time
               </p>
             </CardContent>
           </Card>
