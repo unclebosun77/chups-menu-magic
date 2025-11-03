@@ -9,6 +9,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import logoIcon from "@/assets/logo-icon.png";
+import { z } from "zod";
+
+const signInSchema = z.object({
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
+  password: z.string()
+    .min(1, { message: "Password is required" }),
+});
+
+const signUpSchema = z.object({
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
+  password: z.string()
+    .min(6, { message: "Password must be at least 6 characters" })
+    .max(72, { message: "Password must be less than 72 characters" })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -20,8 +43,25 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("signin-email") as string;
-    const password = formData.get("signin-password") as string;
+
+    // Validate input data
+    const validationResult = signInSchema.safeParse({
+      email: formData.get("signin-email"),
+      password: formData.get("signin-password"),
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
+      toast({ 
+        title: "Validation error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { email, password } = validationResult.data;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -38,8 +78,25 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("signup-email") as string;
-    const password = formData.get("signup-password") as string;
+
+    // Validate input data
+    const validationResult = signUpSchema.safeParse({
+      email: formData.get("signup-email"),
+      password: formData.get("signup-password"),
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
+      toast({ 
+        title: "Validation error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { email, password } = validationResult.data;
 
     const { error } = await supabase.auth.signUp({
       email,

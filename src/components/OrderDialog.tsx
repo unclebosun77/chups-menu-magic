@@ -12,6 +12,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Minus, Plus, X } from "lucide-react";
+import { z } from "zod";
+
+const orderContactSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(1, { message: "Name is required" })
+    .max(100, { message: "Name must be less than 100 characters" }),
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
+  phone: z.string()
+    .trim()
+    .max(20, { message: "Phone must be less than 20 characters" })
+    .optional()
+    .or(z.literal("")),
+});
 
 type OrderItem = {
   id: string;
@@ -52,11 +69,31 @@ const OrderDialog = ({
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
 
+    // Validate input data
+    const validationResult = orderContactSchema.safeParse({
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone") || "",
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
+      toast({ 
+        title: "Validation error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { name, email, phone } = validationResult.data;
+
     const { error } = await supabase.from("orders").insert({
       restaurant_id: restaurantId,
-      customer_name: formData.get("name") as string,
-      customer_email: formData.get("email") as string,
-      customer_phone: formData.get("phone") as string,
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone || null,
       items: order.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
       total: totalAmount,
     });
