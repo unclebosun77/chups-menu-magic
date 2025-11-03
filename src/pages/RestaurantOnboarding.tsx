@@ -69,6 +69,9 @@ const RestaurantOnboarding = () => {
       secondary_color: style?.colors.secondary || "#10B981",
       description: formData.get("description") as string,
       logo_url: formData.get("logo") as string || null,
+      address: formData.get("address") as string || null,
+      city: formData.get("city") as string || null,
+      phone: formData.get("phone") as string || null,
     });
 
     if (error) {
@@ -111,6 +114,21 @@ const RestaurantOnboarding = () => {
             <div className="space-y-2">
               <Label htmlFor="logo">Logo URL (optional)</Label>
               <Input id="logo" name="logo" type="url" placeholder="https://example.com/logo.png" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Address (optional)</Label>
+              <Input id="address" name="address" placeholder="123 Main Street" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="city">City (optional)</Label>
+              <Input id="city" name="city" placeholder="New York" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone (optional)</Label>
+              <Input id="phone" name="phone" type="tel" placeholder="+1 (555) 123-4567" />
             </div>
 
             <div className="space-y-2">

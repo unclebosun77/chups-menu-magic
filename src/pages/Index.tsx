@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, ChefHat, MapPin } from "lucide-react";
+import { LogIn, ChefHat, MapPin, Sparkles, Search, ShoppingBag } from "lucide-react";
 import heroImage from "@/assets/hero-restaurant.jpg";
 import logoIcon from "@/assets/logo-icon.png";
 import globeWatermark from "@/assets/globe-watermark.png";
@@ -54,7 +54,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 relative">
       {/* Globe Watermark */}
       <div 
         className="fixed inset-0 opacity-5 pointer-events-none z-0 bg-contain bg-center bg-no-repeat"
@@ -62,34 +62,88 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden z-10">
+      <section className="relative h-[80vh] overflow-hidden z-10">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80" />
         </div>
         <div className="relative h-full container mx-auto px-4 flex flex-col items-center justify-center text-center">
-          <img src={logoIcon} alt="CHUPS" className="h-24 w-24 mb-6 animate-fade-in" />
+          <img src={logoIcon} alt="CHUPS" className="h-32 w-32 mb-6 animate-fade-in" />
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
             Welcome to CHUPS
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl animate-fade-in">
-            A social community connecting the world through dining and shared experiences.
+            Next-gen restaurant platform with AI-powered discovery, personalized menus & seamless ordering
           </p>
-          <div className="flex gap-4 animate-fade-in">
+          <div className="flex flex-wrap gap-4 justify-center animate-fade-in">
+            <Button size="lg" onClick={() => navigate("/discover")} className="gap-2">
+              <Search className="h-5 w-5" />
+              Discover Restaurants
+            </Button>
+            <Button size="lg" variant="secondary" onClick={() => navigate("/ai-assistant")} className="gap-2">
+              <Sparkles className="h-5 w-5" />
+              AI Assistant
+            </Button>
             {user ? (
-              <Button size="lg" onClick={() => navigate("/restaurant/dashboard")} className="text-lg">
-                <ChefHat className="mr-2 h-5 w-5" />
-                My Dashboard
+              <Button size="lg" variant="outline" onClick={() => navigate("/my-orders")} className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
+                <ShoppingBag className="h-5 w-5" />
+                My Orders
               </Button>
             ) : (
-              <Button size="lg" onClick={() => navigate("/auth")} className="text-lg">
-                <LogIn className="mr-2 h-5 w-5" />
-                Get Started
+              <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="bg-white/10 text-white border-white/20 hover:bg-white/20">
+                Sign In
               </Button>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <Card className="text-center hover:shadow-hover transition-shadow">
+            <CardHeader>
+              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>AI-Powered Planning</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Let our AI assistant help you plan perfect outings, suggest restaurants, and estimate budgets
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-hover transition-shadow">
+            <CardHeader>
+              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <MapPin className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Smart Discovery</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Find restaurants by cuisine, location, ratings, and opening hours with advanced filters
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-hover transition-shadow">
+            <CardHeader>
+              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <ShoppingBag className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Seamless Ordering</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Browse personalized menus, place orders, and track them in real-time
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 

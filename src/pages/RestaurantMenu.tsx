@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Star } from "lucide-react";
 import MenuItemCard from "@/components/MenuItemCard";
 import OrderDialog from "@/components/OrderDialog";
+import ReviewsSection from "@/components/ReviewsSection";
 
 type Restaurant = {
   id: string;
@@ -33,6 +36,7 @@ type OrderItem = MenuItem & { quantity: number };
 
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -143,63 +147,88 @@ const RestaurantMenu = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-10">
+      {/* Restaurant Header */}
+      <div className="border-b bg-card sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {restaurant.logo_url && (
-                <img src={restaurant.logo_url} alt={restaurant.name} className="h-16 w-16 rounded-lg object-cover" />
-              )}
-              <div>
-                <h1 className="text-3xl font-bold">{restaurant.name}</h1>
-                <p className="text-muted-foreground">{restaurant.cuisine_type}</p>
-                {!restaurant.is_open && (
-                  <span className="text-sm text-destructive font-medium">Currently Closed</span>
-                )}
+          <div className="flex items-start gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/discover")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            {restaurant?.logo_url && (
+              <img 
+                src={restaurant.logo_url} 
+                alt={restaurant.name}
+                className="w-20 h-20 rounded-lg object-cover"
+              />
+            )}
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-2">{restaurant?.name}</h1>
+              <div className="flex gap-2 items-center flex-wrap">
+                <Badge>{restaurant?.cuisine_type}</Badge>
+                <Badge variant={restaurant?.is_open ? "default" : "secondary"}>
+                  {restaurant?.is_open ? "Open" : "Closed"}
+                </Badge>
               </div>
+              {restaurant?.description && (
+                <p className="text-muted-foreground mt-3">{restaurant.description}</p>
+              )}
             </div>
-            <Button onClick={() => setShowOrderDialog(true)} className="relative">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Cart ({order.length})
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="relative"
+              onClick={() => setShowOrderDialog(true)}
+            >
+              <ShoppingCart className="h-4 w-4" />
               {order.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                  {order.reduce((sum, item) => sum + item.quantity, 0)}
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {order.length}
                 </span>
               )}
             </Button>
           </div>
-          {restaurant.description && (
-            <p className="mt-4 text-muted-foreground max-w-2xl">{restaurant.description}</p>
-          )}
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        {Object.keys(groupedItems).length === 0 ? (
-          <Card className="p-12 text-center">
-            <CardDescription className="text-lg">
-              Menu coming soon! Check back later.
-            </CardDescription>
-          </Card>
-        ) : (
-          <div className="space-y-12">
-            {Object.entries(groupedItems).map(([category, items]) => (
-              <div key={category}>
-                <h2 className="text-3xl font-bold mb-6 capitalize">{category}</h2>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {items.map((item) => (
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      onAddToOrder={handleAddToOrder}
-                    />
-                  ))}
-                </div>
+      {/* Content Tabs */}
+      <div className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="menu" className="w-full">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsTrigger value="menu">Menu</TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-2">
+              <Star className="h-4 w-4" />
+              Reviews
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="menu" className="mt-6">
+            {Object.entries(groupedItems).length === 0 ? (
+              <p className="text-center text-muted-foreground">No menu items available yet.</p>
+            ) : (
+              <div className="space-y-8">
+                {Object.entries(groupedItems).map(([category, items]) => (
+                  <div key={category}>
+                    <h2 className="text-2xl font-bold mb-4 capitalize">{category}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {items.map((item) => (
+                        <MenuItemCard
+                          key={item.id}
+                          item={item}
+                          onAddToOrder={handleAddToOrder}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-      </main>
+            )}
+          </TabsContent>
+
+          <TabsContent value="reviews" className="mt-6">
+            {restaurantId && <ReviewsSection restaurantId={restaurantId} />}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <OrderDialog
         open={showOrderDialog}

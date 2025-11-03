@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          messages: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           available: boolean
@@ -69,9 +93,11 @@ export type Database = {
           customer_phone: string | null
           id: string
           items: Json
+          notes: string | null
           restaurant_id: string
           status: string
           total: number
+          updated_at: string | null
         }
         Insert: {
           created_at?: string
@@ -80,9 +106,11 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           items: Json
+          notes?: string | null
           restaurant_id: string
           status?: string
           total: number
+          updated_at?: string | null
         }
         Update: {
           created_at?: string
@@ -91,9 +119,11 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           items?: Json
+          notes?: string | null
           restaurant_id?: string
           status?: string
           total?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -125,45 +155,60 @@ export type Database = {
       }
       restaurants: {
         Row: {
+          address: string | null
           brand_style: string
+          city: string | null
           created_at: string
           cuisine_type: string
           description: string | null
           hours: Json | null
           id: string
           is_open: boolean
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
+          phone: string | null
           primary_color: string
           secondary_color: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          address?: string | null
           brand_style: string
+          city?: string | null
           created_at?: string
           cuisine_type: string
           description?: string | null
           hours?: Json | null
           id?: string
           is_open?: boolean
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name: string
+          phone?: string | null
           primary_color?: string
           secondary_color?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          address?: string | null
           brand_style?: string
+          city?: string | null
           created_at?: string
           cuisine_type?: string
           description?: string | null
           hours?: Json | null
           id?: string
           is_open?: boolean
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
+          phone?: string | null
           primary_color?: string
           secondary_color?: string
           updated_at?: string
@@ -175,6 +220,44 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          restaurant_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          restaurant_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          restaurant_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
             referencedColumns: ["id"]
           },
         ]

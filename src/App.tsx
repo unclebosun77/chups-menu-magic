@@ -8,6 +8,9 @@ import Auth from "./pages/Auth";
 import RestaurantOnboarding from "./pages/RestaurantOnboarding";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import RestaurantMenu from "./pages/RestaurantMenu";
+import Discover from "./pages/Discover";
+import AIAssistant from "./pages/AIAssistant";
+import MyOrders from "./pages/MyOrders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +24,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/ai-assistant" element={<AIAssistant />} />
+          <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/:restaurantId" element={<RestaurantMenu />} />
