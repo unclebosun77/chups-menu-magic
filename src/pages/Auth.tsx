@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import logoIcon from "@/assets/logo-icon.png";
 import { z } from "zod";
+import { LogIn, UserPlus, Sparkles } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string()
@@ -117,61 +118,122 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <img src={logoIcon} alt="CHUPS" className="h-16 w-16" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+      <Card className="w-full max-w-md shadow-2xl border-primary/10 backdrop-blur-sm">
+        <CardHeader className="text-center space-y-4 pb-6">
+          <div className="flex justify-center mb-2">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+              <img src={logoIcon} alt="CHUPS" className="h-20 w-20 relative z-10 drop-shadow-lg" />
+            </div>
           </div>
-          <CardTitle className="text-3xl font-bold">CHUPS</CardTitle>
-          <CardDescription>Your personalized menu experience</CardDescription>
+          <div>
+            <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              CHUPS
+            </CardTitle>
+            <CardDescription className="text-base mt-2 flex items-center justify-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Your personalized menu experience
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <Tabs defaultValue="signin" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
+                Sign Up
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="space-y-6 mt-6">
+              <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input id="signin-email" name="signin-email" type="email" required />
+                  <Label htmlFor="signin-email" className="text-sm font-medium">Email</Label>
+                  <Input 
+                    id="signin-email" 
+                    name="signin-email" 
+                    type="email" 
+                    required 
+                    className="h-11 border-primary/20 focus:border-primary"
+                    placeholder="your@email.com"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input id="signin-password" name="signin-password" type="password" required />
+                  <Label htmlFor="signin-password" className="text-sm font-medium">Password</Label>
+                  <Input 
+                    id="signin-password" 
+                    name="signin-password" 
+                    type="password" 
+                    required 
+                    className="h-11 border-primary/20 focus:border-primary"
+                    placeholder="••••••••"
+                  />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing in..." : (
+                    <>
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Sign In
+                    </>
+                  )}
                 </Button>
               </form>
             </TabsContent>
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>I am a</Label>
-                  <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "restaurant")}>
-                    <div className="flex items-center space-x-2">
+            <TabsContent value="signup" className="space-y-6 mt-6">
+              <form onSubmit={handleSignUp} className="space-y-5">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">I am a</Label>
+                  <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "restaurant")} className="gap-3">
+                    <div className="flex items-center space-x-3 rounded-lg border border-primary/20 p-3 cursor-pointer hover:bg-accent transition-colors">
                       <RadioGroupItem value="customer" id="customer" />
-                      <Label htmlFor="customer" className="font-normal">Customer</Label>
+                      <Label htmlFor="customer" className="font-normal cursor-pointer flex-1">Customer</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-3 rounded-lg border border-primary/20 p-3 cursor-pointer hover:bg-accent transition-colors">
                       <RadioGroupItem value="restaurant" id="restaurant" />
-                      <Label htmlFor="restaurant" className="font-normal">Restaurant Owner</Label>
+                      <Label htmlFor="restaurant" className="font-normal cursor-pointer flex-1">Restaurant Owner</Label>
                     </div>
                   </RadioGroup>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" name="signup-email" type="email" required />
+                  <Label htmlFor="signup-email" className="text-sm font-medium">Email</Label>
+                  <Input 
+                    id="signup-email" 
+                    name="signup-email" 
+                    type="email" 
+                    required 
+                    className="h-11 border-primary/20 focus:border-primary"
+                    placeholder="your@email.com"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input id="signup-password" name="signup-password" type="password" required minLength={6} />
+                  <Label htmlFor="signup-password" className="text-sm font-medium">Password</Label>
+                  <Input 
+                    id="signup-password" 
+                    name="signup-password" 
+                    type="password" 
+                    required 
+                    minLength={6} 
+                    className="h-11 border-primary/20 focus:border-primary"
+                    placeholder="••••••••"
+                  />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Sign Up"}
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating account..." : (
+                    <>
+                      <UserPlus className="mr-2 h-5 w-5" />
+                      Sign Up
+                    </>
+                  )}
                 </Button>
               </form>
             </TabsContent>
