@@ -61,6 +61,18 @@ const Index = () => {
         style={{ backgroundImage: `url(${globeWatermark})` }}
       />
       
+      {/* Sign In Icon - Top Right */}
+      {!user && (
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => navigate("/auth")}
+          className="fixed top-4 right-4 z-50 h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background hover:scale-110 transition-all duration-200"
+        >
+          <LogIn className="h-5 w-5" />
+        </Button>
+      )}
+      
       {/* Hero Section */}
       <section className="relative h-[80vh] overflow-hidden z-10">
         <div
@@ -86,14 +98,10 @@ const Index = () => {
               <Sparkles className="h-5 w-5" />
               AI Assistant
             </Button>
-            {user ? (
+            {user && (
               <Button size="lg" variant="outline" onClick={() => navigate("/my-orders")} className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 <ShoppingBag className="h-5 w-5" />
                 My Orders
-              </Button>
-            ) : (
-              <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-                Sign In
               </Button>
             )}
           </div>
