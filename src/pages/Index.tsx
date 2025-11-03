@@ -203,21 +203,6 @@ const Index = () => {
         )}
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-social relative z-10">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Join Our Global Community</h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Connect with people around the world through the universal language of food. 
-            CHUPS brings together restaurant owners and food lovers in one vibrant social community.
-          </p>
-          {!user && (
-            <Button size="lg" variant="secondary" onClick={() => navigate("/auth")} className="text-lg">
-              Become Part of CHUPS
-            </Button>
-          )}
-        </div>
-      </section>
     </div>
   );
 };
