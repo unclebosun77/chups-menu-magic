@@ -4,8 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, ChefHat, MapPin, Sparkles, Search, ShoppingBag } from "lucide-react";
-import heroImage from "@/assets/hero-restaurant.jpg";
-import globeWatermark from "@/assets/globe-watermark.png";
 
 type Restaurant = {
   id: string;
@@ -53,99 +51,76 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 relative">
-      {/* Globe Watermark */}
-      <div 
-        className="fixed inset-0 opacity-5 pointer-events-none z-0 bg-contain bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${globeWatermark})` }}
-      />
-      
-      {/* Sign In Icon - Top Right */}
-      {!user && (
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => navigate("/auth")}
-          className="fixed top-4 right-4 z-50 h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background hover:scale-110 transition-all duration-200"
-        >
-          <User className="h-5 w-5" />
-        </Button>
-      )}
-      
-      {/* Hero Section */}
-      <section className="relative h-[80vh] overflow-hidden z-10">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80" />
-        </div>
-        <div className="relative h-full container mx-auto px-4 flex flex-col items-center justify-center text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
-            Welcome to CHUPS
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl animate-fade-in">
-            Next-gen restaurant platform with AI-powered discovery, personalized menus & seamless ordering
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center animate-fade-in">
-            <Button size="lg" onClick={() => navigate("/discover")} className="gap-2">
-              <Search className="h-5 w-5" />
-              Discover Restaurants
+    <div className="min-h-screen bg-background">
+      {/* App Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">CHUPS</h1>
+          </div>
+          
+          <nav className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/discover")} className="gap-2">
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">Discover</span>
             </Button>
-            <Button size="lg" variant="secondary" onClick={() => navigate("/ai-assistant")} className="gap-2">
-              <Sparkles className="h-5 w-5" />
-              AI Assistant
+            <Button variant="ghost" size="sm" onClick={() => navigate("/ai-assistant")} className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Assistant</span>
             </Button>
-            {user && (
-              <Button size="lg" variant="outline" onClick={() => navigate("/my-orders")} className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
-                <ShoppingBag className="h-5 w-5" />
-                My Orders
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")} className="gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                <span className="hidden sm:inline">Orders</span>
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" onClick={() => navigate("/auth")}>
+                <User className="h-4 w-4" />
               </Button>
             )}
-          </div>
+          </nav>
         </div>
-      </section>
+      </header>
 
-      {/* Features Section */}
-      <section className="py-16 container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
-          <Card className="text-center hover:shadow-hover transition-shadow">
-            <CardHeader>
-              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Sparkles className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>AI-Powered Planning</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Let our AI assistant help you plan perfect outings, suggest restaurants, and estimate budgets
-              </p>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/discover")}>
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
+              <Search className="h-6 w-6 text-primary" />
+              <span className="font-medium text-sm">Discover</span>
             </CardContent>
           </Card>
-
-          <Card className="text-center hover:shadow-hover transition-shadow">
-            <CardHeader>
-              <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <MapPin className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Smart Discovery</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Find restaurants by cuisine, location, ratings, and opening hours with advanced filters
-              </p>
+          
+          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/ai-assistant")}>
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
+              <Sparkles className="h-6 w-6 text-primary" />
+              <span className="font-medium text-sm">AI Assistant</span>
+            </CardContent>
+          </Card>
+          
+          {user && (
+            <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/my-orders")}>
+              <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
+                <ShoppingBag className="h-6 w-6 text-primary" />
+                <span className="font-medium text-sm">My Orders</span>
+              </CardContent>
+            </Card>
+          )}
+          
+          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/discover")}>
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
+              <MapPin className="h-6 w-6 text-primary" />
+              <span className="font-medium text-sm">Near Me</span>
             </CardContent>
           </Card>
         </div>
-      </section>
 
-      {/* Featured Restaurants */}
-      <section className="py-16 container mx-auto px-4 relative z-10">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-4xl font-bold mb-2">Featured Restaurants</h2>
-            <p className="text-muted-foreground text-lg">Discover amazing dining experiences</p>
-          </div>
+        {/* Restaurants Section */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-1">Restaurants</h2>
+          <p className="text-muted-foreground">Browse available restaurants</p>
         </div>
 
         {restaurants.length === 0 ? (
@@ -201,8 +176,7 @@ const Index = () => {
             ))}
           </div>
         )}
-      </section>
-
+      </main>
     </div>
   );
 };
