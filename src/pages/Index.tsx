@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChefHat, MapPin, Sparkles, TrendingUp } from "lucide-react";
+import { ChefHat, MapPin, TrendingUp } from "lucide-react";
 
 type Restaurant = {
   id: string;
@@ -52,18 +51,10 @@ const Index = () => {
 
   return (
     <div className="space-y-6 p-4">
-      {/* Header with Ask CHUPS */}
-      <div className="pt-4 space-y-4">
+      {/* Header */}
+      <div className="pt-4">
         <h1 className="text-3xl font-bold">Discover</h1>
-        
-        <Button 
-          onClick={() => navigate("/ai-assistant")} 
-          className="w-full h-14 text-base gap-2"
-          variant="purple"
-        >
-          <Sparkles className="h-5 w-5" />
-          Ask CHUPS AI
-        </Button>
+        <p className="text-muted-foreground mt-1">Find your next favorite spot</p>
       </div>
 
       {/* Personalized Recommendations */}
