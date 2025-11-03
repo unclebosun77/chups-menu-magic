@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, ChefHat, MapPin, Sparkles, Search, ShoppingBag } from "lucide-react";
+import { ChefHat, MapPin, Sparkles, TrendingUp } from "lucide-react";
 
 type Restaurant = {
   id: string;
@@ -51,132 +51,127 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* App Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">CHUPS</h1>
+    <div className="space-y-6 p-4">
+      {/* Header with Ask CHUPS */}
+      <div className="pt-4 space-y-4">
+        <h1 className="text-3xl font-bold">Discover</h1>
+        
+        <Button 
+          onClick={() => navigate("/ai-assistant")} 
+          className="w-full h-14 text-base gap-2"
+          variant="purple"
+        >
+          <Sparkles className="h-5 w-5" />
+          Ask CHUPS AI
+        </Button>
+      </div>
+
+      {/* Personalized Recommendations */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-bold">For You</h2>
+        </div>
+        
+        {restaurants.length === 0 ? (
+          <Card className="p-8 text-center">
+            <CardDescription>
+              No restaurants available yet
+            </CardDescription>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {restaurants.slice(0, 3).map((restaurant) => (
+              <Card
+                key={restaurant.id}
+                className="overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+              >
+                <div className="flex gap-4 p-4">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-warm overflow-hidden flex-shrink-0">
+                    {restaurant.logo_url ? (
+                      <img
+                        src={restaurant.logo_url}
+                        alt={restaurant.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ChefHat className="h-10 w-10 text-white/80" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-lg mb-1 truncate">{restaurant.name}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{restaurant.cuisine_type}</span>
+                    </div>
+                    {!restaurant.is_open && (
+                      <span className="text-xs text-destructive font-medium">Closed</span>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
-          
-          <nav className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/discover")} className="gap-2">
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Discover</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/ai-assistant")} className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Ask CHUPS</span>
-            </Button>
-            {user ? (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/my-orders")} className="gap-2">
-                <ShoppingBag className="h-4 w-4" />
-                <span className="hidden sm:inline">Orders</span>
-              </Button>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={() => navigate("/auth")}>
-                <User className="h-4 w-4" />
-              </Button>
-            )}
-          </nav>
-        </div>
-      </header>
+        )}
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/discover")}>
-            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
-              <Search className="h-6 w-6 text-primary" />
-              <span className="font-medium text-sm">Discover</span>
-            </CardContent>
-          </Card>
-          
-          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/ai-assistant")}>
-            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-medium text-sm">Ask CHUPS</span>
-            </CardContent>
-          </Card>
-          
-          {user && (
-            <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/my-orders")}>
-              <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
-                <ShoppingBag className="h-6 w-6 text-primary" />
-                <span className="font-medium text-sm">My Orders</span>
-              </CardContent>
-            </Card>
-          )}
-          
-          <Card className="cursor-pointer hover:shadow-hover transition-all" onClick={() => navigate("/discover")}>
-            <CardContent className="flex flex-col items-center justify-center p-6 gap-2">
-              <MapPin className="h-6 w-6 text-primary" />
-              <span className="font-medium text-sm">Near Me</span>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Restaurants Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-1">Restaurants</h2>
-          <p className="text-muted-foreground">Browse available restaurants</p>
-        </div>
-
+      {/* All Restaurants */}
+      <div>
+        <h2 className="text-xl font-bold mb-4">All Restaurants</h2>
+        
         {restaurants.length === 0 ? (
           <Card className="p-12 text-center">
             <CardDescription className="text-lg">
-              No restaurants yet. Be the first to join CHUPS!
+              No restaurants yet
             </CardDescription>
-            {!user && (
-              <Button onClick={() => navigate("/auth")} className="mt-4">
-                Sign Up as Restaurant
-              </Button>
-            )}
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4">
             {restaurants.map((restaurant) => (
               <Card
                 key={restaurant.id}
-                className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group"
+                className="overflow-hidden hover:shadow-lg transition-all cursor-pointer"
                 onClick={() => navigate(`/restaurant/${restaurant.id}`)}
               >
-                <div className="h-48 bg-gradient-warm relative overflow-hidden">
+                <div className="h-40 bg-gradient-warm relative overflow-hidden">
                   {restaurant.logo_url ? (
                     <img
                       src={restaurant.logo_url}
                       alt={restaurant.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <ChefHat className="h-20 w-20 text-white/80" />
+                      <ChefHat className="h-16 w-16 text-white/80" />
                     </div>
                   )}
                   {!restaurant.is_open && (
-                    <div className="absolute top-4 right-4 bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-sm font-medium">
+                    <div className="absolute top-4 right-4 bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-xs font-medium">
                       Closed
                     </div>
                   )}
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-2xl">{restaurant.name}</CardTitle>
-                  <CardDescription className="flex items-center gap-2 text-base">
+                  <CardTitle className="text-xl">{restaurant.name}</CardTitle>
+                  <CardDescription className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
                     {restaurant.cuisine_type}
                   </CardDescription>
                 </CardHeader>
                 {restaurant.description && (
                   <CardContent>
-                    <p className="text-muted-foreground line-clamp-2">{restaurant.description}</p>
+                    <p className="text-muted-foreground text-sm line-clamp-2">{restaurant.description}</p>
                   </CardContent>
                 )}
               </Card>
             ))}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
