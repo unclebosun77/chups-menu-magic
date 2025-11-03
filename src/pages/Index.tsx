@@ -74,27 +74,11 @@ const Index = () => {
       </div>
 
       <div className="space-y-6 p-4 pb-24 relative">
-        {/* Hero Header */}
-        <div className="pt-4 pb-6">
-          <div className="bg-gradient-hero p-8 rounded-3xl shadow-hover text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
-            
-            <div className="relative z-10">
-              <h1 className="text-3xl font-bold mb-3 animate-fade-in leading-tight">
-                Hungry? Let's find your next spot.
-              </h1>
-              <p className="text-white/90 text-sm">Discover amazing food near you</p>
-            </div>
-          </div>
-        </div>
-
         {/* Map Preview */}
-        <div className="relative">
-          <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-soft">
-            <h2 className="text-lg font-bold flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-purple" />
-              Discover 📍
+        <div className="relative pt-4">
+          <div className="absolute top-8 left-4 z-10 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-soft">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              📍 Discover
             </h2>
           </div>
           <RestaurantMap restaurants={restaurants} />
@@ -102,18 +86,12 @@ const Index = () => {
 
         {/* Next Visit Carousel */}
         <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <span className="text-coral">❤️</span>
             Next Visit
           </h2>
           
-          {restaurants.length === 0 ? (
-            <Card className="p-12 text-center bg-gradient-to-br from-purple/5 to-coral/5 border-2 border-dashed rounded-2xl">
-              <UtensilsCrossed className="h-16 w-16 text-muted-foreground mx-auto mb-4 animate-pulse" />
-              <p className="text-lg font-medium mb-2">Nothing cooking yet 🍜</p>
-              <p className="text-sm text-muted-foreground">Check back soon for delicious recommendations!</p>
-            </Card>
-          ) : (
+          {restaurants.length > 0 && (
             <Carousel
               opts={{
                 align: "start",
@@ -185,18 +163,11 @@ const Index = () => {
 
         {/* Explore Dishes */}
         <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             🍲 Explore Dishes
           </h2>
           
-          {restaurants.length === 0 ? (
-            <Card className="p-12 text-center bg-gradient-to-br from-coral/5 to-purple/5 border-2 border-dashed rounded-2xl">
-              <ChefHat className="h-16 w-16 text-muted-foreground mx-auto mb-4 animate-bounce" 
-                       style={{ animationDuration: '2s' }} />
-              <p className="text-lg font-medium mb-2">No restaurants on the menu yet 👨‍🍳</p>
-              <p className="text-sm text-muted-foreground">Be the first chef to join CHUPS!</p>
-            </Card>
-          ) : (
+          {restaurants.length > 0 && (
             <div className="grid gap-4">
               {restaurants.map((restaurant) => (
                 <Card
