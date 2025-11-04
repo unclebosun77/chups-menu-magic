@@ -78,7 +78,7 @@ const Index = () => {
       <div className="space-y-3 p-3 pb-20 relative">
         {/* Compact Hero Header */}
         <div className="pt-2">
-          <div className="bg-gradient-to-br from-primary via-accent to-secondary p-4 rounded-2xl shadow-hover text-white relative overflow-hidden">
+          <div className="bg-gradient-to-br from-purple via-purple/90 to-purple/80 p-4 rounded-2xl shadow-hover text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl" />
             
             <div className="relative z-10">
