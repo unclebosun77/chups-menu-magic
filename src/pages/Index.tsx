@@ -86,15 +86,6 @@ const Index = () => {
                 {/* Coming soon */}
               </h1>
               <p className="text-white/90 text-sm mb-2">&nbsp;</p>
-              
-              <Button
-                onClick={() => navigate("/ai-assistant")}
-                size="sm"
-                className="bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl transition-all gap-2"
-              >
-                <Sparkles className="h-4 w-4" />
-                Ask CHUPS AI 🍽️
-              </Button>
             </div>
           </div>
         </div>
