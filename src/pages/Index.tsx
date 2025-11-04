@@ -83,9 +83,9 @@ const Index = () => {
             
             <div className="relative z-10">
               <h1 className="text-xl font-bold mb-1 animate-fade-in">
-                A community redefining the dining scene
+                {/* Coming soon */}
               </h1>
-              <p className="text-white/90 text-sm mb-2">Beyond food - discover experiences that connect us</p>
+              <p className="text-white/90 text-sm mb-2">&nbsp;</p>
               
               <Button
                 onClick={() => navigate("/ai-assistant")}
