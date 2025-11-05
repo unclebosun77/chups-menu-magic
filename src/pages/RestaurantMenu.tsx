@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Star } from "lucide-react";
-import MenuItemCard from "@/components/MenuItemCard";
 import OrderDialog from "@/components/OrderDialog";
+import MenuItemDialog from "@/components/MenuItemDialog";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
 import RestaurantInfo from "@/components/RestaurantInfo";
@@ -46,6 +48,8 @@ const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [showItemDialog, setShowItemDialog] = useState(false);
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -127,6 +131,11 @@ const RestaurantMenu = () => {
     toast({ title: `Added ${item.name} to order` });
   };
 
+  const handleItemClick = (item: MenuItem) => {
+    setSelectedItem(item);
+    setShowItemDialog(true);
+  };
+
   const handleRemoveFromOrder = (itemId: string) => {
     setOrder((prev) => prev.filter((i) => i.id !== itemId));
   };
@@ -161,7 +170,8 @@ const RestaurantMenu = () => {
         onCartClick={() => setShowOrderDialog(true)}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      {/* Add padding for fixed header */}
+      <div className="container mx-auto px-4 pt-20 pb-8">
         {/* Restaurant Info Cards */}
         <div className="mb-8">
           <RestaurantInfo
@@ -208,18 +218,37 @@ const RestaurantMenu = () => {
                       </h2>
                       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {items.map((item, itemIdx) => (
-                        <div
+                        <Card
                           key={item.id}
-                          className="animate-fade-in-up"
+                          className="cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in-up"
                           style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
+                          onClick={() => handleItemClick(item)}
                         >
-                          <MenuItemCard
-                            item={item}
-                            onAddToOrder={handleAddToOrder}
-                          />
-                        </div>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-lg mb-1 truncate">
+                                  {item.name}
+                                </h4>
+                                {item.description && (
+                                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                    {item.description}
+                                  </p>
+                                )}
+                                <p className="text-xl font-bold text-primary">
+                                  ${item.price.toFixed(2)}
+                                </p>
+                              </div>
+                              {!item.available && (
+                                <Badge variant="secondary" className="shrink-0">
+                                  Unavailable
+                                </Badge>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
                       ))}
                     </div>
                   </div>
@@ -247,6 +276,13 @@ const RestaurantMenu = () => {
           setOrder([]);
           setShowOrderDialog(false);
         }}
+      />
+
+      <MenuItemDialog
+        item={selectedItem}
+        open={showItemDialog}
+        onOpenChange={setShowItemDialog}
+        onAddToOrder={handleAddToOrder}
       />
     </div>
   );
