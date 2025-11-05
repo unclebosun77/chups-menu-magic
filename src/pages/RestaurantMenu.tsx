@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Star } from "lucide-react";
 import OrderDialog from "@/components/OrderDialog";
 import MenuItemDialog from "@/components/MenuItemDialog";
@@ -50,6 +51,10 @@ const RestaurantMenu = () => {
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
+  
+  const infoAnimation = useScrollAnimation();
+  const galleryAnimation = useScrollAnimation();
+  const menuAnimation = useScrollAnimation();
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -173,7 +178,14 @@ const RestaurantMenu = () => {
       {/* Add padding for fixed header */}
       <div className="container mx-auto px-4 pt-20 pb-8">
         {/* Restaurant Info Cards */}
-        <div className="mb-8">
+        <div 
+          ref={infoAnimation.ref}
+          className={`mb-8 transition-all duration-700 ${
+            infoAnimation.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-10'
+          }`}
+        >
           <RestaurantInfo
             address={restaurant.address}
             city={restaurant.city}
@@ -184,10 +196,27 @@ const RestaurantMenu = () => {
         </div>
 
         {/* Gallery Section */}
-        <RestaurantGallery />
+        <div
+          ref={galleryAnimation.ref}
+          className={`transition-all duration-700 delay-150 ${
+            galleryAnimation.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <RestaurantGallery />
+        </div>
 
         {/* Menu & Reviews Tabs */}
-        <Tabs defaultValue="menu" className="w-full">
+        <div
+          ref={menuAnimation.ref}
+          className={`transition-all duration-700 delay-300 ${
+            menuAnimation.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <Tabs defaultValue="menu" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
             <TabsTrigger value="menu" className="text-base">Menu</TabsTrigger>
             <TabsTrigger value="reviews" className="gap-2 text-base">
@@ -260,7 +289,8 @@ const RestaurantMenu = () => {
           <TabsContent value="reviews" className="mt-6">
             {restaurantId && <ReviewsSection restaurantId={restaurantId} />}
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
 
       <OrderDialog
