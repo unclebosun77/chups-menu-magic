@@ -3,7 +3,7 @@ import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  icon: LucideIcon | string;
   title: string;
   description: string;
   className?: string;
@@ -11,12 +11,13 @@ interface EmptyStateProps {
 }
 
 const EmptyState = ({ 
-  icon: Icon, 
+  icon, 
   title, 
   description,
   className,
   compact = false
 }: EmptyStateProps) => {
+  const isStringIcon = typeof icon === 'string';
   return (
     <Card className={cn(
       "text-center bg-[#FAFAFA] rounded-2xl border border-border shadow-soft overflow-hidden relative animate-fade-in-up animate-shimmer-border",
@@ -29,7 +30,14 @@ const EmptyState = ({
           "mx-auto rounded-full bg-purple/5 flex items-center justify-center animate-bounce-gentle",
           compact ? "w-12 h-12 mb-3" : "w-16 h-16 mb-4"
         )}>
-          <Icon className={cn("text-purple", compact ? "h-6 w-6" : "h-8 w-8")} />
+          {isStringIcon ? (
+            <span className={cn("text-3xl", compact && "text-2xl")}>{icon}</span>
+          ) : (
+            (() => {
+              const Icon = icon as LucideIcon;
+              return <Icon className={cn("text-purple", compact ? "h-6 w-6" : "h-8 w-8")} />;
+            })()
+          )}
         </div>
         <p className={cn(
           "font-bold text-foreground animate-fade-in-text",

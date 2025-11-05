@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, ArrowLeft, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import MenuItemCard from "@/components/MenuItemCard";
 import OrderDialog from "@/components/OrderDialog";
 import ReviewsSection from "@/components/ReviewsSection";
+import RestaurantHeader from "@/components/RestaurantHeader";
+import RestaurantInfo from "@/components/RestaurantInfo";
+import EmptyState from "@/components/EmptyState";
 
 type Restaurant = {
   id: string;
@@ -20,6 +20,10 @@ type Restaurant = {
   primary_color: string;
   secondary_color: string;
   is_open: boolean;
+  address: string | null;
+  city: string | null;
+  phone: string | null;
+  hours: Record<string, string> | null;
 };
 
 type MenuItem = {
@@ -36,7 +40,6 @@ type OrderItem = MenuItem & { quantity: number };
 
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -58,7 +61,7 @@ const RestaurantMenu = () => {
         return;
       }
 
-      setRestaurant(restaurantData);
+      setRestaurant(restaurantData as Restaurant);
 
       // Apply theme colors
       document.documentElement.style.setProperty("--primary", hexToHSL(restaurantData.primary_color));
@@ -147,55 +150,33 @@ const RestaurantMenu = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Restaurant Header */}
-      <div className="border-b bg-card sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/discover")}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            {restaurant?.logo_url && (
-              <img 
-                src={restaurant.logo_url} 
-                alt={restaurant.name}
-                className="w-20 h-20 rounded-lg object-cover"
-              />
-            )}
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{restaurant?.name}</h1>
-              <div className="flex gap-2 items-center flex-wrap">
-                <Badge>{restaurant?.cuisine_type}</Badge>
-                <Badge variant={restaurant?.is_open ? "default" : "secondary"}>
-                  {restaurant?.is_open ? "Open" : "Closed"}
-                </Badge>
-              </div>
-              {restaurant?.description && (
-                <p className="text-muted-foreground mt-3">{restaurant.description}</p>
-              )}
-            </div>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="relative"
-              onClick={() => setShowOrderDialog(true)}
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {order.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {order.length}
-                </span>
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <RestaurantHeader
+        logoUrl={restaurant.logo_url}
+        name={restaurant.name}
+        cuisineType={restaurant.cuisine_type}
+        description={restaurant.description}
+        isOpen={restaurant.is_open}
+        orderCount={order.length}
+        onCartClick={() => setShowOrderDialog(true)}
+      />
 
-      {/* Content Tabs */}
       <div className="container mx-auto px-4 py-8">
+        {/* Restaurant Info Cards */}
+        <div className="mb-8">
+          <RestaurantInfo
+            address={restaurant.address}
+            city={restaurant.city}
+            phone={restaurant.phone}
+            hours={restaurant.hours}
+            isOpen={restaurant.is_open}
+          />
+        </div>
+
+        {/* Menu & Reviews Tabs */}
         <Tabs defaultValue="menu" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="menu">Menu</TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-2">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+            <TabsTrigger value="menu" className="text-base">Menu</TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-2 text-base">
               <Star className="h-4 w-4" />
               Reviews
             </TabsTrigger>
@@ -203,19 +184,38 @@ const RestaurantMenu = () => {
 
           <TabsContent value="menu" className="mt-6">
             {Object.entries(groupedItems).length === 0 ? (
-              <p className="text-center text-muted-foreground">No menu items available yet.</p>
+              <EmptyState
+                icon="🍽️"
+                title="No menu items available yet"
+                description="The menu is being updated by our chefs. Check back soon!"
+              />
             ) : (
-              <div className="space-y-8">
-                {Object.entries(groupedItems).map(([category, items]) => (
-                  <div key={category}>
-                    <h2 className="text-2xl font-bold mb-4 capitalize">{category}</h2>
+              <div className="space-y-12">
+                {Object.entries(groupedItems).map(([category, items], idx) => (
+                  <div 
+                    key={category}
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${idx * 0.1}s` }}
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                      <h2 className="text-3xl font-bold capitalize bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text">
+                        {category}
+                      </h2>
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {items.map((item) => (
-                        <MenuItemCard
+                      {items.map((item, itemIdx) => (
+                        <div
                           key={item.id}
-                          item={item}
-                          onAddToOrder={handleAddToOrder}
-                        />
+                          className="animate-fade-in-up"
+                          style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
+                        >
+                          <MenuItemCard
+                            item={item}
+                            onAddToOrder={handleAddToOrder}
+                          />
+                        </div>
                       ))}
                     </div>
                   </div>
