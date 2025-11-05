@@ -9,7 +9,7 @@ interface SkeletonCardProps {
 const SkeletonCard = ({ type = "vertical", className }: SkeletonCardProps) => {
   if (type === "horizontal") {
     return (
-      <Card className={cn("overflow-hidden bg-white", className)}>
+      <Card className={cn("overflow-hidden bg-white animate-fade-in-up", className)}>
         <div className="flex gap-3 p-2.5">
           <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-muted to-muted/50 animate-shimmer flex-shrink-0" />
           <div className="flex-1 space-y-2 py-1">
@@ -23,7 +23,7 @@ const SkeletonCard = ({ type = "vertical", className }: SkeletonCardProps) => {
 
   if (type === "grid") {
     return (
-      <Card className={cn("overflow-hidden bg-white", className)}>
+      <Card className={cn("overflow-hidden bg-white animate-fade-in-up", className)}>
         <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50 animate-shimmer" />
         <CardContent className="p-3 space-y-2">
           <div className="h-4 bg-muted rounded-md animate-shimmer w-full" />
@@ -34,7 +34,7 @@ const SkeletonCard = ({ type = "vertical", className }: SkeletonCardProps) => {
   }
 
   return (
-    <Card className={cn("overflow-hidden bg-white", className)}>
+    <Card className={cn("overflow-hidden bg-white animate-fade-in-up", className)}>
       <div className="relative h-40 bg-gradient-to-br from-muted to-muted/50 animate-shimmer" />
       <CardContent className="p-4 space-y-3">
         <div className="h-4 bg-muted rounded-md animate-shimmer w-3/4" />

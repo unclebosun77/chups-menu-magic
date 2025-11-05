@@ -127,6 +127,26 @@ All colors MUST be HSL.
     animation: shimmer 2s linear infinite;
   }
   
+  .animate-shimmer-border {
+    animation: shimmer-border 3s ease-in-out infinite;
+  }
+  
+  .animate-bounce-gentle {
+    animation: bounce-gentle 2s ease-in-out infinite 1s;
+  }
+  
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-in-out;
+  }
+  
+  .animate-fade-in-text {
+    animation: fade-in-text 0.4s ease-in-out;
+  }
+  
+  .animate-fade-in-subtext {
+    animation: fade-in-text 0.6s ease-in-out;
+  }
+  
   @keyframes pulse-glow {
     0%, 100% {
       opacity: 1;
@@ -144,6 +164,46 @@ All colors MUST be HSL.
     }
     100% {
       background-position: 1000px 0;
+    }
+  }
+  
+  @keyframes shimmer-border {
+    0%, 100% {
+      border-color: hsl(0 0% 91%);
+      box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.08);
+    }
+    50% {
+      border-color: hsl(270 78% 61% / 0.15);
+      box-shadow: 0 2px 12px -2px hsl(270 78% 61% / 0.1);
+    }
+  }
+  
+  @keyframes bounce-gentle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+  
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fade-in-text {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
     }
   }
   
