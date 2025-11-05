@@ -13,6 +13,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
 import RestaurantInfo from "@/components/RestaurantInfo";
 import RestaurantGallery from "@/components/RestaurantGallery";
+import SectionNavigation from "@/components/SectionNavigation";
 import EmptyState from "@/components/EmptyState";
 
 type Restaurant = {
@@ -141,6 +142,20 @@ const RestaurantMenu = () => {
     setShowItemDialog(true);
   };
 
+  const handleNavigate = (section: "info" | "gallery" | "menu" | "reviews") => {
+    const element = document.getElementById(section);
+    if (element) {
+      const headerOffset = 120;
+      const elementPosition = element.offsetTop;
+      const offsetPosition = elementPosition - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
   const handleRemoveFromOrder = (itemId: string) => {
     setOrder((prev) => prev.filter((i) => i.id !== itemId));
   };
@@ -175,10 +190,13 @@ const RestaurantMenu = () => {
         onCartClick={() => setShowOrderDialog(true)}
       />
 
-      {/* Add padding for fixed header */}
-      <div className="container mx-auto px-4 pt-20 pb-8">
+      <SectionNavigation onNavigate={handleNavigate} />
+
+      {/* Add padding for fixed header + navigation */}
+      <div className="container mx-auto px-4 pt-8 pb-8">
         {/* Restaurant Info Cards */}
         <div 
+          id="info"
           ref={infoAnimation.ref}
           className={`mb-8 transition-all duration-700 ${
             infoAnimation.isVisible 
@@ -197,6 +215,7 @@ const RestaurantMenu = () => {
 
         {/* Gallery Section */}
         <div
+          id="gallery"
           ref={galleryAnimation.ref}
           className={`transition-all duration-700 delay-150 ${
             galleryAnimation.isVisible 
@@ -209,6 +228,7 @@ const RestaurantMenu = () => {
 
         {/* Menu & Reviews Tabs */}
         <div
+          id="menu"
           ref={menuAnimation.ref}
           className={`transition-all duration-700 delay-300 ${
             menuAnimation.isVisible 
@@ -217,9 +237,13 @@ const RestaurantMenu = () => {
           }`}
         >
           <Tabs defaultValue="menu" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="menu" className="text-base">Menu</TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-2 text-base">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+              <TabsTrigger value="menu" className="text-base">Menu</TabsTrigger>
+              <TabsTrigger 
+                value="reviews" 
+                id="reviews"
+                className="gap-2 text-base"
+              >
               <Star className="h-4 w-4" />
               Reviews
             </TabsTrigger>
