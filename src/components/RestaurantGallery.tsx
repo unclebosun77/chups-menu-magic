@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Camera } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 
 // Gallery images
@@ -98,19 +97,6 @@ const galleryImages: GalleryImage[] = [
 const RestaurantGallery = () => {
   return (
     <div className="py-12 animate-fade-in-up">
-      <div className="flex items-center justify-center gap-3 mb-8">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent max-w-xs" />
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-full bg-primary/10 animate-bounce-gentle">
-            <Camera className="h-5 w-5 text-primary" />
-          </div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text">
-            Gallery
-          </h2>
-        </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent max-w-xs" />
-      </div>
-
       <Carousel
         opts={{
           align: "start",
