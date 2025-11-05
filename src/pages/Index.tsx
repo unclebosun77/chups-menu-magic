@@ -74,7 +74,7 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen bg-gradient-app">
-      <div className="space-y-4 p-4 pb-20 relative">
+      <div className="space-y-5 p-4 pb-20 relative">{/* Increased spacing from space-y-4 to space-y-5 */}
         {/* Hero Section */}
         <div className="pt-2">
           <div className="bg-gradient-hero p-6 rounded-3xl shadow-hover text-white relative overflow-hidden">
@@ -120,15 +120,14 @@ const Index = () => {
               icon={MapPin}
               title="We're mapping your flavor zone 🗺️"
               description="Hang tight while we discover amazing restaurants near you!"
-              actionLabel="Ask CHUPS AI 🍴"
-              onAction={() => setAiModalOpen(true)}
+              compact
             />
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {restaurants.map((restaurant) => (
                 <Card
                   key={restaurant.id}
-                  className="flex-shrink-0 w-64 overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border"
+                  className="flex-shrink-0 w-64 overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft"
                   onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                 >
                   <div className="relative h-40 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
@@ -186,9 +185,8 @@ const Index = () => {
             <EmptyState
               icon={Sparkles}
               title="No bites matched your cravings yet 😋"
-              description="Check back soon or ask CHUPS AI for personalized recommendations!"
-              actionLabel="Ask CHUPS AI 💡"
-              onAction={() => setAiModalOpen(true)}
+              description="Check back soon or use our AI assistant for personalized recommendations!"
+              compact
             />
           ) : (
             <Carousel
@@ -207,7 +205,7 @@ const Index = () => {
                 {restaurants.map((restaurant) => (
                   <CarouselItem key={restaurant.id} className="basis-4/5">
                     <Card
-                      className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border relative"
+                      className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft relative"
                       onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                     >
                       <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/3 to-transparent bg-[length:1000px_100%]" />
@@ -292,13 +290,14 @@ const Index = () => {
               icon={ChefHat}
               title="The menu's being updated by our chefs 👨🏽‍🍳🍛"
               description="Exciting new dishes are on the way!"
+              compact
             />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {restaurants.map((restaurant) => (
                 <Card
                   key={restaurant.id}
-                  className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border"
+                  className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft"
                   onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                 >
                   <div className="relative h-32 overflow-hidden">

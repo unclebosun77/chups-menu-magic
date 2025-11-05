@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,42 +6,43 @@ interface EmptyStateProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  actionLabel?: string;
-  onAction?: () => void;
   className?: string;
+  compact?: boolean;
 }
 
 const EmptyState = ({ 
   icon: Icon, 
   title, 
-  description, 
-  actionLabel, 
-  onAction,
-  className 
+  description,
+  className,
+  compact = false
 }: EmptyStateProps) => {
   return (
     <Card className={cn(
-      "p-8 text-center bg-gradient-purple-glow rounded-2xl border border-border shadow-soft overflow-hidden relative",
+      "text-center bg-[#FAFAFA] rounded-2xl border border-border shadow-soft overflow-hidden relative",
+      compact ? "p-6" : "p-8",
       className
     )}>
-      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/3 to-transparent bg-[length:1000px_100%]" />
-      <div className="relative">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple/5 flex items-center justify-center">
-          <Icon className="h-8 w-8 text-purple animate-pulse" />
+      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/2 to-transparent bg-[length:1000px_100%]" />
+      <div className="relative flex flex-col items-center">
+        <div className={cn(
+          "mx-auto rounded-full bg-purple/5 flex items-center justify-center",
+          compact ? "w-12 h-12 mb-3" : "w-16 h-16 mb-4"
+        )}>
+          <Icon className={cn("text-purple animate-pulse", compact ? "h-6 w-6" : "h-8 w-8")} />
         </div>
-        <p className="text-base font-bold mb-2 text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground mb-4">{description}</p>
-        {actionLabel && onAction && (
-          <Button 
-            onClick={onAction}
-            className="bg-purple hover:bg-purple-hover text-white shadow-hover"
-          >
-            {actionLabel}
-          </Button>
-        )}
+        <p className={cn(
+          "font-bold text-foreground",
+          compact ? "text-sm mb-1.5" : "text-base mb-2"
+        )}>{title}</p>
+        <p className={cn(
+          "text-muted-foreground max-w-xs mx-auto",
+          compact ? "text-xs" : "text-sm"
+        )}>{description}</p>
       </div>
     </Card>
   );
 };
 
 export default EmptyState;
+
