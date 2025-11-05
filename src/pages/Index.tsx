@@ -75,6 +75,20 @@ const Index = () => {
   return (
     <div className="relative min-h-screen bg-gradient-app">
       <div className="space-y-5 p-4 pb-20 relative">{/* Increased spacing from space-y-4 to space-y-5 */}
+        {/* Dev: Quick Onboarding Access */}
+        {restaurants.length === 0 && (
+          <div className="bg-purple/10 border border-purple/20 rounded-xl p-3 mb-3">
+            <p className="text-sm text-foreground mb-2">👋 No restaurants yet!</p>
+            <Button 
+              onClick={() => navigate("/restaurant/onboarding")}
+              className="w-full bg-purple text-white hover:bg-purple-hover"
+              size="sm"
+            >
+              Add Your First Restaurant
+            </Button>
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="pt-2">
           <div className="bg-gradient-hero p-6 rounded-3xl shadow-hover text-white relative overflow-hidden">
