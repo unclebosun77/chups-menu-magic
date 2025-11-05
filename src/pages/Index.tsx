@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, MapPin, Star, Sparkles, UtensilsCrossed } from "lucide-react";
-import RestaurantMap from "@/components/RestaurantMap";
+import { Input } from "@/components/ui/input";
+import { ChefHat, MapPin, Star, Search, UtensilsCrossed } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -30,6 +30,9 @@ const Index = () => {
   const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  
+  const categories = ["All", "Nigerian", "Italian", "Asian Fusion", "Fast Food", "Desserts"];
 
   useEffect(() => {
     const checkUser = async () => {
@@ -63,56 +66,108 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple/5 to-background" />
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-primary/20 to-accent/10 rounded-full blur-3xl animate-pulse" 
-             style={{ animationDuration: '8s' }} />
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-gradient-to-br from-purple/15 to-primary/10 rounded-full blur-3xl animate-pulse" 
-             style={{ animationDuration: '10s', animationDelay: '2s' }} />
-        <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-gradient-to-br from-accent/10 to-secondary/5 rounded-full blur-3xl animate-pulse" 
-             style={{ animationDuration: '12s', animationDelay: '4s' }} />
-      </div>
-
-      <div className="space-y-3 p-3 pb-20 relative">
-        {/* Compact Hero Header */}
+    <div className="relative min-h-screen bg-gradient-app">
+      <div className="space-y-4 p-4 pb-20 relative">
+        {/* Hero Section */}
         <div className="pt-2">
-          <div className="bg-gradient-to-br from-purple via-purple/90 to-black p-4 rounded-2xl shadow-hover text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-purple/20 rounded-full blur-xl" />
+          <div className="bg-gradient-hero p-6 rounded-3xl shadow-hover text-white relative overflow-hidden">
+            {/* Decorative blurred elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple/30 rounded-full blur-2xl" />
             
             <div className="relative z-10">
-              <h1 className="text-xl font-bold mb-1 animate-fade-in">
-                {/* Coming soon */}
+              <h1 className="text-2xl font-bold mb-2 animate-fade-in">
+                Discover your next bite 🍴
               </h1>
-              <p className="text-white/90 text-sm mb-2">&nbsp;</p>
+              <p className="text-white/90 text-sm mb-4">CHUPS knows where to take you.</p>
+              
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-purple/60" />
+                <Input
+                  placeholder="Search nearby restaurants 📍"
+                  className="pl-10 bg-white/95 border-0 text-foreground placeholder:text-muted-foreground rounded-xl h-12 shadow-lg"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Compact Map Preview */}
+        {/* Discover Section */}
         <div>
-          <h2 className="text-base font-bold mb-2 flex items-center gap-1.5">
-            <MapPin className="h-4 w-4 text-primary" />
-            Near You
-          </h2>
-          <div className="h-32">
-            <RestaurantMap restaurants={restaurants} />
-          </div>
-        </div>
-
-        {/* Compact For You Carousel */}
-        <div>
-          <h2 className="text-base font-bold mb-2 flex items-center gap-1.5">
-            <Star className="h-4 w-4 text-primary" />
-            For You
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-purple">
+            Discover 🍽️
           </h2>
           
           {restaurants.length === 0 ? (
-            <Card className="p-6 text-center bg-gradient-to-br from-accent/5 to-primary/5 border-2 border-dashed">
-              <UtensilsCrossed className="h-10 w-10 text-muted-foreground mx-auto mb-2 animate-pulse" />
+            <Card className="p-6 text-center bg-white rounded-2xl shadow-soft border-2 border-dashed border-purple/20">
+              <UtensilsCrossed className="h-10 w-10 text-purple/40 mx-auto mb-2 animate-pulse" />
               <p className="text-sm font-medium mb-1">Nothing cooking yet 🍜</p>
               <p className="text-xs text-muted-foreground">Check back soon for delicious recommendations!</p>
+            </Card>
+          ) : (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              {restaurants.map((restaurant) => (
+                <Card
+                  key={restaurant.id}
+                  className="flex-shrink-0 w-64 overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border-2 border-purple/10 hover:border-purple/30"
+                  onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+                >
+                  <div className="relative h-40 bg-gradient-warm overflow-hidden">
+                    {restaurant.logo_url ? (
+                      <img
+                        src={restaurant.logo_url}
+                        alt={restaurant.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ChefHat className="h-16 w-16 text-white/80" />
+                      </div>
+                    )}
+                    {restaurant.is_open && (
+                      <Badge className="absolute top-3 right-3 bg-secondary text-white text-xs shadow-lg">
+                        Open now
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <CardContent className="p-4">
+                    <h3 className="font-bold text-base mb-2 line-clamp-1">{restaurant.name}</h3>
+                    
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4 text-purple" />
+                        <span>2.4 km</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-accent text-accent" />
+                        <span className="font-medium text-foreground">4.8</span>
+                      </div>
+                    </div>
+                    
+                    <Badge variant="secondary" className="text-xs">
+                      {restaurant.cuisine_type}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Next Visit Section */}
+        <div>
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-purple">
+            Next Visit 🔮
+          </h2>
+          
+          {restaurants.length === 0 ? (
+            <Card className="p-8 text-center bg-gradient-purple-glow rounded-2xl border-2 border-purple/20 shadow-soft overflow-hidden relative">
+              <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:1000px_100%]" />
+              <Star className="h-12 w-12 text-purple/60 mx-auto mb-3 animate-pulse" />
+              <p className="text-sm font-semibold mb-1 text-purple">Curating your recommendations...</p>
+              <p className="text-xs text-muted-foreground">Based on your taste 💜</p>
             </Card>
           ) : (
             <Carousel
@@ -131,43 +186,42 @@ const Index = () => {
                 {restaurants.map((restaurant) => (
                   <CarouselItem key={restaurant.id} className="basis-4/5">
                     <Card
-                      className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group"
+                      className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border-2 border-purple/10 hover:border-purple/30 relative"
                       onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                     >
-                      <div className="relative h-24 bg-gradient-warm overflow-hidden">
+                      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/5 to-transparent bg-[length:1000px_100%]" />
+                      <div className="relative h-32 bg-gradient-warm overflow-hidden">
                         {restaurant.logo_url ? (
                           <img
                             src={restaurant.logo_url}
                             alt={restaurant.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <ChefHat className="h-12 w-12 text-white/80" />
+                            <ChefHat className="h-14 w-14 text-white/80" />
                           </div>
                         )}
-                        {!restaurant.is_open && (
-                          <Badge className="absolute top-2 right-2 bg-destructive text-xs">
-                            Closed
-                          </Badge>
-                        )}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                          <p className="text-white/90 text-xs italic">Based on your taste</p>
+                        </div>
                       </div>
                       
-                      <CardContent className="p-2.5">
-                        <h3 className="font-bold text-sm mb-1.5 line-clamp-1">{restaurant.name}</h3>
+                      <CardContent className="p-3 relative">
+                        <h3 className="font-bold text-base mb-2 line-clamp-1">{restaurant.name}</h3>
                         
-                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
                           <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            <span>2.4 mi</span>
+                            <MapPin className="h-4 w-4 text-purple" />
+                            <span>2.4 km</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-accent text-accent" />
+                            <Star className="h-4 w-4 fill-accent text-accent" />
                             <span className="font-medium text-foreground">4.8</span>
                           </div>
                         </div>
                         
-                        <Badge variant="secondary" className="text-xs h-5">
+                        <Badge variant="secondary" className="text-xs">
                           {restaurant.cuisine_type}
                         </Badge>
                       </CardContent>
@@ -181,62 +235,66 @@ const Index = () => {
           )}
         </div>
 
-        {/* Compact All Restaurants */}
+        {/* Explore Dishes Section */}
         <div>
-          <h2 className="text-base font-bold mb-2">All Restaurants</h2>
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-purple">
+            Explore Dishes 🍲
+          </h2>
+          
+          {/* Category Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide mb-3">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className={`flex-shrink-0 rounded-full ${
+                  selectedCategory === category 
+                    ? "bg-purple text-white hover:bg-purple-hover" 
+                    : "border-purple/30 text-purple hover:bg-purple/10"
+                }`}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
           
           {restaurants.length === 0 ? (
-            <Card className="p-6 text-center bg-gradient-to-br from-purple/5 to-secondary/5 border-2 border-dashed">
-              <ChefHat className="h-10 w-10 text-muted-foreground mx-auto mb-2 animate-bounce" 
+            <Card className="p-8 text-center bg-gradient-purple-glow rounded-2xl border-2 border-dashed border-purple/30">
+              <ChefHat className="h-12 w-12 text-purple/40 mx-auto mb-3 animate-bounce" 
                        style={{ animationDuration: '2s' }} />
-              <p className="text-sm font-medium mb-1">No restaurants on the menu yet 👨‍🍳</p>
+              <p className="text-sm font-semibold mb-1 text-purple">No dishes on the menu yet 👨‍🍳</p>
               <p className="text-xs text-muted-foreground">Be the first chef to join CHUPS!</p>
             </Card>
           ) : (
-            <div className="grid gap-2.5">
+            <div className="grid grid-cols-2 gap-3">
               {restaurants.map((restaurant) => (
                 <Card
                   key={restaurant.id}
-                  className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group"
+                  className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border-2 border-purple/10 hover:border-purple/30"
                   onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                 >
-                  <div className="flex gap-3 p-2.5">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-warm overflow-hidden flex-shrink-0">
-                      {restaurant.logo_url ? (
-                        <img
-                          src={restaurant.logo_url}
-                          alt={restaurant.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ChefHat className="h-8 w-8 text-white/80" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-bold text-sm mb-0.5 line-clamp-1">{restaurant.name}</h3>
-                        <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-0.5">
-                            <MapPin className="h-3 w-3" />
-                            <span>3.1 mi</span>
-                          </div>
-                          <div className="flex items-center gap-0.5">
-                            <Star className="h-3 w-3 fill-accent text-accent" />
-                            <span className="font-medium text-foreground">4.6</span>
-                          </div>
-                        </div>
+                  <div className="relative h-32 overflow-hidden">
+                    {restaurant.logo_url ? (
+                      <img
+                        src={restaurant.logo_url}
+                        alt={restaurant.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-warm flex items-center justify-center">
+                        <ChefHat className="h-10 w-10 text-white/80" />
                       </div>
-                      
-                      <div className="flex items-center justify-between mt-1">
-                        <Badge variant="secondary" className="text-xs h-5">
-                          {restaurant.cuisine_type}
-                        </Badge>
-                        {!restaurant.is_open && (
-                          <Badge variant="destructive" className="text-xs h-5">Closed</Badge>
-                        )}
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-2">
+                      <h3 className="font-bold text-sm text-white line-clamp-2 mb-1">{restaurant.name}</h3>
+                      <div className="flex items-center gap-1 text-white/90">
+                        <Star className="h-3 w-3 fill-accent text-accent" />
+                        <span className="text-xs font-medium">4.8</span>
+                        <span className="text-xs">• {restaurant.cuisine_type}</span>
                       </div>
                     </div>
                   </div>
