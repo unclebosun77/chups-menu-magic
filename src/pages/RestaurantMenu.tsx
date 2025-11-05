@@ -9,6 +9,7 @@ import OrderDialog from "@/components/OrderDialog";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
 import RestaurantInfo from "@/components/RestaurantInfo";
+import RestaurantGallery from "@/components/RestaurantGallery";
 import EmptyState from "@/components/EmptyState";
 
 type Restaurant = {
@@ -171,6 +172,9 @@ const RestaurantMenu = () => {
             isOpen={restaurant.is_open}
           />
         </div>
+
+        {/* Gallery Section */}
+        <RestaurantGallery />
 
         {/* Menu & Reviews Tabs */}
         <Tabs defaultValue="menu" className="w-full">
