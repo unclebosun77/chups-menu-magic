@@ -17,7 +17,8 @@ const LoadingState = ({ message }: LoadingStateProps) => {
   const displayMessage = message || loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
 
   return (
-    <Card className="p-6 text-center bg-[#FAFAFA] rounded-2xl border border-border shadow-soft animate-fade-in-up animate-shimmer-border">
+    <Card className="p-6 text-center bg-[#FAFAFA] rounded-2xl border border-border shadow-soft overflow-hidden relative animate-fade-in-up animate-shimmer-border">
+      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/2 to-transparent bg-[length:1000px_100%]" />
       <div className="relative flex flex-col items-center">
         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple/5 flex items-center justify-center animate-bounce-gentle">
           <ChefHat className="h-6 w-6 text-purple" />
