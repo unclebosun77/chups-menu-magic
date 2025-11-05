@@ -19,6 +19,13 @@ export const useScrollAnimation = (threshold = 0.1) => {
 
     const currentRef = ref.current;
     if (currentRef) {
+      // Check if element is already in viewport on mount
+      const rect = currentRef.getBoundingClientRect();
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+      if (isInViewport) {
+        setIsVisible(true);
+      }
+      
       observer.observe(currentRef);
     }
 
