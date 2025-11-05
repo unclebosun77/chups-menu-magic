@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ChefHat, MapPin, Star, Search, UtensilsCrossed } from "lucide-react";
+import { ChefHat, MapPin, Star, Search, UtensilsCrossed, Sparkles } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +14,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import SkeletonCard from "@/components/SkeletonCard";
+import EmptyState from "@/components/EmptyState";
+import LoadingState from "@/components/LoadingState";
 
 type Restaurant = {
   id: string;
@@ -31,6 +34,8 @@ const Index = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [user, setUser] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [isLoading, setIsLoading] = useState(true);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   
   const categories = ["All", "Nigerian", "Italian", "Asian Fusion", "Fast Food", "Desserts"];
 
@@ -51,6 +56,7 @@ const Index = () => {
 
   useEffect(() => {
     const loadRestaurants = async () => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from("restaurants")
         .select("id, name, cuisine_type, description, logo_url, is_open, latitude, longitude")
@@ -60,6 +66,7 @@ const Index = () => {
       if (!error && data) {
         setRestaurants(data);
       }
+      setIsLoading(false);
     };
 
     loadRestaurants();
@@ -99,12 +106,20 @@ const Index = () => {
             Discover 🍽️
           </h2>
           
-          {restaurants.length === 0 ? (
-            <Card className="p-6 text-center bg-white rounded-2xl shadow-soft border-2 border-dashed border-purple/20">
-              <UtensilsCrossed className="h-10 w-10 text-purple/40 mx-auto mb-2 animate-pulse" />
-              <p className="text-sm font-medium mb-1">Nothing cooking yet 🍜</p>
-              <p className="text-xs text-muted-foreground">Check back soon for delicious recommendations!</p>
-            </Card>
+          {isLoading ? (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              {[1, 2, 3].map((i) => (
+                <SkeletonCard key={i} type="vertical" className="flex-shrink-0 w-64" />
+              ))}
+            </div>
+          ) : restaurants.length === 0 ? (
+            <EmptyState
+              icon={MapPin}
+              title="We're mapping your flavor zone 🗺️"
+              description="Hang tight while we discover amazing restaurants near you!"
+              actionLabel="Ask CHUPS AI 🍴"
+              onAction={() => setAiModalOpen(true)}
+            />
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {restaurants.map((restaurant) => (
@@ -162,13 +177,16 @@ const Index = () => {
             Next Visit 🔮
           </h2>
           
-          {restaurants.length === 0 ? (
-            <Card className="p-8 text-center bg-gradient-purple-glow rounded-2xl border-2 border-purple/20 shadow-soft overflow-hidden relative">
-              <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:1000px_100%]" />
-              <Star className="h-12 w-12 text-purple/60 mx-auto mb-3 animate-pulse" />
-              <p className="text-sm font-semibold mb-1 text-purple">Curating your recommendations...</p>
-              <p className="text-xs text-muted-foreground">Based on your taste 💜</p>
-            </Card>
+          {isLoading ? (
+            <LoadingState message="Curating your recommendations… ✨" />
+          ) : restaurants.length === 0 ? (
+            <EmptyState
+              icon={Sparkles}
+              title="No bites matched your cravings yet 😋"
+              description="Check back soon or ask CHUPS AI for personalized recommendations!"
+              actionLabel="Ask CHUPS AI 💡"
+              onAction={() => setAiModalOpen(true)}
+            />
           ) : (
             <Carousel
               opts={{
@@ -260,13 +278,18 @@ const Index = () => {
             ))}
           </div>
           
-          {restaurants.length === 0 ? (
-            <Card className="p-8 text-center bg-gradient-purple-glow rounded-2xl border-2 border-dashed border-purple/30">
-              <ChefHat className="h-12 w-12 text-purple/40 mx-auto mb-3 animate-bounce" 
-                       style={{ animationDuration: '2s' }} />
-              <p className="text-sm font-semibold mb-1 text-purple">No dishes on the menu yet 👨‍🍳</p>
-              <p className="text-xs text-muted-foreground">Be the first chef to join CHUPS!</p>
-            </Card>
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonCard key={i} type="grid" />
+              ))}
+            </div>
+          ) : restaurants.length === 0 ? (
+            <EmptyState
+              icon={ChefHat}
+              title="The menu's being updated by our chefs 👨🏽‍🍳🍛"
+              description="Exciting new dishes are on the way!"
+            />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {restaurants.map((restaurant) => (
