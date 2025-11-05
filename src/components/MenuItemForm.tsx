@@ -28,11 +28,49 @@ const MenuItemForm = ({ restaurantId, item, onSuccess, onCancel }: MenuItemFormP
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [available, setAvailable] = useState(item?.available ?? true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(item?.image_url || null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
+
+    let imageUrl = item?.image_url || null;
+
+    // Upload image if a new file was selected
+    if (imageFile) {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${restaurantId}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from('menu-images')
+        .upload(fileName, imageFile);
+
+      if (uploadError) {
+        toast({ title: "Error uploading image", description: uploadError.message, variant: "destructive" });
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('menu-images')
+        .getPublicUrl(fileName);
+      
+      imageUrl = publicUrl;
+    }
 
     const data = {
       restaurant_id: restaurantId,
@@ -40,7 +78,7 @@ const MenuItemForm = ({ restaurantId, item, onSuccess, onCancel }: MenuItemFormP
       description: formData.get("description") as string,
       price: parseFloat(formData.get("price") as string),
       category: formData.get("category") as string,
-      image_url: (formData.get("image_url") as string) || null,
+      image_url: imageUrl,
       available,
     };
 
@@ -73,23 +111,37 @@ const MenuItemForm = ({ restaurantId, item, onSuccess, onCancel }: MenuItemFormP
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="price">Price ($) *</Label>
-          <Input
-            id="price"
-            name="price"
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            defaultValue={item?.price}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="image_url">Image URL</Label>
-          <Input id="image_url" name="image_url" type="url" defaultValue={item?.image_url || ""} />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="price">Price ($) *</Label>
+        <Input
+          id="price"
+          name="price"
+          type="number"
+          step="0.01"
+          min="0"
+          required
+          defaultValue={item?.price}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image">Menu Item Image</Label>
+        <Input
+          id="image"
+          name="image"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+        {imagePreview && (
+          <div className="mt-2">
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-32 h-32 object-cover rounded-md border"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
