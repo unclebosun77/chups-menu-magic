@@ -8,9 +8,10 @@ interface RestaurantInfoProps {
   phone?: string | null;
   hours?: Record<string, string> | null;
   isOpen?: boolean;
+  description?: string | null;
 }
 
-const RestaurantInfo = ({ address, city, phone, hours, isOpen }: RestaurantInfoProps) => {
+const RestaurantInfo = ({ address, city, phone, hours, isOpen, description }: RestaurantInfoProps) => {
   const getCurrentDayHours = () => {
     if (!hours) return null;
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -21,7 +22,19 @@ const RestaurantInfo = ({ address, city, phone, hours, isOpen }: RestaurantInfoP
   const todayHours = getCurrentDayHours();
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="space-y-6">
+      {/* Description */}
+      {description && (
+        <Card className="overflow-hidden animate-fade-in">
+          <CardContent className="p-6">
+            <p className="text-base text-muted-foreground leading-relaxed">
+              {description}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-3">
       {/* Address */}
       {(address || city) && (
         <Card className="overflow-hidden animate-fade-in-up">
@@ -85,6 +98,7 @@ const RestaurantInfo = ({ address, city, phone, hours, isOpen }: RestaurantInfoP
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 };

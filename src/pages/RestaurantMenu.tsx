@@ -210,6 +210,7 @@ const RestaurantMenu = () => {
             phone={restaurant.phone}
             hours={restaurant.hours}
             isOpen={restaurant.is_open}
+            description={restaurant.description}
           />
         </div>
 
