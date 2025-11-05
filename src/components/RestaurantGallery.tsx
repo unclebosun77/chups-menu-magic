@@ -13,10 +13,18 @@ import Autoplay from "embla-carousel-autoplay";
 // Gallery images
 import interiorImage from "@/assets/gallery/prox-interior-1.jpg";
 import barImage from "@/assets/gallery/prox-bar.jpg";
-import padThaiImage from "@/assets/gallery/prox-pad-thai.jpg";
-import tomYumImage from "@/assets/gallery/prox-tom-yum.jpg";
-import greenCurryImage from "@/assets/gallery/prox-green-curry.jpg";
-import mangoStickyRiceImage from "@/assets/gallery/prox-mango-sticky-rice.jpg";
+
+// Real menu item photos
+import noodlesPickled from "@/assets/menu/noodles-pickled.jpg";
+import thaiOmelet from "@/assets/menu/thai-omelet-noodles.jpg";
+import pastaVegetables from "@/assets/menu/pasta-vegetables.jpg";
+import spicyPasta from "@/assets/menu/spicy-pasta-chicken.jpg";
+import ricePlatter from "@/assets/menu/rice-platter.jpg";
+import chickenRamen from "@/assets/menu/chicken-ramen.jpg";
+import grilledWings from "@/assets/menu/grilled-wings.jpg";
+import spicedChickenRice from "@/assets/menu/spiced-chicken-rice.jpg";
+import friedRiceEgg from "@/assets/menu/fried-rice-egg.jpg";
+import goldenDumplings from "@/assets/menu/golden-dumplings.jpg";
 
 interface GalleryImage {
   src: string;
@@ -31,28 +39,58 @@ const galleryImages: GalleryImage[] = [
     category: "Interior",
   },
   {
+    src: noodlesPickled,
+    title: "Bangkok Street Noodles",
+    category: "Signature Dish",
+  },
+  {
+    src: thaiOmelet,
+    title: "Thai Omelet Ramen",
+    category: "Signature Dish",
+  },
+  {
     src: barImage,
     title: "Premium Bar",
     category: "Interior",
   },
   {
-    src: padThaiImage,
-    title: "Signature Pad Thai",
+    src: pastaVegetables,
+    title: "Colorful Rigatoni",
     category: "Signature Dish",
   },
   {
-    src: tomYumImage,
-    title: "Tom Yum Soup",
+    src: spicyPasta,
+    title: "Spicy Penne with Chicken",
     category: "Signature Dish",
   },
   {
-    src: greenCurryImage,
-    title: "Green Curry",
+    src: ricePlatter,
+    title: "Heritage Rice Platter",
     category: "Signature Dish",
   },
   {
-    src: mangoStickyRiceImage,
-    title: "Mango Sticky Rice",
+    src: chickenRamen,
+    title: "Classic Chicken Ramen",
+    category: "Signature Dish",
+  },
+  {
+    src: grilledWings,
+    title: "BBQ Glazed Wings",
+    category: "Signature Dish",
+  },
+  {
+    src: spicedChickenRice,
+    title: "Spiced Chicken & Rice",
+    category: "Signature Dish",
+  },
+  {
+    src: friedRiceEgg,
+    title: "Sunny Fried Rice",
+    category: "Signature Dish",
+  },
+  {
+    src: goldenDumplings,
+    title: "Golden Silk Dumplings",
     category: "Signature Dish",
   },
 ];
