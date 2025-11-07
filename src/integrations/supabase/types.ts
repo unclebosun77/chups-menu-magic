@@ -92,6 +92,63 @@ export type Database = {
         }
         Relationships: []
       }
+      catering_orders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          event_date: string
+          event_location: string
+          event_time: string
+          event_type: string
+          guest_count: number
+          id: string
+          menu_items: Json
+          special_requests: string | null
+          status: string
+          total_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          event_date: string
+          event_location: string
+          event_time: string
+          event_type: string
+          guest_count: number
+          id?: string
+          menu_items?: Json
+          special_requests?: string | null
+          status?: string
+          total_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          event_date?: string
+          event_location?: string
+          event_time?: string
+          event_type?: string
+          guest_count?: number
+          id?: string
+          menu_items?: Json
+          special_requests?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           available: boolean

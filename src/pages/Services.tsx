@@ -28,10 +28,7 @@ const Services = () => {
         navigate("/discover");
         break;
       case "Catering":
-        toast({
-          title: "Catering Service",
-          description: "Our catering service is coming soon! Contact us for more information.",
-        });
+        navigate("/catering");
         break;
       case "Rewards & Gift Cards":
         toast({
