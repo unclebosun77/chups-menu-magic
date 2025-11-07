@@ -31,10 +31,7 @@ const Services = () => {
         navigate("/catering");
         break;
       case "Rewards & Gift Cards":
-        toast({
-          title: "Rewards Program",
-          description: "Gift cards and rewards program launching soon!",
-        });
+        navigate("/rewards");
         break;
       case "Find Locations":
         navigate("/discover");

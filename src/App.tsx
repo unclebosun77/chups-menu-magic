@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Catering from "./pages/Catering";
+import Rewards from "./pages/Rewards";
 import Activity from "./pages/Activity";
 import Account from "./pages/Account";
 import Auth from "./pages/Auth";
@@ -38,6 +39,7 @@ const App = () => (
           {/* Full screen routes without bottom nav */}
           <Route path="/auth" element={<Auth />} />
           <Route path="/catering" element={<Catering />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route path="/my-orders" element={<MyOrders />} />
