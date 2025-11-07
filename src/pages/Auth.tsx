@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import logoIcon from "@/assets/logo-icon.png";
 import { z } from "zod";
-import { LogIn, UserPlus, Sparkles } from "lucide-react";
+import { LogIn, UserPlus, Sparkles, KeyRound } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string()
@@ -32,6 +32,13 @@ const signUpSchema = z.object({
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
 });
 
 const Auth = () => {
@@ -117,6 +124,48 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+
+    // Validate input data
+    const validationResult = resetPasswordSchema.safeParse({
+      email: formData.get("reset-email"),
+    });
+
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
+      toast({ 
+        title: "Validation error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { email } = validationResult.data;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+
+    if (error) {
+      toast({ 
+        title: "Error", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } else {
+      toast({ 
+        title: "Reset email sent!", 
+        description: "Check your email for the password reset link." 
+      });
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <Card className="w-full max-w-md shadow-2xl border-primary/10 backdrop-blur-sm">
@@ -139,12 +188,15 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
               <TabsTrigger value="signin" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
                 Sign In
               </TabsTrigger>
               <TabsTrigger value="signup" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
                 Sign Up
+              </TabsTrigger>
+              <TabsTrigger value="reset" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
+                Reset
               </TabsTrigger>
             </TabsList>
             <TabsContent value="signin" className="space-y-6 mt-6">
@@ -232,6 +284,42 @@ const Auth = () => {
                     <>
                       <UserPlus className="mr-2 h-5 w-5" />
                       Sign Up
+                    </>
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="reset" className="space-y-6 mt-6">
+              <form onSubmit={handleResetPassword} className="space-y-5">
+                <div className="space-y-3 text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
+                    <KeyRound className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold">Reset Your Password</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Enter your email address and we'll send you a link to reset your password.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email" className="text-sm font-medium">Email</Label>
+                  <Input 
+                    id="reset-email" 
+                    name="reset-email" 
+                    type="email" 
+                    required 
+                    className="h-11 border-primary/20 focus:border-primary"
+                    placeholder="your@email.com"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending..." : (
+                    <>
+                      <KeyRound className="mr-2 h-5 w-5" />
+                      Send Reset Link
                     </>
                   )}
                 </Button>
