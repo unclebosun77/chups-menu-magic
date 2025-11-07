@@ -34,6 +34,160 @@ const Activity = () => {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('activity-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          console.log('New order:', payload);
+          const newOrder = payload.new as any;
+          const newActivity: ActivityItem = {
+            id: newOrder.id,
+            type: 'order',
+            title: 'Order Placed',
+            description: `Order for ${newOrder.customer_name || 'customer'}`,
+            amount: Number(newOrder.total),
+            status: newOrder.status,
+            date: new Date(newOrder.created_at),
+            metadata: newOrder,
+          };
+          setActivities(prev => [newActivity, ...prev]);
+          toast({
+            title: "New Order",
+            description: "A new order has been placed",
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'bookings'
+        },
+        (payload) => {
+          console.log('New booking:', payload);
+          const newBooking = payload.new as any;
+          if (newBooking.user_id === user.id) {
+            const newActivity: ActivityItem = {
+              id: newBooking.id,
+              type: 'booking',
+              title: 'Experience Booked',
+              description: `${newBooking.experience_name} - ${newBooking.party_size} guests`,
+              status: newBooking.status,
+              date: new Date(newBooking.created_at),
+              metadata: newBooking,
+            };
+            setActivities(prev => [newActivity, ...prev]);
+            toast({
+              title: "New Booking",
+              description: "A new experience has been booked",
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'catering_orders'
+        },
+        (payload) => {
+          console.log('New catering order:', payload);
+          const newCatering = payload.new as any;
+          if (newCatering.user_id === user.id) {
+            const newActivity: ActivityItem = {
+              id: newCatering.id,
+              type: 'catering',
+              title: 'Catering Order',
+              description: `${newCatering.event_type} for ${newCatering.guest_count} guests`,
+              amount: Number(newCatering.total_price),
+              status: newCatering.status,
+              date: new Date(newCatering.created_at),
+              metadata: newCatering,
+            };
+            setActivities(prev => [newActivity, ...prev]);
+            toast({
+              title: "New Catering Order",
+              description: "A new catering order has been placed",
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'rewards_transactions'
+        },
+        (payload) => {
+          console.log('New rewards transaction:', payload);
+          const newReward = payload.new as any;
+          if (newReward.user_id === user.id) {
+            const newActivity: ActivityItem = {
+              id: newReward.id,
+              type: 'reward',
+              title: newReward.points > 0 ? 'Points Earned' : 'Points Redeemed',
+              description: newReward.description,
+              points: newReward.points,
+              date: new Date(newReward.created_at),
+              metadata: newReward,
+            };
+            setActivities(prev => [newActivity, ...prev]);
+            toast({
+              title: newReward.points > 0 ? "Points Earned" : "Points Redeemed",
+              description: newReward.description,
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'gift_cards'
+        },
+        (payload) => {
+          console.log('New gift card:', payload);
+          const newCard = payload.new as any;
+          if (newCard.purchaser_user_id === user.id) {
+            const newActivity: ActivityItem = {
+              id: newCard.id,
+              type: 'gift_card',
+              title: 'Gift Card Purchased',
+              description: `Sent to ${newCard.recipient_email}`,
+              amount: Number(newCard.initial_amount),
+              status: newCard.status,
+              date: new Date(newCard.created_at),
+              metadata: newCard,
+            };
+            setActivities(prev => [newActivity, ...prev]);
+            toast({
+              title: "Gift Card Purchased",
+              description: `Gift card sent to ${newCard.recipient_email}`,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, toast]);
+
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
