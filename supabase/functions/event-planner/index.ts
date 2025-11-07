@@ -34,14 +34,16 @@ When planning events, you should:
 2. Suggest appropriate venues, restaurants, and experiences from the CHUPS platform
 3. Recommend menu options, decorations, and special touches using the recommend_menu_items tool
 4. Check venue availability using the check_venue_availability tool when users ask about dates or booking
-5. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
-6. Offer creative ideas to make the event memorable and unique
-7. Help coordinate bookings, catering orders, and reservations
+5. Show visual previews using the show_visual_preview tool to help users visualize the event
+6. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
+7. Offer creative ideas to make the event memorable and unique
+8. Help coordinate bookings, catering orders, and reservations
 
 IMPORTANT: 
 - When users ask about budget, costs, or pricing, ALWAYS use the calculate_event_budget tool to provide accurate breakdowns. Tell them you're calculating the budget, then use the tool.
 - When users ask about menu suggestions, food recommendations, or dietary options, ALWAYS use the recommend_menu_items tool to get real dishes from our database. Tell them you're finding the perfect menu items, then use the tool.
 - When users ask about availability, dates, or time slots, ALWAYS use the check_venue_availability tool to check real booking data. Tell them you're checking availability, then use the tool.
+- When discussing venues, atmospheres, or specific dishes, use the show_visual_preview tool to show relevant images. Tell them you're showing them some inspiration, then use the tool.
 
 Keep your tone warm, enthusiastic, and helpful. Be creative but practical. When suggesting restaurants or experiences, explain why they're perfect for the specific occasion. Always consider the emotional significance of the event and help create special moments.
 
@@ -174,6 +176,46 @@ If the user mentions specific dietary restrictions, preferences, or cultural con
                   }
                 },
                 required: ['start_date', 'end_date'],
+                additionalProperties: false
+              }
+            }
+          },
+          {
+            type: 'function',
+            function: {
+              name: 'show_visual_preview',
+              description: 'Display relevant venue and food images to help users visualize their event. Shows curated images from the gallery based on event type, atmosphere, and menu selections.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  event_type: {
+                    type: 'string',
+                    enum: ['proposal', 'wedding', 'birthday', 'anniversary', 'corporate', 'romantic', 'casual', 'formal', 'celebration'],
+                    description: 'Type of event to show visuals for'
+                  },
+                  atmosphere: {
+                    type: 'string',
+                    enum: ['elegant', 'cozy', 'modern', 'romantic', 'festive', 'upscale', 'casual'],
+                    description: 'Desired atmosphere or vibe'
+                  },
+                  show_venue: {
+                    type: 'boolean',
+                    description: 'Whether to show venue/interior images'
+                  },
+                  show_food: {
+                    type: 'boolean',
+                    description: 'Whether to show food images'
+                  },
+                  cuisine_focus: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      enum: ['Thai', 'Asian', 'Japanese', 'Italian', 'American', 'Fusion', 'dessert']
+                    },
+                    description: 'Specific cuisines or dishes to highlight'
+                  }
+                },
+                required: ['event_type'],
                 additionalProperties: false
               }
             }

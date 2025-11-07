@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  images?: string[];
 };
 
 interface EventPlannerModalProps {
@@ -144,6 +145,8 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
                 result = await recommendMenuItems(args);
               } else if (currentToolCall.function.name === "check_venue_availability") {
                 result = await checkVenueAvailability(args);
+              } else if (currentToolCall.function.name === "show_visual_preview") {
+                result = showVisualPreview(args);
               }
               
               // Send tool result back to AI
@@ -251,6 +254,106 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       // Remove the empty assistant message
       setMessages((prev) => prev.slice(0, -1));
     }
+  };
+
+  const showVisualPreview = (params: any) => {
+    const { event_type, atmosphere, show_venue = true, show_food = true, cuisine_focus = [] } = params;
+    
+    const images: string[] = [];
+    
+    // Venue/Interior images
+    if (show_venue) {
+      const venueImages = {
+        proposal: ['/src/assets/gallery/prox-interior-1.jpg', '/src/assets/gallery/prox-bar.jpg'],
+        romantic: ['/src/assets/gallery/prox-interior-1.jpg', '/src/assets/gallery/prox-bar.jpg'],
+        wedding: ['/src/assets/gallery/prox-interior-1.jpg', '/src/assets/gallery/prox-bar.jpg'],
+        formal: ['/src/assets/gallery/prox-interior-1.jpg', '/src/assets/gallery/prox-bar.jpg'],
+        birthday: ['/src/assets/gallery/prox-bar.jpg', '/src/assets/gallery/prox-interior-1.jpg'],
+        celebration: ['/src/assets/gallery/prox-bar.jpg'],
+        casual: ['/src/assets/gallery/prox-bar.jpg'],
+        corporate: ['/src/assets/gallery/prox-interior-1.jpg'],
+        anniversary: ['/src/assets/gallery/prox-interior-1.jpg', '/src/assets/gallery/prox-bar.jpg']
+      };
+      
+      const selectedVenue = venueImages[event_type as keyof typeof venueImages] || venueImages.celebration;
+      images.push(...selectedVenue);
+    }
+    
+    // Food images based on cuisine focus
+    if (show_food) {
+      const foodImages: Record<string, string[]> = {
+        Thai: [
+          '/src/assets/gallery/prox-pad-thai.jpg',
+          '/src/assets/gallery/prox-green-curry.jpg',
+          '/src/assets/gallery/prox-tom-yum.jpg'
+        ],
+        Asian: [
+          '/src/assets/menu/chicken-ramen.jpg',
+          '/src/assets/menu/golden-dumplings.jpg',
+          '/src/assets/menu/noodles-pickled.jpg'
+        ],
+        Japanese: [
+          '/src/assets/menu/chicken-ramen.jpg',
+          '/src/assets/menu/thai-omelet-noodles.jpg'
+        ],
+        Italian: [
+          '/src/assets/menu/pasta-vegetables.jpg',
+          '/src/assets/menu/spicy-pasta-chicken.jpg'
+        ],
+        American: [
+          '/src/assets/menu/grilled-wings.jpg',
+          '/src/assets/menu/rice-platter.jpg'
+        ],
+        Fusion: [
+          '/src/assets/menu/spiced-chicken-rice.jpg',
+          '/src/assets/menu/fried-rice-egg.jpg'
+        ],
+        dessert: ['/src/assets/gallery/prox-mango-sticky-rice.jpg']
+      };
+      
+      if (cuisine_focus.length > 0) {
+        cuisine_focus.forEach((cuisine: string) => {
+          if (foodImages[cuisine]) {
+            images.push(...foodImages[cuisine].slice(0, 2));
+          }
+        });
+      } else {
+        // Default food selection for event type
+        if (event_type === 'romantic' || event_type === 'proposal' || event_type === 'anniversary') {
+          images.push(
+            '/src/assets/gallery/prox-pad-thai.jpg',
+            '/src/assets/gallery/prox-mango-sticky-rice.jpg'
+          );
+        } else if (event_type === 'wedding' || event_type === 'formal') {
+          images.push(
+            '/src/assets/menu/spiced-chicken-rice.jpg',
+            '/src/assets/gallery/prox-green-curry.jpg'
+          );
+        } else {
+          images.push(
+            '/src/assets/menu/chicken-ramen.jpg',
+            '/src/assets/menu/golden-dumplings.jpg'
+          );
+        }
+      }
+    }
+    
+    // Update the last assistant message to include images
+    setMessages(prev => {
+      const newMessages = [...prev];
+      if (newMessages[newMessages.length - 1]?.role === "assistant") {
+        newMessages[newMessages.length - 1].images = images;
+      }
+      return newMessages;
+    });
+    
+    return {
+      success: true,
+      event_type,
+      atmosphere,
+      images_shown: images.length,
+      message: `Showing ${images.length} visual previews for your ${event_type} event`
+    };
   };
 
   const checkVenueAvailability = async (params: any) => {
@@ -627,6 +730,18 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
                   >
                     <div className="p-4">
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.images && message.images.length > 0 && (
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          {message.images.map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={img}
+                              alt={`Event preview ${idx + 1}`}
+                              className="rounded-lg w-full h-32 object-cover"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </Card>
                 </div>
