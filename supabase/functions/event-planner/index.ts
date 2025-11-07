@@ -33,9 +33,11 @@ When planning events, you should:
 1. Ask thoughtful questions to understand the occasion, budget, preferences, and guest count
 2. Suggest appropriate venues, restaurants, and experiences from the CHUPS platform
 3. Recommend menu options, decorations, and special touches
-4. Provide realistic budget estimates and timing suggestions
+4. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
 5. Offer creative ideas to make the event memorable and unique
 6. Help coordinate bookings, catering orders, and reservations
+
+IMPORTANT: When users ask about budget, costs, or pricing, ALWAYS use the calculate_event_budget tool to provide accurate breakdowns. Tell them you're calculating the budget, then use the tool.
 
 Keep your tone warm, enthusiastic, and helpful. Be creative but practical. When suggesting restaurants or experiences, explain why they're perfect for the specific occasion. Always consider the emotional significance of the event and help create special moments.
 
@@ -53,6 +55,45 @@ If the user mentions specific dietary restrictions, preferences, or cultural con
           { role: 'system', content: systemPrompt },
           ...messages
         ],
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'calculate_event_budget',
+              description: 'Calculate a detailed budget breakdown for an event based on guest count, event type, and service level. Returns costs for venue, food, drinks, and extras.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  guest_count: {
+                    type: 'number',
+                    description: 'Number of guests attending the event'
+                  },
+                  event_type: {
+                    type: 'string',
+                    enum: ['proposal', 'wedding', 'birthday', 'anniversary', 'corporate', 'graduation', 'casual', 'formal'],
+                    description: 'Type of event being planned'
+                  },
+                  service_level: {
+                    type: 'string',
+                    enum: ['basic', 'standard', 'premium', 'luxury'],
+                    description: 'Level of service and quality desired'
+                  },
+                  include_venue: {
+                    type: 'boolean',
+                    description: 'Whether to include venue rental costs'
+                  },
+                  include_drinks: {
+                    type: 'boolean',
+                    description: 'Whether to include alcoholic beverages'
+                  }
+                },
+                required: ['guest_count', 'event_type', 'service_level'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: 'auto',
         stream: true,
       }),
     });

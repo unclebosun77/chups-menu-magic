@@ -86,6 +86,8 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       let textBuffer = "";
       let streamDone = false;
       let assistantContent = "";
+      let currentToolCall: any = null;
+      let toolCallArguments = "";
 
       // Add empty assistant message
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
@@ -112,7 +114,111 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
 
           try {
             const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            
+            // Handle tool calls
+            const toolCalls = parsed.choices?.[0]?.delta?.tool_calls;
+            if (toolCalls && toolCalls.length > 0) {
+              const toolCall = toolCalls[0];
+              
+              if (toolCall.function?.name) {
+                currentToolCall = toolCall;
+                toolCallArguments = "";
+                console.log("Tool call started:", toolCall.function.name);
+              }
+              
+              if (toolCall.function?.arguments) {
+                toolCallArguments += toolCall.function.arguments;
+              }
+            }
+
+            // Handle finish reason for tool calls
+            const finishReason = parsed.choices?.[0]?.finish_reason;
+            if (finishReason === "tool_calls" && currentToolCall) {
+              console.log("Tool call complete, executing...");
+              const args = JSON.parse(toolCallArguments);
+              const result = calculateEventBudget(args);
+              
+              // Send tool result back to AI
+              const toolResponseMessages = [
+                ...messages,
+                userMessage,
+                {
+                  role: "assistant",
+                  content: null,
+                  tool_calls: [{
+                    id: currentToolCall.id || "call_1",
+                    type: "function",
+                    function: {
+                      name: currentToolCall.function.name,
+                      arguments: toolCallArguments
+                    }
+                  }]
+                },
+                {
+                  role: "tool",
+                  content: JSON.stringify(result),
+                  tool_call_id: currentToolCall.id || "call_1"
+                }
+              ];
+
+              // Make new request with tool result
+              const toolResponse = await fetch(CHAT_URL, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                },
+                body: JSON.stringify({ messages: toolResponseMessages }),
+              });
+
+              if (toolResponse.ok && toolResponse.body) {
+                const toolReader = toolResponse.body.getReader();
+                let toolTextBuffer = "";
+                let toolStreamDone = false;
+
+                while (!toolStreamDone) {
+                  const { done: toolDone, value: toolValue } = await toolReader.read();
+                  if (toolDone) break;
+                  toolTextBuffer += decoder.decode(toolValue, { stream: true });
+
+                  let toolNewlineIndex: number;
+                  while ((toolNewlineIndex = toolTextBuffer.indexOf("\n")) !== -1) {
+                    let toolLine = toolTextBuffer.slice(0, toolNewlineIndex);
+                    toolTextBuffer = toolTextBuffer.slice(toolNewlineIndex + 1);
+
+                    if (toolLine.endsWith("\r")) toolLine = toolLine.slice(0, -1);
+                    if (toolLine.startsWith(":") || toolLine.trim() === "") continue;
+                    if (!toolLine.startsWith("data: ")) continue;
+
+                    const toolJsonStr = toolLine.slice(6).trim();
+                    if (toolJsonStr === "[DONE]") {
+                      toolStreamDone = true;
+                      break;
+                    }
+
+                    try {
+                      const toolParsed = JSON.parse(toolJsonStr);
+                      const toolContent = toolParsed.choices?.[0]?.delta?.content;
+                      if (toolContent) {
+                        assistantContent += toolContent;
+                        setMessages((prev) => {
+                          const newMessages = [...prev];
+                          newMessages[newMessages.length - 1].content = assistantContent;
+                          return newMessages;
+                        });
+                      }
+                    } catch {
+                      toolTextBuffer = toolLine + "\n" + toolTextBuffer;
+                      break;
+                    }
+                  }
+                }
+              }
+              return; // Exit after tool call handling
+            }
+
+            // Handle regular content
+            const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
               setMessages((prev) => {
@@ -137,6 +243,116 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       // Remove the empty assistant message
       setMessages((prev) => prev.slice(0, -1));
     }
+  };
+
+  const calculateEventBudget = (params: any) => {
+    const { guest_count, event_type, service_level, include_venue = true, include_drinks = true } = params;
+
+    // Base costs per person
+    const foodCosts = {
+      basic: 25,
+      standard: 45,
+      premium: 75,
+      luxury: 120,
+    };
+
+    const drinkCosts = {
+      basic: 15,
+      standard: 25,
+      premium: 40,
+      luxury: 65,
+    };
+
+    // Venue rental (flat fee + per person)
+    const venueCosts = {
+      basic: { flat: 200, perPerson: 5 },
+      standard: { flat: 500, perPerson: 8 },
+      premium: { flat: 1000, perPerson: 12 },
+      luxury: { flat: 2500, perPerson: 20 },
+    };
+
+    // Event type multipliers
+    const eventMultipliers: Record<string, number> = {
+      proposal: 1.3,
+      wedding: 1.5,
+      birthday: 1.0,
+      anniversary: 1.2,
+      corporate: 1.1,
+      graduation: 1.0,
+      casual: 0.9,
+      formal: 1.2,
+    };
+
+    const multiplier = eventMultipliers[event_type] || 1.0;
+    
+    // Calculate costs
+    const foodTotal = foodCosts[service_level as keyof typeof foodCosts] * guest_count * multiplier;
+    const drinksTotal = include_drinks 
+      ? drinkCosts[service_level as keyof typeof drinkCosts] * guest_count * multiplier 
+      : 0;
+    
+    const venueFlat = include_venue ? venueCosts[service_level as keyof typeof venueCosts].flat : 0;
+    const venuePerPerson = include_venue 
+      ? venueCosts[service_level as keyof typeof venueCosts].perPerson * guest_count 
+      : 0;
+    const venueTotal = (venueFlat + venuePerPerson) * multiplier;
+
+    // Extras (decorations, staff, service charges) - 20% of food + drinks
+    const extrasTotal = (foodTotal + drinksTotal) * 0.2;
+
+    const subtotal = foodTotal + drinksTotal + venueTotal + extrasTotal;
+    const tax = subtotal * 0.08; // 8% tax
+    const gratuity = (foodTotal + drinksTotal) * 0.18; // 18% gratuity on food/drinks
+    const total = subtotal + tax + gratuity;
+
+    return {
+      breakdown: {
+        venue: {
+          amount: venueTotal,
+          description: include_venue 
+            ? `${service_level} venue rental for ${guest_count} guests` 
+            : "Venue not included"
+        },
+        food: {
+          amount: foodTotal,
+          description: `${service_level} catering for ${guest_count} guests`,
+          per_person: foodCosts[service_level as keyof typeof foodCosts] * multiplier
+        },
+        drinks: {
+          amount: drinksTotal,
+          description: include_drinks 
+            ? `${service_level} beverage package for ${guest_count} guests` 
+            : "Beverages not included",
+          per_person: include_drinks ? drinkCosts[service_level as keyof typeof drinkCosts] * multiplier : 0
+        },
+        extras: {
+          amount: extrasTotal,
+          description: "Decorations, service staff, and coordination"
+        },
+        tax: {
+          amount: tax,
+          description: "Sales tax (8%)"
+        },
+        gratuity: {
+          amount: gratuity,
+          description: "Service gratuity (18%)"
+        }
+      },
+      summary: {
+        subtotal,
+        tax,
+        gratuity,
+        total,
+        per_person: total / guest_count
+      },
+      event_details: {
+        event_type,
+        service_level,
+        guest_count,
+        includes_venue: include_venue,
+        includes_drinks: include_drinks
+      }
+    };
   };
 
   const handleSend = async () => {
