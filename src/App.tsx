@@ -15,6 +15,7 @@ import RestaurantMenu from "./pages/RestaurantMenu";
 import Discover from "./pages/Discover";
 import AIAssistant from "./pages/AIAssistant";
 import MyOrders from "./pages/MyOrders";
+import MyBookings from "./pages/MyBookings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           {/* Main app routes with bottom nav */}
           <Route path="/" element={<Layout><Index /></Layout>} />
           <Route path="/services" element={<Layout><Services /></Layout>} />
+          <Route path="/bookings" element={<MyBookings />} />
           <Route path="/activity" element={<Layout><Activity /></Layout>} />
           <Route path="/account" element={<Layout><Account /></Layout>} />
           

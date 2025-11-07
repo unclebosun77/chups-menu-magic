@@ -1,4 +1,4 @@
-import { Home, Grid3x3, Activity, User } from "lucide-react";
+import { Home, Grid3x3, CalendarCheck, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ const BottomNav = () => {
   const tabs = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Grid3x3, label: "Services", path: "/services" },
-    { icon: Activity, label: "Activity", path: "/activity" },
+    { icon: CalendarCheck, label: "Bookings", path: "/bookings" },
     { icon: User, label: "Account", path: "/account" },
   ];
 

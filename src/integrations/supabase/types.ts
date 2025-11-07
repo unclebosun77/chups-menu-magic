@@ -38,6 +38,60 @@ export type Database = {
         }
         Relationships: []
       }
+      bookings: {
+        Row: {
+          booking_date: string
+          category_title: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          experience_name: string
+          id: string
+          party_size: string
+          pricing: string
+          special_requests: string | null
+          status: string
+          time_slot: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          category_title: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          experience_name: string
+          id?: string
+          party_size: string
+          pricing: string
+          special_requests?: string | null
+          status?: string
+          time_slot: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          category_title?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          experience_name?: string
+          id?: string
+          party_size?: string
+          pricing?: string
+          special_requests?: string | null
+          status?: string
+          time_slot?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           available: boolean

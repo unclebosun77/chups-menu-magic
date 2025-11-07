@@ -106,7 +106,40 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('send-booking-confirmation', {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to make a booking.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save booking to database
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          experience_name: selectedExperience.name,
+          category_title: category?.title || '',
+          booking_date: format(date, "yyyy-MM-dd"),
+          time_slot: timeSlot,
+          party_size: partySize,
+          customer_name: name,
+          customer_email: email,
+          customer_phone: phone || null,
+          special_requests: specialRequests || null,
+          pricing: getPricing(category?.id || '', selectedExperience.name),
+          status: 'pending',
+        });
+
+      if (bookingError) throw bookingError;
+
+      // Send confirmation email
+      await supabase.functions.invoke('send-booking-confirmation', {
         body: {
           experienceName: selectedExperience.name,
           categoryTitle: category?.title || '',
@@ -121,11 +154,9 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
         },
       });
 
-      if (error) throw error;
-
       toast({
         title: "Booking Confirmed! 🎉",
-        description: `A confirmation email has been sent to ${email}. We'll contact you within 24 hours to finalize the details.`,
+        description: `Your booking has been saved. A confirmation email has been sent to ${email}.`,
       });
 
       // Reset form
@@ -139,23 +170,12 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
       setSpecialRequests("");
       onClose();
     } catch (error: any) {
-      console.error('Error sending booking confirmation:', error);
+      console.error('Error creating booking:', error);
       toast({
-        title: "Booking Received",
-        description: `Your booking has been received but we couldn't send a confirmation email. We'll contact you at ${email}.`,
-        variant: "default",
+        title: "Error",
+        description: "There was an error processing your booking. Please try again.",
+        variant: "destructive",
       });
-      
-      // Reset form anyway
-      setSelectedExperience(null);
-      setDate(undefined);
-      setTimeSlot(undefined);
-      setPartySize(undefined);
-      setName("");
-      setEmail("");
-      setPhone("");
-      setSpecialRequests("");
-      onClose();
     }
   };
 
