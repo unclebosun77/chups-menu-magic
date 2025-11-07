@@ -8,7 +8,6 @@ import {
   Leaf, Shield
 } from "lucide-react";
 import { useState } from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Services = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -180,55 +179,26 @@ const Services = () => {
       {/* Experiences */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">Curated Experiences</h2>
-        <Accordion type="single" collapsible className="space-y-3">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {experienceCategories.map((category) => (
-            <AccordionItem 
+            <Card 
               key={category.id} 
-              value={category.id}
-              className={`border rounded-lg overflow-hidden ${category.color}`}
+              className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color}`}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{category.emoji}</span>
-                  <span className="font-semibold">{category.title}</span>
-                  <span className="text-xs text-muted-foreground ml-2">
-                    ({category.items.length} options)
-                  </span>
+              <CardHeader className="p-3 h-full">
+                <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
+                  <span className="text-4xl">{category.emoji}</span>
+                  <div>
+                    <CardTitle className="text-sm mb-0.5">{category.title}</CardTitle>
+                    <CardDescription className="text-xs">
+                      ({category.items.length} options)
+                    </CardDescription>
+                  </div>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 pt-2">
-                  {category.items.map((item, idx) => {
-                    const Icon = item.icon;
-                    return (
-                      <Card 
-                        key={idx} 
-                        className="cursor-pointer hover:shadow-md transition-all hover-scale bg-background/50 backdrop-blur-sm aspect-square"
-                      >
-                        <CardHeader className="p-3 h-full">
-                          <div className="flex flex-col items-center text-center gap-2 h-full justify-between">
-                            <div className="flex flex-col items-center gap-2">
-                              <div className="p-2 rounded-lg bg-purple/10 flex items-center justify-center w-12 h-12">
-                                <Icon className="h-5 w-5 text-purple" />
-                              </div>
-                              <div>
-                                <CardTitle className="text-sm mb-0.5">{item.name}</CardTitle>
-                                <CardDescription className="text-xs line-clamp-2">{item.description}</CardDescription>
-                              </div>
-                            </div>
-                            <Button size="sm" variant="purple" className="w-full text-xs h-7">
-                              Book Now
-                            </Button>
-                          </div>
-                        </CardHeader>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CardHeader>
+            </Card>
           ))}
-        </Accordion>
+        </div>
       </div>
 
       <Card className="animate-fade-in">
