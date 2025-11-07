@@ -188,12 +188,7 @@ const Services = () => {
               <CardHeader className="p-3 h-full">
                 <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
                   <span className="text-4xl">{category.emoji}</span>
-                  <div>
-                    <CardTitle className="text-sm mb-0.5">{category.title}</CardTitle>
-                    <CardDescription className="text-xs">
-                      ({category.items.length} options)
-                    </CardDescription>
-                  </div>
+                  <CardTitle className="text-sm">{category.title}</CardTitle>
                 </div>
               </CardHeader>
             </Card>
