@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Send, Sparkles, PartyPopper } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Send, Sparkles, PartyPopper, History, Plus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
   role: "user" | "assistant";
@@ -19,11 +21,21 @@ interface EventPlannerModalProps {
   occasionType?: string;
 }
 
+interface SavedConversation {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  messages: Message[];
+}
+
 export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlannerModalProps) => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [savedConversations, setSavedConversations] = useState<SavedConversation[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,6 +58,104 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadConversationHistory();
+    }
+  }, [isOpen]);
+
+  const loadConversationHistory = async () => {
+    setIsLoadingHistory(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setSavedConversations((data || []).map(conv => ({
+        ...conv,
+        messages: conv.messages as Message[]
+      })));
+    } catch (error) {
+      console.error('Error loading conversation history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const saveConversation = async (messagesToSave: Message[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      if (conversationId) {
+        // Update existing conversation
+        const { error } = await supabase
+          .from('ai_conversations')
+          .update({ 
+            messages: messagesToSave,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', conversationId);
+
+        if (error) throw error;
+      } else {
+        // Create new conversation
+        const { data, error } = await supabase
+          .from('ai_conversations')
+          .insert({ 
+            user_id: user.id,
+            messages: messagesToSave 
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        setConversationId(data.id);
+      }
+    } catch (error) {
+      console.error('Error saving conversation:', error);
+    }
+  };
+
+  const loadConversation = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      setMessages((data.messages as Message[]) || []);
+      setConversationId(id);
+      toast({
+        title: "Conversation loaded",
+        description: "Your previous event planning session has been restored.",
+      });
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startNewConversation = () => {
+    setMessages([]);
+    setConversationId(null);
+    setInput("");
+  };
 
   const streamChat = async (userMessage: Message) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/event-planner`;
@@ -681,13 +791,22 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input.trim() };
+    const userMessage: Message = {
+      role: "user",
+      content: input.trim(),
+    };
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     await streamChat(userMessage);
     setIsLoading(false);
+
+    // Save conversation after response
+    const updatedMessages = [...messages, userMessage];
+    await saveConversation(updatedMessages);
+    await loadConversationHistory();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -712,76 +831,148 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
           </div>
         </DialogHeader>
 
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <ScrollArea ref={scrollRef} className="flex-1 px-6">
-            <div className="space-y-4 py-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
-                >
-                  <Card
-                    className={`max-w-[80%] ${
-                      message.role === "user"
-                        ? "bg-gradient-to-br from-pink-500 to-purple-500 text-white"
-                        : "bg-muted"
-                    }`}
-                  >
-                    <div className="p-4">
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      {message.images && message.images.length > 0 && (
-                        <div className="mt-3 grid grid-cols-2 gap-2">
-                          {message.images.map((img, idx) => (
-                            <img
-                              key={idx}
-                              src={img}
-                              alt={`Event preview ${idx + 1}`}
-                              className="rounded-lg w-full h-32 object-cover"
-                            />
-                          ))}
+        <Tabs defaultValue="chat" className="flex-1 flex flex-col min-h-0">
+          <TabsList className="mx-6 mt-4 grid w-auto grid-cols-2">
+            <TabsTrigger value="chat">Current Chat</TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="h-4 w-4 mr-2" />
+              History
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chat" className="flex-1 flex flex-col min-h-0 mt-0">
+            {conversationId && (
+              <div className="mx-6 mt-4 mb-2 flex items-center justify-between p-3 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground">Continuing saved conversation</p>
+                <Button size="sm" variant="outline" onClick={startNewConversation}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Chat
+                </Button>
+              </div>
+            )}
+
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <ScrollArea ref={scrollRef} className="flex-1 px-6">
+                <div className="space-y-4 py-4">
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
+                    >
+                      <Card
+                        className={`max-w-[80%] ${
+                          message.role === "user"
+                            ? "bg-gradient-to-br from-pink-500 to-purple-500 text-white"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <div className="p-4">
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          {message.images && message.images.length > 0 && (
+                            <div className="mt-3 grid grid-cols-2 gap-2">
+                              {message.images.map((img, idx) => (
+                                <img
+                                  key={idx}
+                                  src={img}
+                                  alt={`Event preview ${idx + 1}`}
+                                  className="rounded-lg w-full h-32 object-cover"
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </Card>
                     </div>
-                  </Card>
+                  ))}
+                  {isLoading && messages[messages.length - 1]?.role === "user" && (
+                    <div className="flex justify-start">
+                      <Card className="bg-muted max-w-[80%]">
+                        <div className="p-4">
+                          <div className="flex gap-1">
+                            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+                  )}
                 </div>
-              ))}
-              {isLoading && messages[messages.length - 1]?.role === "user" && (
-                <div className="flex justify-start">
-                  <Card className="bg-muted max-w-[80%]">
-                    <div className="p-4">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
-                    </div>
-                  </Card>
+              </ScrollArea>
+
+              {/* Input Area */}
+              <div className="border-t p-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Tell me about your event..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  I can help with venues, menus, budgets, timing, and special touches ✨
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="history" className="flex-1 flex flex-col min-h-0 mt-0 px-6 pb-6">
+            <ScrollArea className="flex-1 mt-4">
+              {isLoadingHistory ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : savedConversations.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <History className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium mb-2">No saved conversations yet</p>
+                  <p className="text-sm">Start planning an event to create your first conversation</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {savedConversations.map((conv) => {
+                    const firstUserMessage = conv.messages.find(m => m.role === 'user');
+                    const preview = firstUserMessage?.content.slice(0, 80) || 'New conversation';
+                    const date = new Date(conv.updated_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    });
+
+                    return (
+                      <Card
+                        key={conv.id}
+                        className="p-4 hover:bg-accent cursor-pointer transition-colors"
+                        onClick={() => {
+                          loadConversation(conv.id);
+                          const chatTab = document.querySelector('[value="chat"]') as HTMLElement;
+                          chatTab?.click();
+                        }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium line-clamp-2 flex-1">{preview}</h4>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-3">{date}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {conv.messages.length} messages
+                        </p>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
-            </div>
-          </ScrollArea>
-
-          {/* Input Area */}
-          <div className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Tell me about your event..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              I can help with venues, menus, budgets, timing, and special touches ✨
-            </p>
-          </div>
-        </div>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
