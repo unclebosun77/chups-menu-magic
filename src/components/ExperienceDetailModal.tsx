@@ -34,6 +34,7 @@ interface ExperienceDetailModalProps {
   category: ExperienceCategory | null;
   isOpen: boolean;
   onClose: () => void;
+  onItemClick?: (categoryId: string, itemName: string) => void;
 }
 
 const timeSlots = [
@@ -82,7 +83,7 @@ const getPricing = (categoryId: string, itemName: string): string => {
   return pricing[categoryId]?.[itemName] || pricing[categoryId]?.default || "$50-200 per person";
 };
 
-export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceDetailModalProps) => {
+export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }: ExperienceDetailModalProps) => {
   const [selectedExperience, setSelectedExperience] = useState<ExperienceItem | null>(null);
   const [date, setDate] = useState<Date>();
   const [timeSlot, setTimeSlot] = useState<string>();
@@ -211,7 +212,15 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
                         ? "ring-2 ring-primary shadow-lg"
                         : "hover:shadow-md"
                     )}
-                    onClick={() => setSelectedExperience(item)}
+                    onClick={() => {
+                      // For celebrations category with CHUPS Concierge item, trigger special handler
+                      if (category.id === "celebrations" && onItemClick) {
+                        onItemClick(category.id, item.name);
+                        onClose();
+                        return;
+                      }
+                      setSelectedExperience(item);
+                    }}
                   >
                     <CardHeader className="p-4">
                       <div className="flex flex-col gap-2">

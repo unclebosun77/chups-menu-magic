@@ -2,3 +2,9 @@ project_id = "mwwtwrzevtrxtjzzwsbe"
 
 [functions.send-booking-confirmation]
 verify_jwt = false
+
+[functions.ai-assistant]
+verify_jwt = false
+
+[functions.event-planner]
+verify_jwt = false

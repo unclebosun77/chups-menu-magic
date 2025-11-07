@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
+import { EventPlannerModal } from "@/components/EventPlannerModal";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const Services = () => {
   const [reminderNote, setReminderNote] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEventPlannerOpen, setIsEventPlannerOpen] = useState(false);
+  const [selectedOccasion, setSelectedOccasion] = useState<string | undefined>();
 
   const handleQuickServiceClick = (serviceTitle: string) => {
     switch(serviceTitle) {
@@ -138,6 +141,7 @@ const Services = () => {
       emoji: "🎉",
       color: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
       items: [
+        { name: "CHUPS Concierge", icon: Sparkles, description: "AI-powered event planning assistant" },
         { name: "Special Occasions", icon: PartyPopper, description: "Celebrate life's big moments" },
         { name: "Proposal Packages", icon: Heart, description: "Make your moment unforgettable" },
         { name: "Seasonal Events", icon: Calendar, description: "Festive seasonal celebrations" },
@@ -164,7 +168,6 @@ const Services = () => {
       emoji: "✨",
       color: "bg-gradient-to-br from-indigo-500/10 to-violet-500/10",
       items: [
-        { name: "CHUPS Concierge", icon: Sparkles, description: "AI-powered outing planner" },
         { name: "Experience Gifting", icon: Gift, description: "Give memorable dining experiences" },
         { name: "Dine & Stay Packages", icon: Home, description: "Complete getaway experiences" },
         { name: "Restaurant Tours", icon: Map, description: "Behind-the-scenes kitchen tours" },
@@ -173,8 +176,25 @@ const Services = () => {
   ];
 
   const handleCategoryClick = (category: typeof experienceCategories[0]) => {
+    // Special handling for Occasions & Celebrations - open event planner for CHUPS Concierge
+    if (category.id === "celebrations") {
+      setIsEventPlannerOpen(true);
+      setSelectedOccasion(undefined);
+      return;
+    }
     setSelectedCategory(category);
     setIsModalOpen(true);
+  };
+
+  const handleExperienceItemClick = (categoryId: string, itemName: string) => {
+    if (categoryId === "celebrations" && itemName === "CHUPS Concierge") {
+      setIsEventPlannerOpen(true);
+      setSelectedOccasion(undefined);
+    } else if (categoryId === "celebrations") {
+      // For specific occasion types, open event planner with context
+      setSelectedOccasion(itemName);
+      setIsEventPlannerOpen(true);
+    }
   };
 
   return (
@@ -220,13 +240,23 @@ const Services = () => {
           {experienceCategories.map((category) => (
             <Card 
               key={category.id} 
-              className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color}`}
+              className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color} ${
+                category.id === 'celebrations' ? 'ring-2 ring-primary ring-offset-2' : ''
+              }`}
               onClick={() => handleCategoryClick(category)}
             >
-              <CardHeader className="p-3 h-full">
+              <CardHeader className="p-3 h-full relative">
+                {category.id === 'celebrations' && (
+                  <div className="absolute top-2 right-2">
+                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                  </div>
+                )}
                 <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
                   <span className="text-4xl">{category.emoji}</span>
                   <CardTitle className="text-sm">{category.title}</CardTitle>
+                  {category.id === 'celebrations' && (
+                    <p className="text-xs text-primary font-medium">✨ AI-Powered</p>
+                  )}
                 </div>
               </CardHeader>
             </Card>
@@ -242,6 +272,17 @@ const Services = () => {
           setIsModalOpen(false);
           setSelectedCategory(null);
         }}
+        onItemClick={handleExperienceItemClick}
+      />
+
+      {/* Event Planner Modal */}
+      <EventPlannerModal
+        isOpen={isEventPlannerOpen}
+        onClose={() => {
+          setIsEventPlannerOpen(false);
+          setSelectedOccasion(undefined);
+        }}
+        occasionType={selectedOccasion}
       />
 
       <Card className="animate-fade-in">
