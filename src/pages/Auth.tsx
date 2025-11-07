@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,7 @@ const Auth = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<"customer" | "restaurant">("customer");
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -162,6 +164,7 @@ const Auth = () => {
         title: "Reset email sent!", 
         description: "Check your email for the password reset link." 
       });
+      setShowResetDialog(false);
     }
     setIsLoading(false);
   };
@@ -188,15 +191,12 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
               <TabsTrigger value="signin" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
                 Sign In
               </TabsTrigger>
               <TabsTrigger value="signup" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
                 Sign Up
-              </TabsTrigger>
-              <TabsTrigger value="reset" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Reset
               </TabsTrigger>
             </TabsList>
             <TabsContent value="signin" className="space-y-6 mt-6">
@@ -222,6 +222,13 @@ const Auth = () => {
                     className="h-11 border-primary/20 focus:border-primary"
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetDialog(true)}
+                    className="text-sm text-primary hover:underline font-medium"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
                 <Button 
                   type="submit" 
@@ -289,45 +296,45 @@ const Auth = () => {
                 </Button>
               </form>
             </TabsContent>
-            <TabsContent value="reset" className="space-y-6 mt-6">
-              <form onSubmit={handleResetPassword} className="space-y-5">
-                <div className="space-y-3 text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
-                    <KeyRound className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold">Reset Your Password</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Enter your email address and we'll send you a link to reset your password.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reset-email" className="text-sm font-medium">Email</Label>
-                  <Input 
-                    id="reset-email" 
-                    name="reset-email" 
-                    type="email" 
-                    required 
-                    className="h-11 border-primary/20 focus:border-primary"
-                    placeholder="your@email.com"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending..." : (
-                    <>
-                      <KeyRound className="mr-2 h-5 w-5" />
-                      Send Reset Link
-                    </>
-                  )}
-                </Button>
-              </form>
-            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
+
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+                <KeyRound className="h-5 w-5 text-primary" />
+              </div>
+              <DialogTitle>Reset Your Password</DialogTitle>
+            </div>
+            <DialogDescription>
+              Enter your email address and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword} className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email" className="text-sm font-medium">Email</Label>
+              <Input 
+                id="reset-email" 
+                name="reset-email" 
+                type="email" 
+                required 
+                className="h-11"
+                placeholder="your@email.com"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full h-11 font-semibold" 
+              disabled={isLoading}
+            >
+              {isLoading ? "Sending..." : "Send Reset Link"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
