@@ -8,10 +8,13 @@ import {
   Leaf, Shield
 } from "lucide-react";
 import { useState } from "react";
+import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
 
 const Services = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reminderNote, setReminderNote] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const quickServices = [
     {
@@ -145,6 +148,11 @@ const Services = () => {
     },
   ];
 
+  const handleCategoryClick = (category: typeof experienceCategories[0]) => {
+    setSelectedCategory(category);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="p-4 space-y-6 pb-24">
       <div className="pt-4">
@@ -185,6 +193,7 @@ const Services = () => {
             <Card 
               key={category.id} 
               className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color}`}
+              onClick={() => handleCategoryClick(category)}
             >
               <CardHeader className="p-3 h-full">
                 <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
@@ -196,6 +205,16 @@ const Services = () => {
           ))}
         </div>
       </div>
+
+      {/* Experience Detail Modal */}
+      <ExperienceDetailModal
+        category={selectedCategory}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedCategory(null);
+        }}
+      />
 
       <Card className="animate-fade-in">
         <CardHeader>
