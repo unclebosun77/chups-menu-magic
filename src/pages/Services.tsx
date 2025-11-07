@@ -8,13 +8,46 @@ import {
   Leaf, Shield
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
 
 const Services = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reminderNote, setReminderNote] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleQuickServiceClick = (serviceTitle: string) => {
+    switch(serviceTitle) {
+      case "Dine-In":
+        navigate("/discover");
+        break;
+      case "Catering":
+        toast({
+          title: "Catering Service",
+          description: "Our catering service is coming soon! Contact us for more information.",
+        });
+        break;
+      case "Rewards & Gift Cards":
+        toast({
+          title: "Rewards Program",
+          description: "Gift cards and rewards program launching soon!",
+        });
+        break;
+      case "Find Locations":
+        navigate("/discover");
+        break;
+      case "Call & Reserve":
+        toast({
+          title: "Quick Reservation",
+          description: "Call us at (555) 123-4567 or use our booking system!",
+        });
+        break;
+    }
+  };
 
   const quickServices = [
     {
@@ -167,7 +200,11 @@ const Services = () => {
           {quickServices.map((service) => {
             const Icon = service.icon;
             return (
-              <Card key={service.title} className="cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in">
+              <Card 
+                key={service.title} 
+                className="cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in"
+                onClick={() => handleQuickServiceClick(service.title)}
+              >
                 <CardHeader className="p-3">
                   <div className="flex flex-col items-center text-center gap-2">
                     <div className={`p-2 rounded-lg ${service.color} flex items-center justify-center w-12 h-12`}>
