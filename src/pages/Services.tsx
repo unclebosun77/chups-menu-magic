@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
+import { ReservationDialog } from "@/components/ReservationDialog";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Services = () => {
   const [reminderNote, setReminderNote] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   const handleQuickServiceClick = (serviceTitle: string) => {
     switch(serviceTitle) {
@@ -40,11 +42,8 @@ const Services = () => {
       case "Find Locations":
         navigate("/discover");
         break;
-      case "Call & Reserve":
-        toast({
-          title: "Quick Reservation",
-          description: "Call us at (555) 123-4567 or use our booking system!",
-        });
+      case "Reservations":
+        setIsReservationOpen(true);
         break;
     }
   };
@@ -80,9 +79,9 @@ const Services = () => {
     },
     {
       icon: Phone,
-      emoji: "📞",
-      title: "Call & Reserve",
-      description: "Quick phone reservation service",
+      emoji: "📅",
+      title: "Reservations",
+      description: "Quick table reservation",
       color: "bg-teal-500/10 text-teal-500",
     },
   ];
@@ -251,6 +250,12 @@ const Services = () => {
           setIsModalOpen(false);
           setSelectedCategory(null);
         }}
+      />
+
+      {/* Reservation Dialog */}
+      <ReservationDialog
+        isOpen={isReservationOpen}
+        onClose={() => setIsReservationOpen(false)}
       />
 
       <Card className="animate-fade-in">
