@@ -33,13 +33,15 @@ When planning events, you should:
 1. Ask thoughtful questions to understand the occasion, budget, preferences, and guest count
 2. Suggest appropriate venues, restaurants, and experiences from the CHUPS platform
 3. Recommend menu options, decorations, and special touches using the recommend_menu_items tool
-4. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
-5. Offer creative ideas to make the event memorable and unique
-6. Help coordinate bookings, catering orders, and reservations
+4. Check venue availability using the check_venue_availability tool when users ask about dates or booking
+5. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
+6. Offer creative ideas to make the event memorable and unique
+7. Help coordinate bookings, catering orders, and reservations
 
 IMPORTANT: 
 - When users ask about budget, costs, or pricing, ALWAYS use the calculate_event_budget tool to provide accurate breakdowns. Tell them you're calculating the budget, then use the tool.
 - When users ask about menu suggestions, food recommendations, or dietary options, ALWAYS use the recommend_menu_items tool to get real dishes from our database. Tell them you're finding the perfect menu items, then use the tool.
+- When users ask about availability, dates, or time slots, ALWAYS use the check_venue_availability tool to check real booking data. Tell them you're checking availability, then use the tool.
 
 Keep your tone warm, enthusiastic, and helpful. Be creative but practical. When suggesting restaurants or experiences, explain why they're perfect for the specific occasion. Always consider the emotional significance of the event and help create special moments.
 
@@ -137,6 +139,41 @@ If the user mentions specific dietary restrictions, preferences, or cultural con
                   }
                 },
                 required: ['occasion_type'],
+                additionalProperties: false
+              }
+            }
+          },
+          {
+            type: 'function',
+            function: {
+              name: 'check_venue_availability',
+              description: 'Check availability for event venues and experiences by querying real booking data. Returns available dates and time slots for specific experiences or categories.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  start_date: {
+                    type: 'string',
+                    description: 'Start date for availability search in YYYY-MM-DD format'
+                  },
+                  end_date: {
+                    type: 'string',
+                    description: 'End date for availability search in YYYY-MM-DD format'
+                  },
+                  experience_name: {
+                    type: 'string',
+                    description: 'Specific experience or venue name to check (optional)'
+                  },
+                  category: {
+                    type: 'string',
+                    enum: ['proposal', 'wedding', 'birthday', 'anniversary', 'romantic', 'luxury', 'all'],
+                    description: 'Category of experience to filter by'
+                  },
+                  party_size: {
+                    type: 'number',
+                    description: 'Number of guests to accommodate'
+                  }
+                },
+                required: ['start_date', 'end_date'],
                 additionalProperties: false
               }
             }

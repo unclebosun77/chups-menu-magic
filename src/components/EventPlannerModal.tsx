@@ -142,6 +142,8 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
                 result = calculateEventBudget(args);
               } else if (currentToolCall.function.name === "recommend_menu_items") {
                 result = await recommendMenuItems(args);
+              } else if (currentToolCall.function.name === "check_venue_availability") {
+                result = await checkVenueAvailability(args);
               }
               
               // Send tool result back to AI
@@ -248,6 +250,119 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       });
       // Remove the empty assistant message
       setMessages((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const checkVenueAvailability = async (params: any) => {
+    const { start_date, end_date, experience_name, category, party_size } = params;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // Query existing bookings in the date range
+      let query = supabase
+        .from('bookings')
+        .select('experience_name, category_title, booking_date, time_slot, party_size')
+        .gte('booking_date', start_date)
+        .lte('booking_date', end_date);
+      
+      if (experience_name) {
+        query = query.ilike('experience_name', `%${experience_name}%`);
+      }
+      
+      if (category && category !== 'all') {
+        query = query.ilike('category_title', `%${category}%`);
+      }
+      
+      const { data: bookings, error } = await query;
+      
+      if (error) throw error;
+      
+      // Define available time slots
+      const timeSlots = [
+        "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", 
+        "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", 
+        "8:00 PM", "9:00 PM"
+      ];
+      
+      // Group bookings by experience and date
+      const bookedSlots = new Map<string, Set<string>>();
+      bookings?.forEach(booking => {
+        const key = `${booking.experience_name}_${booking.booking_date}`;
+        if (!bookedSlots.has(key)) {
+          bookedSlots.set(key, new Set());
+        }
+        bookedSlots.get(key)?.add(booking.time_slot);
+      });
+      
+      // Calculate availability for each date in range
+      const availabilityMap = new Map<string, any>();
+      const startDateObj = new Date(start_date);
+      const endDateObj = new Date(end_date);
+      
+      // Get unique experiences from bookings or use a default set
+      const experiences = experience_name 
+        ? [experience_name]
+        : Array.from(new Set(bookings?.map(b => b.experience_name) || [
+            "Rooftop Romance Package",
+            "Private Dining Experience",
+            "Garden Celebration",
+            "Waterfront Event Space"
+          ]));
+      
+      for (let d = new Date(startDateObj); d <= endDateObj; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        
+        experiences.forEach(exp => {
+          const key = `${exp}_${dateStr}`;
+          const booked = bookedSlots.get(key) || new Set();
+          const available = timeSlots.filter(slot => !booked.has(slot));
+          
+          if (!availabilityMap.has(exp)) {
+            availabilityMap.set(exp, []);
+          }
+          
+          availabilityMap.get(exp).push({
+            date: dateStr,
+            day_of_week: d.toLocaleDateString('en-US', { weekday: 'long' }),
+            available_slots: available,
+            booked_slots: Array.from(booked),
+            total_available: available.length,
+            capacity_status: available.length > 8 ? "high" : available.length > 4 ? "medium" : "low"
+          });
+        });
+      }
+      
+      // Convert map to array format
+      const availability = Array.from(availabilityMap.entries()).map(([experience, dates]) => ({
+        experience_name: experience,
+        dates: dates
+      }));
+      
+      return {
+        success: true,
+        search_period: { start_date, end_date },
+        party_size: party_size || "Not specified",
+        availability,
+        summary: {
+          total_experiences: availability.length,
+          most_available: availability.reduce((max, curr) => {
+            const currTotal = curr.dates.reduce((sum: number, d: any) => sum + d.total_available, 0);
+            const maxTotal = max.dates.reduce((sum: number, d: any) => sum + d.total_available, 0);
+            return currTotal > maxTotal ? curr : max;
+          }, availability[0]),
+          recommendation: availability.length > 0 
+            ? "Multiple venues available - would you like to discuss specific options?"
+            : "Limited availability in this period - consider alternative dates?"
+        }
+      };
+    } catch (error) {
+      console.error("Error checking venue availability:", error);
+      return {
+        success: false,
+        message: "Failed to check venue availability",
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
     }
   };
 
