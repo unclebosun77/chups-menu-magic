@@ -136,7 +136,13 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
             if (finishReason === "tool_calls" && currentToolCall) {
               console.log("Tool call complete, executing...");
               const args = JSON.parse(toolCallArguments);
-              const result = calculateEventBudget(args);
+              
+              let result;
+              if (currentToolCall.function.name === "calculate_event_budget") {
+                result = calculateEventBudget(args);
+              } else if (currentToolCall.function.name === "recommend_menu_items") {
+                result = await recommendMenuItems(args);
+              }
               
               // Send tool result back to AI
               const toolResponseMessages = [
@@ -242,6 +248,105 @@ export const EventPlannerModal = ({ isOpen, onClose, occasionType }: EventPlanne
       });
       // Remove the empty assistant message
       setMessages((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const recommendMenuItems = async (params: any) => {
+    const { cuisine_types, dietary_restrictions, occasion_type, course_preferences, guest_count } = params;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // Query menu items
+      let query = supabase
+        .from('menu_items')
+        .select('*')
+        .eq('available', true);
+      
+      // Execute query
+      const { data: menuItems, error } = await query;
+      
+      if (error) throw error;
+      
+      if (!menuItems || menuItems.length === 0) {
+        return {
+          success: false,
+          message: "No menu items found in the database",
+          recommendations: []
+        };
+      }
+      
+      // Filter and score items based on criteria
+      const scoredItems = menuItems.map(item => {
+        let score = 0;
+        const itemLower = `${item.name} ${item.description || ''} ${item.category}`.toLowerCase();
+        
+        // Cuisine matching
+        if (cuisine_types && cuisine_types.length > 0) {
+          cuisine_types.forEach((cuisine: string) => {
+            if (itemLower.includes(cuisine.toLowerCase())) score += 3;
+          });
+        }
+        
+        // Dietary restrictions matching (boost vegetarian/vegan items)
+        if (dietary_restrictions && dietary_restrictions.length > 0) {
+          dietary_restrictions.forEach((restriction: string) => {
+            if (restriction === 'vegetarian' && (itemLower.includes('veggie') || itemLower.includes('vegetarian'))) score += 2;
+            if (restriction === 'vegan' && itemLower.includes('vegan')) score += 2;
+            if (restriction === 'gluten-free' && itemLower.includes('rice')) score += 1;
+          });
+        }
+        
+        // Course preferences
+        if (course_preferences && course_preferences.length > 0 && !course_preferences.includes('all')) {
+          course_preferences.forEach((course: string) => {
+            if (course === 'appetizer' && (itemLower.includes('dumpling') || itemLower.includes('wing'))) score += 2;
+            if (course === 'main' && (itemLower.includes('rice') || itemLower.includes('noodle') || itemLower.includes('pasta'))) score += 2;
+            if (course === 'dessert' && itemLower.includes('dessert')) score += 2;
+          });
+        }
+        
+        // Occasion-based scoring
+        if (occasion_type === 'romantic' || occasion_type === 'proposal') {
+          if (itemLower.includes('special') || itemLower.includes('premium')) score += 2;
+        }
+        if (occasion_type === 'wedding' || occasion_type === 'formal') {
+          if (item.price && Number(item.price) > 15) score += 1;
+        }
+        if (occasion_type === 'casual' || occasion_type === 'family') {
+          if (itemLower.includes('rice') || itemLower.includes('noodle')) score += 1;
+        }
+        
+        return { ...item, score };
+      });
+      
+      // Sort by score and get top recommendations
+      const topItems = scoredItems
+        .sort((a, b) => b.score - a.score)
+        .slice(0, guest_count && guest_count > 10 ? 8 : 5);
+      
+      return {
+        success: true,
+        occasion_type,
+        guest_count,
+        dietary_restrictions: dietary_restrictions || [],
+        cuisine_types: cuisine_types || [],
+        recommendations: topItems.map(item => ({
+          name: item.name,
+          description: item.description,
+          category: item.category,
+          price: `$${Number(item.price).toFixed(2)}`,
+          image_url: item.image_url,
+          match_score: item.score
+        }))
+      };
+    } catch (error) {
+      console.error("Error fetching menu recommendations:", error);
+      return {
+        success: false,
+        message: "Failed to fetch menu recommendations",
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
     }
   };
 

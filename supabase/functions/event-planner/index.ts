@@ -32,12 +32,14 @@ Your role is to help users plan memorable events including:
 When planning events, you should:
 1. Ask thoughtful questions to understand the occasion, budget, preferences, and guest count
 2. Suggest appropriate venues, restaurants, and experiences from the CHUPS platform
-3. Recommend menu options, decorations, and special touches
+3. Recommend menu options, decorations, and special touches using the recommend_menu_items tool
 4. Provide realistic budget estimates and timing suggestions using the calculate_event_budget tool when appropriate
 5. Offer creative ideas to make the event memorable and unique
 6. Help coordinate bookings, catering orders, and reservations
 
-IMPORTANT: When users ask about budget, costs, or pricing, ALWAYS use the calculate_event_budget tool to provide accurate breakdowns. Tell them you're calculating the budget, then use the tool.
+IMPORTANT: 
+- When users ask about budget, costs, or pricing, ALWAYS use the calculate_event_budget tool to provide accurate breakdowns. Tell them you're calculating the budget, then use the tool.
+- When users ask about menu suggestions, food recommendations, or dietary options, ALWAYS use the recommend_menu_items tool to get real dishes from our database. Tell them you're finding the perfect menu items, then use the tool.
 
 Keep your tone warm, enthusiastic, and helpful. Be creative but practical. When suggesting restaurants or experiences, explain why they're perfect for the specific occasion. Always consider the emotional significance of the event and help create special moments.
 
@@ -88,6 +90,53 @@ If the user mentions specific dietary restrictions, preferences, or cultural con
                   }
                 },
                 required: ['guest_count', 'event_type', 'service_level'],
+                additionalProperties: false
+              }
+            }
+          },
+          {
+            type: 'function',
+            function: {
+              name: 'recommend_menu_items',
+              description: 'Get personalized menu recommendations from the restaurant database based on cuisine preferences, dietary restrictions, and occasion type. Returns real dishes with names, descriptions, and prices.',
+              parameters: {
+                type: 'object',
+                properties: {
+                  cuisine_types: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      enum: ['Thai', 'Asian', 'Japanese', 'Chinese', 'Italian', 'American', 'Fusion', 'International']
+                    },
+                    description: 'Types of cuisine to include in recommendations'
+                  },
+                  dietary_restrictions: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      enum: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher', 'low-carb', 'none']
+                    },
+                    description: 'Dietary restrictions to accommodate'
+                  },
+                  occasion_type: {
+                    type: 'string',
+                    enum: ['proposal', 'wedding', 'birthday', 'anniversary', 'corporate', 'graduation', 'casual', 'formal', 'romantic', 'family'],
+                    description: 'Type of occasion to tailor recommendations for'
+                  },
+                  course_preferences: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      enum: ['appetizer', 'main', 'dessert', 'drink', 'all']
+                    },
+                    description: 'Which courses to include in recommendations'
+                  },
+                  guest_count: {
+                    type: 'number',
+                    description: 'Number of guests to help determine variety and portions'
+                  }
+                },
+                required: ['occasion_type'],
                 additionalProperties: false
               }
             }
