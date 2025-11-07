@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { UtensilsCrossed, Users, Calendar, Gift, MapPin, Phone, Bell, Award } from "lucide-react";
+import { UtensilsCrossed, Users, Calendar, Gift, MapPin, Phone, Bell } from "lucide-react";
 import { useState } from "react";
 
 const Services = () => {
@@ -32,8 +32,8 @@ const Services = () => {
     {
       icon: Gift,
       emoji: "🎁",
-      title: "Gift Cards",
-      description: "Give the gift of great food",
+      title: "Rewards & Gift Cards",
+      description: "Earn points and send gift cards",
       color: "bg-yellow-500/10 text-yellow-500",
     },
     {
@@ -49,13 +49,6 @@ const Services = () => {
       title: "Call & Reserve",
       description: "Quick phone reservation service",
       color: "bg-teal-500/10 text-teal-500",
-    },
-    {
-      icon: Award,
-      emoji: "⭐",
-      title: "Loyalty Points",
-      description: "Earn rewards with every visit",
-      color: "bg-yellow-500/10 text-yellow-500",
     },
   ];
 
