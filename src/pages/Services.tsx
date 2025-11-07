@@ -11,7 +11,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
-import { ReservationDialog } from "@/components/ReservationDialog";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ const Services = () => {
   const [reminderNote, setReminderNote] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   const handleQuickServiceClick = (serviceTitle: string) => {
     switch(serviceTitle) {
@@ -37,7 +35,7 @@ const Services = () => {
         navigate("/discover");
         break;
       case "Reservations":
-        setIsReservationOpen(true);
+        navigate("/bookings");
         break;
     }
   };
@@ -244,12 +242,6 @@ const Services = () => {
           setIsModalOpen(false);
           setSelectedCategory(null);
         }}
-      />
-
-      {/* Reservation Dialog */}
-      <ReservationDialog
-        isOpen={isReservationOpen}
-        onClose={() => setIsReservationOpen(false)}
       />
 
       <Card className="animate-fade-in">
