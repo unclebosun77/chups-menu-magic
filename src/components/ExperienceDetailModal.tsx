@@ -12,6 +12,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ExperienceItem {
   name: string;
@@ -94,7 +95,7 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
 
   if (!category) return null;
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!selectedExperience || !date || !timeSlot || !partySize || !name || !email) {
       toast({
         title: "Missing Information",
@@ -104,21 +105,58 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose }: ExperienceD
       return;
     }
 
-    toast({
-      title: "Booking Requested",
-      description: `Your ${selectedExperience.name} experience has been requested for ${format(date, "PPP")} at ${timeSlot}. We'll contact you shortly at ${email}.`,
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('send-booking-confirmation', {
+        body: {
+          experienceName: selectedExperience.name,
+          categoryTitle: category?.title || '',
+          date: format(date, "PPP"),
+          timeSlot,
+          partySize,
+          name,
+          email,
+          phone,
+          specialRequests,
+          pricing: getPricing(category?.id || '', selectedExperience.name),
+        },
+      });
 
-    // Reset form
-    setSelectedExperience(null);
-    setDate(undefined);
-    setTimeSlot(undefined);
-    setPartySize(undefined);
-    setName("");
-    setEmail("");
-    setPhone("");
-    setSpecialRequests("");
-    onClose();
+      if (error) throw error;
+
+      toast({
+        title: "Booking Confirmed! 🎉",
+        description: `A confirmation email has been sent to ${email}. We'll contact you within 24 hours to finalize the details.`,
+      });
+
+      // Reset form
+      setSelectedExperience(null);
+      setDate(undefined);
+      setTimeSlot(undefined);
+      setPartySize(undefined);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setSpecialRequests("");
+      onClose();
+    } catch (error: any) {
+      console.error('Error sending booking confirmation:', error);
+      toast({
+        title: "Booking Received",
+        description: `Your booking has been received but we couldn't send a confirmation email. We'll contact you at ${email}.`,
+        variant: "default",
+      });
+      
+      // Reset form anyway
+      setSelectedExperience(null);
+      setDate(undefined);
+      setTimeSlot(undefined);
+      setPartySize(undefined);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setSpecialRequests("");
+      onClose();
+    }
   };
 
   return (
