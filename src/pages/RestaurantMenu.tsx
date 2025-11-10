@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Star } from "lucide-react";
 import OrderDialog from "@/components/OrderDialog";
 import MenuItemDialog from "@/components/MenuItemDialog";
@@ -52,10 +51,6 @@ const RestaurantMenu = () => {
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
-  
-  const infoAnimation = useScrollAnimation();
-  const galleryAnimation = useScrollAnimation();
-  const menuAnimation = useScrollAnimation();
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -197,12 +192,7 @@ const RestaurantMenu = () => {
         {/* Restaurant Info Cards */}
         <div 
           id="info"
-          ref={infoAnimation.ref}
-          className={`mb-8 transition-all duration-700 ${
-            infoAnimation.isVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-10'
-          }`}
+          className="mb-8 opacity-100 translate-y-0"
         >
           <RestaurantInfo
             address={restaurant.address}
@@ -217,12 +207,7 @@ const RestaurantMenu = () => {
         {/* Gallery Section */}
         <div
           id="gallery"
-          ref={galleryAnimation.ref}
-          className={`transition-all duration-700 delay-150 ${
-            galleryAnimation.isVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-10'
-          }`}
+          className="mb-8 opacity-100 translate-y-0"
         >
           <RestaurantGallery />
         </div>
@@ -230,12 +215,7 @@ const RestaurantMenu = () => {
         {/* Menu & Reviews Tabs */}
         <div
           id="menu"
-          ref={menuAnimation.ref}
-          className={`transition-all duration-700 delay-300 ${
-            menuAnimation.isVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-10'
-          }`}
+          className="opacity-100 translate-y-0"
         >
           <Tabs defaultValue="menu" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
