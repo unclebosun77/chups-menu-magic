@@ -125,32 +125,32 @@ const Index = () => {
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
             <IconTile
-              emoji="🍽️"
+              icon={UtensilsCrossed}
               label="Order Food"
               onClick={() => navigate("/discover")}
             />
             <IconTile
-              emoji="📅"
+              icon={Calendar}
               label="Book Table"
               onClick={() => navigate("/services")}
             />
             <IconTile
-              emoji="🎉"
+              icon={PartyPopper}
               label="Catering"
               onClick={() => navigate("/catering")}
             />
             <IconTile
-              emoji="🤖"
+              icon={Bot}
               label="AI Assistant"
               onClick={() => navigate("/ai-assistant")}
             />
             <IconTile
-              emoji="🛍️"
+              icon={ShoppingBag}
               label="My Orders"
               onClick={() => navigate("/my-orders")}
             />
             <IconTile
-              emoji="📖"
+              icon={Calendar}
               label="Bookings"
               onClick={() => navigate("/my-bookings")}
             />

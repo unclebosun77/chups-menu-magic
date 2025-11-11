@@ -26,27 +26,27 @@ const Services = () => {
 
   const quickServices = [
     {
-      emoji: "🍽️",
+      icon: UtensilsCrossed,
       label: "Dine-In",
       onClick: () => navigate("/discover"),
     },
     {
-      emoji: "🎉",
+      icon: Calendar,
       label: "Catering",
       onClick: () => navigate("/catering"),
     },
     {
-      emoji: "🎁",
+      icon: Gift,
       label: "Rewards",
       onClick: () => navigate("/rewards"),
     },
     {
-      emoji: "📍",
+      icon: MapPin,
       label: "Locations",
       onClick: () => navigate("/discover"),
     },
     {
-      emoji: "📅",
+      icon: Phone,
       label: "Book Table",
       onClick: () => navigate("/bookings"),
     },
@@ -191,7 +191,7 @@ const Services = () => {
           {quickServices.map((service) => (
             <IconTile
               key={service.label}
-              emoji={service.emoji}
+              icon={service.icon}
               label={service.label}
               onClick={service.onClick}
             />
@@ -208,7 +208,7 @@ const Services = () => {
           {experienceCategories.map((category) => (
             <IconTile
               key={category.id}
-              emoji={category.emoji}
+              icon={category.icon}
               label={category.title}
               onClick={() => handleCategoryClick(category)}
               className={category.id === 'celebrations' ? 'ring-2 ring-primary' : ''}
