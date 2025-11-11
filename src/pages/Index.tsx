@@ -17,8 +17,6 @@ import Autoplay from "embla-carousel-autoplay";
 import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
 import LoadingState from "@/components/LoadingState";
-import DiscoverTiles from "@/components/DiscoverTiles";
-import ExperiencesTiles from "@/components/ExperiencesTiles";
 
 type Restaurant = {
   id: string;
@@ -75,16 +73,15 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-white overflow-hidden">
-      
-      <div className="space-y-6 p-4 pb-20 relative z-10">{/* Increased spacing for breathing room */}
+    <div className="relative min-h-screen bg-gradient-app">
+      <div className="space-y-5 p-4 pb-20 relative">{/* Increased spacing from space-y-4 to space-y-5 */}
         {/* Dev: Quick Onboarding Access */}
         {restaurants.length === 0 && (
-          <div className="bg-purple/10 border border-purple/30 rounded-xl p-3 mb-3">
-            <p className="text-sm text-black mb-2">👋 No restaurants yet!</p>
+          <div className="bg-purple/10 border border-purple/20 rounded-xl p-3 mb-3">
+            <p className="text-sm text-foreground mb-2">👋 No restaurants yet!</p>
             <Button 
               onClick={() => navigate("/restaurant/onboarding")}
-              className="w-full bg-purple text-white hover:bg-purple/90"
+              className="w-full bg-purple text-white hover:bg-purple-hover"
               size="sm"
             >
               Add Your First Restaurant
@@ -94,19 +91,26 @@ const Index = () => {
 
         {/* Hero Section */}
         <div className="pt-2">
-          <div className="bg-gradient-to-br from-purple/10 via-white to-black/5 p-6 rounded-3xl shadow-lg relative overflow-hidden border border-purple/20">
+          <div className="bg-gradient-hero p-6 rounded-3xl shadow-hover text-white relative overflow-hidden">
+            {/* Black overlay for contrast */}
+            <div className="absolute inset-0 bg-black/15" />
+            
+            {/* Decorative blurred elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/20 rounded-full blur-2xl" />
+            
             <div className="relative z-10">
-              <h1 className="text-3xl font-bold mb-2 animate-fade-in bg-gradient-to-r from-black via-purple to-black bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold mb-2 animate-fade-in text-white">
                 Discover your next bite 🍴
               </h1>
-              <p className="text-gray-700 text-sm mb-4 font-light">CHUPS knows where to take you.</p>
+              <p className="text-white/95 text-sm mb-4">CHUPS knows where to take you.</p>
               
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   placeholder="Search nearby restaurants 📍"
-                  className="pl-12 bg-white border border-purple/30 focus:border-purple text-black placeholder:text-gray-500 rounded-2xl h-14 shadow-md transition-all hover:border-purple/50"
+                  className="pl-10 bg-white border-2 border-transparent focus:border-purple text-foreground placeholder:text-muted-foreground rounded-xl h-12 shadow-sm"
                 />
               </div>
             </div>
@@ -114,15 +118,9 @@ const Index = () => {
         </div>
 
         {/* Discover Section */}
-        <DiscoverTiles />
-
-        {/* Experiences Section */}
-        <ExperiencesTiles />
-
-        {/* Restaurant Cards - Now labeled as "Featured" */}
         <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 bg-gradient-to-r from-black via-purple to-black bg-clip-text text-transparent">
-            <span className="text-purple">⭐</span> Featured
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
+            <span className="text-purple">🍽️</span> Discover
           </h2>
           
           {isLoading ? (
@@ -143,7 +141,7 @@ const Index = () => {
               {restaurants.map((restaurant) => (
                 <Card
                   key={restaurant.id}
-                  className="flex-shrink-0 w-64 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group bg-white rounded-3xl border border-purple/20 shadow-lg hover:scale-105 hover:border-purple/40"
+                  className="flex-shrink-0 w-64 overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft"
                   onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                 >
                   <div className="relative h-40 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
@@ -159,27 +157,27 @@ const Index = () => {
                       </div>
                     )}
                     {restaurant.is_open && (
-                      <Badge className="absolute top-3 right-3 bg-purple text-white text-xs shadow-lg border border-purple/30">
+                      <Badge className="absolute top-3 right-3 bg-purple text-white text-xs shadow-lg">
                         Open now
                       </Badge>
                     )}
                   </div>
                   
                   <CardContent className="p-4">
-                    <h3 className="font-bold text-base mb-2 line-clamp-1 text-black">{restaurant.name}</h3>
+                    <h3 className="font-bold text-base mb-2 line-clamp-1 text-foreground">{restaurant.name}</h3>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4 text-purple" />
                         <span>2.4 km</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                        <span className="font-medium text-black">4.8</span>
+                        <Star className="h-4 w-4 fill-purple text-purple" />
+                        <span className="font-medium text-foreground">4.8</span>
                       </div>
                     </div>
                     
-                    <Badge variant="secondary" className="text-xs bg-purple/10 text-purple border border-purple/30">
+                    <Badge variant="secondary" className="text-xs bg-muted text-foreground">
                       {restaurant.cuisine_type}
                     </Badge>
                   </CardContent>
@@ -191,7 +189,7 @@ const Index = () => {
 
         {/* Next Visit Section */}
         <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 bg-gradient-to-r from-black via-purple to-black bg-clip-text text-transparent">
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
             <span className="text-purple">🔮</span> Next Visit
           </h2>
           
@@ -221,9 +219,10 @@ const Index = () => {
                 {restaurants.map((restaurant) => (
                   <CarouselItem key={restaurant.id} className="basis-4/5">
                     <Card
-                      className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group bg-white rounded-3xl border border-purple/20 shadow-lg hover:scale-105 hover:border-purple/40 relative"
+                      className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft relative"
                       onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                     >
+                      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-purple/3 to-transparent bg-[length:1000px_100%]" />
                       <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
                         {restaurant.logo_url ? (
                           <img
@@ -242,20 +241,20 @@ const Index = () => {
                       </div>
                       
                       <CardContent className="p-3 relative">
-                        <h3 className="font-bold text-base mb-2 line-clamp-1 text-black">{restaurant.name}</h3>
+                        <h3 className="font-bold text-base mb-2 line-clamp-1 text-foreground">{restaurant.name}</h3>
                         
-                        <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4 text-purple" />
                             <span>2.4 km</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                            <span className="font-medium text-black">4.8</span>
+                            <Star className="h-4 w-4 fill-purple text-purple" />
+                            <span className="font-medium text-foreground">4.8</span>
                           </div>
                         </div>
                         
-                        <Badge variant="secondary" className="text-xs bg-purple/10 text-purple border border-purple/30">
+                        <Badge variant="secondary" className="text-xs bg-muted text-foreground">
                           {restaurant.cuisine_type}
                         </Badge>
                       </CardContent>
@@ -271,7 +270,7 @@ const Index = () => {
 
         {/* Explore Dishes Section */}
         <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 bg-gradient-to-r from-black via-purple to-black bg-clip-text text-transparent">
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
             <span className="text-purple">🍲</span> Explore Dishes
           </h2>
           
@@ -283,10 +282,10 @@ const Index = () => {
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className={`flex-shrink-0 rounded-full transition-all duration-300 ${
+                className={`flex-shrink-0 rounded-full ${
                   selectedCategory === category 
-                    ? "bg-purple text-white hover:shadow-lg shadow-md border border-purple/50" 
-                    : "border-purple/30 bg-white text-gray-700 hover:bg-purple/5 hover:border-purple/50"
+                    ? "bg-purple text-white hover:bg-purple-hover shadow-sm" 
+                    : "border-border text-foreground hover:bg-muted"
                 }`}
               >
                 {category}
@@ -312,7 +311,7 @@ const Index = () => {
               {restaurants.map((restaurant) => (
                 <Card
                   key={restaurant.id}
-                  className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group bg-white rounded-3xl border border-purple/20 shadow-lg hover:scale-105 hover:border-purple/40"
+                  className="overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-white rounded-2xl border border-border shadow-soft"
                   onClick={() => navigate(`/restaurant/${restaurant.id}`)}
                 >
                   <div className="relative h-32 overflow-hidden">
@@ -329,10 +328,10 @@ const Index = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                     
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                      <h3 className="font-bold text-sm text-white line-clamp-2 mb-1 drop-shadow-lg">{restaurant.name}</h3>
+                    <div className="absolute bottom-0 left-0 right-0 p-2">
+                      <h3 className="font-bold text-sm text-white line-clamp-2 mb-1">{restaurant.name}</h3>
                       <div className="flex items-center gap-1 text-white/95">
-                        <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                        <Star className="h-3 w-3 fill-purple text-purple" />
                         <span className="text-xs font-medium">4.8</span>
                         <span className="text-xs">• {restaurant.cuisine_type}</span>
                       </div>

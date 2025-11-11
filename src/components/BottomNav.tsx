@@ -14,7 +14,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-black/90 border-t border-white/10 z-50 shadow-premium backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-50 shadow-sm">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -25,14 +25,14 @@ const BottomNav = () => {
               key={tab.path}
               onClick={() => navigate(tab.path)}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative group",
-                isActive ? "text-purple-glow" : "text-white/60 hover:text-white/90"
+                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative",
+                isActive ? "text-purple" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className={cn("h-6 w-6 transition-all duration-300", isActive && "scale-110 drop-shadow-glow")} />
+              <Icon className={cn("h-6 w-6 transition-transform", isActive && "scale-110")} />
               <span className="text-xs font-medium">{tab.label}</span>
               {isActive && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-purple to-purple-glow rounded-full shadow-premium-glow" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-purple rounded-full" />
               )}
             </button>
           );
