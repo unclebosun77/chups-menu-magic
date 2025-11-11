@@ -256,10 +256,19 @@ const RestaurantMenu = () => {
                       {items.map((item, itemIdx) => (
                         <Card
                           key={item.id}
-                          className="cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in-up"
+                          className="cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in-up overflow-hidden"
                           style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
                           onClick={() => handleItemClick(item)}
                         >
+                          {item.image_url && (
+                            <div className="h-48 overflow-hidden">
+                              <img
+                                src={item.image_url}
+                                alt={item.name}
+                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                          )}
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
