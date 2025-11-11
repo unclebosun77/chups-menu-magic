@@ -126,28 +126,18 @@ const Index = () => {
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
             <IconTile
               icon={UtensilsCrossed}
-              label="Order Food"
+              label="Dine-In"
               onClick={() => navigate("/discover")}
             />
             <IconTile
               icon={Calendar}
-              label="Book Table"
+              label="Reservations"
               onClick={() => navigate("/services")}
             />
             <IconTile
-              icon={PartyPopper}
-              label="Catering"
-              onClick={() => navigate("/catering")}
-            />
-            <IconTile
               icon={Bot}
-              label="AI Assistant"
+              label="Ask CHUPS"
               onClick={() => navigate("/ai-assistant")}
-            />
-            <IconTile
-              icon={ShoppingBag}
-              label="My Orders"
-              onClick={() => navigate("/my-orders")}
             />
             <IconTile
               icon={Calendar}
