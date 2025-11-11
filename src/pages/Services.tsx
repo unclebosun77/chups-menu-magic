@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
 import { EventPlannerModal } from "@/components/EventPlannerModal";
+import IconTile from "@/components/IconTile";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -207,60 +208,50 @@ const Services = () => {
       {/* Quick Services */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">Quick Services</h2>
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          {quickServices.map((service) => {
-            const Icon = service.icon;
-            return (
-              <Card 
-                key={service.title} 
-                className="cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in"
-                onClick={() => handleQuickServiceClick(service.title)}
-              >
-                <CardHeader className="p-3">
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className={`p-2 rounded-lg ${service.color} flex items-center justify-center w-12 h-12`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm mb-0.5">{service.title}</CardTitle>
-                      <CardDescription className="text-xs">{service.description}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
+        <div className="grid grid-cols-3 gap-3">
+          {quickServices.map((service) => (
+            <IconTile
+              key={service.title}
+              icon={service.icon}
+              label={service.title}
+              onClick={() => handleQuickServiceClick(service.title)}
+              size="md"
+            />
+          ))}
         </div>
       </div>
 
       {/* Experiences */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">Curated Experiences</h2>
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {experienceCategories.map((category) => (
-            <Card 
-              key={category.id} 
-              className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color} ${
-                category.id === 'celebrations' ? 'ring-2 ring-primary ring-offset-2' : ''
-              }`}
-              onClick={() => handleCategoryClick(category)}
-            >
-              <CardHeader className="p-3 h-full relative">
+        <div className="grid grid-cols-3 gap-3">
+          {experienceCategories.map((category) => {
+            const categoryIcons = {
+              dining: UtensilsCrossed,
+              pairings: Wine,
+              learning: ChefHat,
+              membership: Crown,
+              celebrations: PartyPopper,
+              wellness: Leaf,
+              addons: Sparkles
+            };
+            const IconComponent = categoryIcons[category.id as keyof typeof categoryIcons] || Sparkles;
+            
+            return (
+              <div key={category.id} className="relative">
+                <IconTile
+                  icon={IconComponent}
+                  label={category.title}
+                  onClick={() => handleCategoryClick(category)}
+                  size="lg"
+                  className={category.id === 'celebrations' ? 'ring-2 ring-purple/30' : ''}
+                />
                 {category.id === 'celebrations' && (
-                  <div className="absolute top-2 right-2">
-                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                  </div>
+                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-purple rounded-full animate-pulse" />
                 )}
-                <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
-                  <span className="text-4xl">{category.emoji}</span>
-                  <CardTitle className="text-sm">{category.title}</CardTitle>
-                  {category.id === 'celebrations' && (
-                    <p className="text-xs text-primary font-medium">✨ AI-Powered</p>
-                  )}
-                </div>
-              </CardHeader>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 

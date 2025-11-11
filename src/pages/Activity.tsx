@@ -420,37 +420,42 @@ const Activity = () => {
       </div>
 
       {/* Activity Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-blue-500" />
+      <div>
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
+          <span className="text-purple">📊</span> Overview
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="rounded-2xl bg-background border border-border/50 p-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)" }}>
+            <div className="mx-auto mb-2 w-fit rounded-xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent p-2.5">
+              <ShoppingBag className="h-6 w-6 text-blue-500" />
+            </div>
             <p className="text-2xl font-bold">{filterActivities('order').length}</p>
             <p className="text-xs text-muted-foreground">Orders</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Calendar className="h-6 w-6 mx-auto mb-2 text-purple-500" />
+          </div>
+          <div className="rounded-2xl bg-background border border-border/50 p-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)" }}>
+            <div className="mx-auto mb-2 w-fit rounded-xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent p-2.5">
+              <Calendar className="h-6 w-6 text-purple-500" />
+            </div>
             <p className="text-2xl font-bold">{filterActivities('booking').length}</p>
             <p className="text-xs text-muted-foreground">Bookings</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <ChefHat className="h-6 w-6 mx-auto mb-2 text-orange-500" />
+          </div>
+          <div className="rounded-2xl bg-background border border-border/50 p-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)" }}>
+            <div className="mx-auto mb-2 w-fit rounded-xl bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent p-2.5">
+              <ChefHat className="h-6 w-6 text-orange-500" />
+            </div>
             <p className="text-2xl font-bold">{filterActivities('catering').length}</p>
             <p className="text-xs text-muted-foreground">Catering</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Star className="h-6 w-6 mx-auto mb-2 text-yellow-500" />
+          </div>
+          <div className="rounded-2xl bg-background border border-border/50 p-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)" }}>
+            <div className="mx-auto mb-2 w-fit rounded-xl bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent p-2.5">
+              <Star className="h-6 w-6 text-yellow-500" />
+            </div>
             <p className="text-2xl font-bold">
               {filterActivities('reward').reduce((sum, a) => sum + (a.points || 0), 0)}
             </p>
             <p className="text-xs text-muted-foreground">Points</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Activity Tabs */}

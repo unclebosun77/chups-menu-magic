@@ -17,6 +17,9 @@ import Autoplay from "embla-carousel-autoplay";
 import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
 import LoadingState from "@/components/LoadingState";
+import DiscoverTiles from "@/components/DiscoverTiles";
+import OrderTiles from "@/components/OrderTiles";
+import ExperiencesTiles from "@/components/ExperiencesTiles";
 
 type Restaurant = {
   id: string;
@@ -118,9 +121,18 @@ const Index = () => {
         </div>
 
         {/* Discover Section */}
+        <DiscoverTiles />
+
+        {/* Orders Section */}
+        <OrderTiles />
+
+        {/* Experiences Section */}
+        <ExperiencesTiles />
+
+        {/* Restaurant Cards - Now labeled as "Featured" */}
         <div>
           <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
-            <span className="text-purple">🍽️</span> Discover
+            <span className="text-purple">⭐</span> Featured
           </h2>
           
           {isLoading ? (
