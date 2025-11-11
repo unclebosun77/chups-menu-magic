@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface ExperienceItem {
   name: string;
   icon: any;
+  emoji?: string;
   description: string;
   price?: string;
   duration?: string;
@@ -226,7 +227,11 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
                       <div className="flex flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <div className="p-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <Icon className="h-5 w-5 text-primary" />
+                            {item.emoji ? (
+                              <span className="text-2xl">{item.emoji}</span>
+                            ) : (
+                              <Icon className="h-5 w-5 text-primary" />
+                            )}
                           </div>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <DollarSign className="h-3 w-3" />
