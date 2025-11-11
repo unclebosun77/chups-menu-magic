@@ -83,7 +83,7 @@ const Services = () => {
     },
     {
       id: "wellness",
-      title: "Health & Cooking",
+      title: "Health and Wellness",
       icon: Leaf,
       emoji: "🌿",
       color: "bg-gradient-to-br from-green-500/10 to-blue-500/10",
