@@ -167,11 +167,11 @@ const Services = () => {
       </div>
 
       {/* Quick Services */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <span className="text-purple">⚡</span> Quick Services
         </h2>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {quickServices.map((service) => (
             <IconTile
               key={service.label}
@@ -184,11 +184,11 @@ const Services = () => {
       </div>
 
       {/* Experiences */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <span className="text-purple">✨</span> Curated Experiences
         </h2>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+        <div className="grid grid-cols-3 gap-3">
           {experienceCategories.map((category) => (
             <IconTile
               key={category.id}
