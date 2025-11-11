@@ -61,10 +61,7 @@ const Services = () => {
       items: [
         { name: "Private Dining", icon: Users, emoji: "👥", description: "Intimate setups or hidden chef's tables" },
         { name: "Chef's Table Nights", icon: ChefHat, emoji: "👨‍🍳", description: "Behind-the-scenes tasting menus" },
-        { name: "Home Dining", icon: Home, emoji: "🏠", description: "Chef comes to you" },
         { name: "Pop-Up Restaurants & Food Events", icon: Sparkles, emoji: "⚡", description: "Limited-time culinary adventures" },
-        { name: "Rooftop / Outdoor Dining", icon: UtensilsCrossed, emoji: "🌃", description: "Dine under the stars" },
-        { name: "Surprise Dining", icon: Gift, emoji: "🎁", description: "Mystery chef, mystery menu" },
       ],
     },
     {
