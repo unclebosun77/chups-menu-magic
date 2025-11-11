@@ -55,7 +55,8 @@ const Services = () => {
   const experienceCategories = [
     {
       id: "dining",
-      title: "Exclusive Dining",
+      title: "Exclusive",
+      icon: UtensilsCrossed,
       emoji: "🍽️",
       color: "bg-gradient-to-br from-orange-500/10 to-red-500/10",
       items: [
@@ -69,7 +70,8 @@ const Services = () => {
     },
     {
       id: "pairings",
-      title: "Pairings & Tastings",
+      title: "Pairings",
+      icon: Wine,
       emoji: "🍷",
       color: "bg-gradient-to-br from-purple-500/10 to-pink-500/10",
       items: [
@@ -82,7 +84,8 @@ const Services = () => {
     },
     {
       id: "learning",
-      title: "Learning & Classes",
+      title: "Classes",
+      icon: ChefHat,
       emoji: "👩🏽‍🍳",
       color: "bg-gradient-to-br from-blue-500/10 to-cyan-500/10",
       items: [
@@ -95,7 +98,8 @@ const Services = () => {
     },
     {
       id: "membership",
-      title: "Membership & Lifestyle",
+      title: "VIP",
+      icon: Crown,
       emoji: "💎",
       color: "bg-gradient-to-br from-yellow-500/10 to-amber-500/10",
       items: [
@@ -108,7 +112,8 @@ const Services = () => {
     },
     {
       id: "celebrations",
-      title: "Occasions & Celebrations",
+      title: "Events",
+      icon: PartyPopper,
       emoji: "🎉",
       color: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
       items: [
@@ -122,7 +127,8 @@ const Services = () => {
     },
     {
       id: "wellness",
-      title: "Health & Wellness",
+      title: "Wellness",
+      icon: Leaf,
       emoji: "🌿",
       color: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
       items: [
@@ -135,7 +141,8 @@ const Services = () => {
     },
     {
       id: "addons",
-      title: "Add-On Experiences",
+      title: "Add-Ons",
+      icon: Gift,
       emoji: "✨",
       color: "bg-gradient-to-br from-indigo-500/10 to-violet-500/10",
       items: [
@@ -194,31 +201,18 @@ const Services = () => {
 
       {/* Experiences */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Curated Experiences</h2>
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <span className="text-purple">✨</span> Curated Experiences
+        </h2>
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {experienceCategories.map((category) => (
-            <Card 
-              key={category.id} 
-              className={`cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in aspect-square ${category.color} ${
-                category.id === 'celebrations' ? 'ring-2 ring-primary ring-offset-2' : ''
-              }`}
+            <IconTile
+              key={category.id}
+              icon={category.icon}
+              label={category.title}
               onClick={() => handleCategoryClick(category)}
-            >
-              <CardHeader className="p-3 h-full relative">
-                {category.id === 'celebrations' && (
-                  <div className="absolute top-2 right-2">
-                    <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                  </div>
-                )}
-                <div className="flex flex-col items-center text-center gap-2 h-full justify-center">
-                  <span className="text-4xl">{category.emoji}</span>
-                  <CardTitle className="text-sm">{category.title}</CardTitle>
-                  {category.id === 'celebrations' && (
-                    <p className="text-xs text-primary font-medium">✨ AI-Powered</p>
-                  )}
-                </div>
-              </CardHeader>
-            </Card>
+              className={category.id === 'celebrations' ? 'ring-2 ring-primary' : ''}
+            />
           ))}
         </div>
       </div>
