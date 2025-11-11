@@ -25,9 +25,9 @@ const IconTile = ({
   };
 
   const iconSizeClasses = {
-    sm: "h-8 w-8",
-    md: "h-10 w-10",
-    lg: "h-12 w-12"
+    sm: "h-6 w-6",
+    md: "h-7 w-7",
+    lg: "h-9 w-9"
   };
 
   return (
