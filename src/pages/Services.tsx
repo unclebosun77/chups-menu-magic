@@ -27,21 +27,25 @@ const Services = () => {
   const quickServices = [
     {
       icon: UtensilsCrossed,
+      emoji: "🍽️",
       label: "Dine-In",
       onClick: () => navigate("/discover"),
     },
     {
       icon: Gift,
+      emoji: "🎁",
       label: "Rewards",
       onClick: () => navigate("/rewards"),
     },
     {
       icon: MapPin,
+      emoji: "📍",
       label: "Locations",
       onClick: () => navigate("/discover"),
     },
     {
       icon: Phone,
+      emoji: "📞",
       label: "Book Table",
       onClick: () => navigate("/bookings"),
     },
@@ -161,21 +165,23 @@ const Services = () => {
 
   return (
     <div className="p-4 space-y-6 pb-24">
-      <div className="pt-4">
+      <div className="pt-4 pb-2">
         <h1 className="text-3xl font-bold bg-gradient-purple-glow bg-clip-text text-transparent">Services & Experiences</h1>
         <p className="text-muted-foreground mt-1">Explore everything CHUPS offers</p>
       </div>
 
       {/* Quick Services */}
-      <div className="space-y-4">
+      <div className="space-y-4 p-5 rounded-3xl bg-gradient-to-br from-purple/5 via-background to-purple/5 border border-purple/10 shadow-soft">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <span className="text-purple">⚡</span> Quick Services
+          <span className="text-2xl">⚡</span> 
+          <span className="bg-gradient-purple-glow bg-clip-text text-transparent">Quick Services</span>
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {quickServices.map((service) => (
             <IconTile
               key={service.label}
               icon={service.icon}
+              emoji={service.emoji}
               label={service.label}
               onClick={service.onClick}
             />
@@ -184,18 +190,20 @@ const Services = () => {
       </div>
 
       {/* Experiences */}
-      <div className="space-y-4">
+      <div className="space-y-4 p-5 rounded-3xl bg-gradient-to-br from-accent/10 via-background to-accent/10 border border-accent/20 shadow-soft">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <span className="text-purple">✨</span> Curated Experiences
+          <span className="text-2xl">✨</span> 
+          <span className="bg-gradient-purple-glow bg-clip-text text-transparent">Curated Experiences</span>
         </h2>
         <div className="grid grid-cols-3 gap-3">
           {experienceCategories.map((category) => (
             <IconTile
               key={category.id}
               icon={category.icon}
+              emoji={category.emoji}
               label={category.title}
               onClick={() => handleCategoryClick(category)}
-              className={category.id === 'celebrations' ? 'ring-2 ring-primary' : ''}
+              className={category.id === 'celebrations' ? 'ring-2 ring-primary animate-pulse-glow' : ''}
             />
           ))}
         </div>
@@ -222,11 +230,13 @@ const Services = () => {
         occasionType={selectedOccasion}
       />
 
-      <Card className="animate-fade-in">
+      <Card className="animate-fade-in border-2 border-primary/20 shadow-hover bg-gradient-to-br from-background via-primary/5 to-background">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" />
-            <CardTitle>Dining Reminders</CardTitle>
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="bg-gradient-purple-glow bg-clip-text text-transparent">Dining Reminders</CardTitle>
           </div>
           <CardDescription>Set reminders for your next dining experience</CardDescription>
         </CardHeader>
