@@ -1,4 +1,4 @@
-import { UtensilsCrossed, ChefHat, PartyPopper } from "lucide-react";
+import { Calendar, Gift, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import IconTile from "./IconTile";
 
@@ -7,19 +7,19 @@ const ExperiencesTiles = () => {
 
   const experienceOptions = [
     {
-      icon: UtensilsCrossed,
-      label: "Dine-in",
+      icon: Calendar,
+      label: "Book Table",
       onClick: () => navigate("/services")
     },
     {
-      icon: ChefHat,
-      label: "Private Chef",
-      onClick: () => navigate("/services")
+      icon: Gift,
+      label: "Gift Cards",
+      onClick: () => navigate("/rewards")
     },
     {
-      icon: PartyPopper,
-      label: "Events",
-      onClick: () => navigate("/services")
+      icon: Star,
+      label: "Rewards",
+      onClick: () => navigate("/rewards")
     }
   ];
 

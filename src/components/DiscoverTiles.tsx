@@ -1,4 +1,4 @@
-import { MapPin, UtensilsCrossed, Grid3x3 } from "lucide-react";
+import { MapPin, Compass, Tag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import IconTile from "./IconTile";
 
@@ -7,8 +7,8 @@ const DiscoverTiles = () => {
 
   const discoverOptions = [
     {
-      icon: UtensilsCrossed,
-      label: "Restaurants",
+      icon: Compass,
+      label: "Discover",
       onClick: () => navigate("/discover")
     },
     {
@@ -17,8 +17,8 @@ const DiscoverTiles = () => {
       onClick: () => navigate("/discover")
     },
     {
-      icon: Grid3x3,
-      label: "Categories",
+      icon: Tag,
+      label: "Offers",
       onClick: () => navigate("/discover")
     }
   ];
