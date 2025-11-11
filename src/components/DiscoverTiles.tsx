@@ -25,8 +25,8 @@ const DiscoverTiles = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
-        <span className="text-purple">🍽️</span> Discover
+      <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+        <span className="text-purple-glow drop-shadow-glow">🍽️</span> Discover
       </h2>
       <div className="grid grid-cols-3 gap-3">
         {discoverOptions.map((option) => (
