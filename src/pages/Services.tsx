@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
 import { EventPlannerModal } from "@/components/EventPlannerModal";
+import { IconTile } from "@/components/IconTile";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -23,61 +24,31 @@ const Services = () => {
   const [isEventPlannerOpen, setIsEventPlannerOpen] = useState(false);
   const [selectedOccasion, setSelectedOccasion] = useState<string | undefined>();
 
-  const handleQuickServiceClick = (serviceTitle: string) => {
-    switch(serviceTitle) {
-      case "Dine-In":
-        navigate("/discover");
-        break;
-      case "Catering":
-        navigate("/catering");
-        break;
-      case "Rewards & Gift Cards":
-        navigate("/rewards");
-        break;
-      case "Find Locations":
-        navigate("/discover");
-        break;
-      case "Reservations":
-        navigate("/bookings");
-        break;
-    }
-  };
-
   const quickServices = [
     {
       icon: UtensilsCrossed,
-      emoji: "🍽️",
-      title: "Dine-In",
-      description: "Reserve a table at your favorite spot",
-      color: "bg-orange-500/10 text-orange-500",
+      label: "Dine-In",
+      onClick: () => navigate("/discover"),
     },
     {
       icon: Calendar,
-      emoji: "🎉",
-      title: "Catering",
-      description: "Order for your next event",
-      color: "bg-purple-500/10 text-purple-500",
+      label: "Catering",
+      onClick: () => navigate("/catering"),
     },
     {
       icon: Gift,
-      emoji: "🎁",
-      title: "Rewards & Gift Cards",
-      description: "Earn points and send gift cards",
-      color: "bg-yellow-500/10 text-yellow-500",
+      label: "Rewards",
+      onClick: () => navigate("/rewards"),
     },
     {
       icon: MapPin,
-      emoji: "📍",
-      title: "Find Locations",
-      description: "Discover restaurants near you",
-      color: "bg-red-500/10 text-red-500",
+      label: "Locations",
+      onClick: () => navigate("/discover"),
     },
     {
       icon: Phone,
-      emoji: "📅",
-      title: "Reservations",
-      description: "Quick table reservation",
-      color: "bg-teal-500/10 text-teal-500",
+      label: "Book Table",
+      onClick: () => navigate("/bookings"),
     },
   ];
 
@@ -206,30 +177,18 @@ const Services = () => {
 
       {/* Quick Services */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Quick Services</h2>
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          {quickServices.map((service) => {
-            const Icon = service.icon;
-            return (
-              <Card 
-                key={service.title} 
-                className="cursor-pointer hover:shadow-lg transition-all hover-scale animate-fade-in"
-                onClick={() => handleQuickServiceClick(service.title)}
-              >
-                <CardHeader className="p-3">
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className={`p-2 rounded-lg ${service.color} flex items-center justify-center w-12 h-12`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm mb-0.5">{service.title}</CardTitle>
-                      <CardDescription className="text-xs">{service.description}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <span className="text-purple">⚡</span> Quick Services
+        </h2>
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {quickServices.map((service) => (
+            <IconTile
+              key={service.label}
+              icon={service.icon}
+              label={service.label}
+              onClick={service.onClick}
+            />
+          ))}
         </div>
       </div>
 
