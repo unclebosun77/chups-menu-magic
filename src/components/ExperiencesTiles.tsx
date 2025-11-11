@@ -8,17 +8,17 @@ const ExperiencesTiles = () => {
   const experienceOptions = [
     {
       icon: Calendar,
-      label: "Book Table",
+      label: "📅 Book Table",
       onClick: () => navigate("/services")
     },
     {
       icon: Gift,
-      label: "Gift Cards",
+      label: "🎁 Gift Cards",
       onClick: () => navigate("/rewards")
     },
     {
       icon: Star,
-      label: "Rewards",
+      label: "⭐ Rewards",
       onClick: () => navigate("/rewards")
     }
   ];

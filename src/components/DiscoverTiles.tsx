@@ -8,17 +8,17 @@ const DiscoverTiles = () => {
   const discoverOptions = [
     {
       icon: Compass,
-      label: "Discover",
+      label: "🧭 Discover",
       onClick: () => navigate("/discover")
     },
     {
       icon: MapPin,
-      label: "Near Me",
+      label: "📍 Near Me",
       onClick: () => navigate("/discover")
     },
     {
       icon: Tag,
-      label: "Offers",
+      label: "🏷️ Offers",
       onClick: () => navigate("/discover")
     }
   ];
