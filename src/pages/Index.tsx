@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ChefHat, MapPin, Star, Search, UtensilsCrossed, Sparkles } from "lucide-react";
+import { ChefHat, MapPin, Star, Search, UtensilsCrossed, Sparkles, Calendar, ShoppingBag, PartyPopper, Bot } from "lucide-react";
+import { IconTile } from "@/components/IconTile";
 import {
   Carousel,
   CarouselContent,
@@ -114,6 +115,45 @@ const Index = () => {
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
+            <span className="text-purple">⚡</span> Quick Actions
+          </h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <IconTile
+              icon={UtensilsCrossed}
+              label="Order Food"
+              onClick={() => navigate("/discover")}
+            />
+            <IconTile
+              icon={Calendar}
+              label="Book Table"
+              onClick={() => navigate("/services")}
+            />
+            <IconTile
+              icon={PartyPopper}
+              label="Catering"
+              onClick={() => navigate("/catering")}
+            />
+            <IconTile
+              icon={Bot}
+              label="AI Assistant"
+              onClick={() => navigate("/ai-assistant")}
+            />
+            <IconTile
+              icon={ShoppingBag}
+              label="My Orders"
+              onClick={() => navigate("/my-orders")}
+            />
+            <IconTile
+              icon={Calendar}
+              label="Bookings"
+              onClick={() => navigate("/my-bookings")}
+            />
           </div>
         </div>
 
