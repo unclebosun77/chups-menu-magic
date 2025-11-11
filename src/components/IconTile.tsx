@@ -17,7 +17,7 @@ export const IconTile = ({ icon: Icon, label, onClick, className, emoji }: IconT
         "flex flex-col items-center justify-center relative overflow-hidden",
         "bg-gradient-to-br from-white to-purple/5 backdrop-blur-sm",
         "rounded-2xl border border-purple/10 shadow-soft",
-        "p-4 gap-2 min-w-[90px]",
+        "p-3 gap-1.5 min-w-[80px]",
         "hover:shadow-hover hover:scale-105 hover:border-purple/30 hover:-translate-y-1",
         "active:scale-95 active:translate-y-0",
         "transition-all duration-300 ease-out",
@@ -31,14 +31,14 @@ export const IconTile = ({ icon: Icon, label, onClick, className, emoji }: IconT
       {/* Icon container with animation */}
       <div className="relative flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
         {emoji ? (
-          <span className="text-3xl filter drop-shadow-sm">{emoji}</span>
+          <span className="text-2xl filter drop-shadow-sm">{emoji}</span>
         ) : (
-          <Icon className="h-7 w-7 text-purple group-hover:text-purple-hover transition-colors duration-300" strokeWidth={2.5} />
+          <Icon className="h-5 w-5 text-purple group-hover:text-purple-hover transition-colors duration-300" strokeWidth={2.5} />
         )}
       </div>
       
       {/* Label */}
-      <span className="relative text-[9px] font-medium text-foreground text-center leading-tight group-hover:text-purple transition-colors duration-300">
+      <span className="relative text-[10px] font-medium text-foreground text-center leading-tight group-hover:text-purple transition-colors duration-300">
         {label}
       </span>
     </button>
