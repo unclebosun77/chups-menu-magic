@@ -31,11 +31,6 @@ const Services = () => {
       onClick: () => navigate("/discover"),
     },
     {
-      icon: Calendar,
-      label: "Catering",
-      onClick: () => navigate("/catering"),
-    },
-    {
       icon: Gift,
       label: "Rewards",
       onClick: () => navigate("/rewards"),
