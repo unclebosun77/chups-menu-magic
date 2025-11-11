@@ -199,61 +199,88 @@ const Services = () => {
   };
 
   return (
-    <div className="p-4 space-y-6 pb-24">
-      <div className="pt-4">
-        <h1 className="text-3xl font-bold bg-gradient-purple-glow bg-clip-text text-transparent">Services & Experiences</h1>
-        <p className="text-muted-foreground mt-1">Explore everything CHUPS offers</p>
-      </div>
-
-      {/* Quick Services */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Quick Services</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {quickServices.map((service) => (
-            <IconTile
-              key={service.title}
-              icon={service.icon}
-              label={service.title}
-              onClick={() => handleQuickServiceClick(service.title)}
-              size="md"
-            />
-          ))}
+    <div className="relative min-h-screen">
+      {/* Premium Background Layers */}
+      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-background/95 -z-10" />
+      <div className="fixed inset-0 bg-premium-mesh opacity-20 -z-10" />
+      <div className="fixed inset-0 bg-gradient-premium-radial opacity-30 -z-10" />
+      
+      <div className="p-4 space-y-8 pb-24 relative z-10">
+        <div className="pt-6 space-y-2">
+          <h1 className="text-4xl font-bold text-white drop-shadow-glow">
+            Services & Experiences
+          </h1>
+          <div className="h-0.5 w-32 bg-gradient-to-r from-purple-glow via-purple to-transparent rounded-full" />
+          <p className="text-white/70 mt-2">Explore everything CHUPS offers</p>
         </div>
-      </div>
 
-      {/* Experiences */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Curated Experiences</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {experienceCategories.map((category) => {
-            const categoryIcons = {
-              dining: UtensilsCrossed,
-              pairings: Wine,
-              learning: ChefHat,
-              membership: Crown,
-              celebrations: PartyPopper,
-              wellness: Leaf,
-              addons: Sparkles
-            };
-            const IconComponent = categoryIcons[category.id as keyof typeof categoryIcons] || Sparkles;
-            
-            return (
-              <div key={category.id} className="relative">
-                <IconTile
-                  icon={IconComponent}
-                  label={category.title}
-                  onClick={() => handleCategoryClick(category)}
-                  size="lg"
-                  className={category.id === 'celebrations' ? 'ring-2 ring-purple/30' : ''}
-                />
-                {category.id === 'celebrations' && (
-                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-purple rounded-full animate-pulse" />
-                )}
-              </div>
-            );
-          })}
+        {/* Quick Services */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+            <span className="text-purple-glow">⚡</span> Quick Services
+            <div className="h-px flex-1 bg-gradient-to-r from-purple-glow/30 to-transparent ml-3" />
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            {quickServices.slice(0, 2).map((service) => (
+              <IconTile
+                key={service.title}
+                icon={service.icon}
+                label={service.title}
+                onClick={() => handleQuickServiceClick(service.title)}
+                size="lg"
+                className="row-span-1"
+              />
+            ))}
+            {quickServices.slice(2).map((service) => (
+              <IconTile
+                key={service.title}
+                icon={service.icon}
+                label={service.title}
+                onClick={() => handleQuickServiceClick(service.title)}
+                size="md"
+              />
+            ))}
+          </div>
         </div>
-      </div>
+
+        {/* Curated Experiences */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+            <span className="text-purple-glow">✨</span> Curated Experiences
+            <div className="h-px flex-1 bg-gradient-to-r from-purple-glow/30 to-transparent ml-3" />
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            {experienceCategories.map((category) => {
+              const categoryIcons = {
+                dining: UtensilsCrossed,
+                pairings: Wine,
+                learning: ChefHat,
+                membership: Crown,
+                celebrations: PartyPopper,
+                wellness: Leaf,
+                addons: Sparkles
+              };
+              const IconComponent = categoryIcons[category.id as keyof typeof categoryIcons] || Sparkles;
+              
+              const isHero = category.id === 'dining' || category.id === 'celebrations';
+              
+              return (
+                <div key={category.id} className={`relative ${isHero ? 'col-span-3' : ''}`}>
+                  <IconTile
+                    icon={IconComponent}
+                    label={category.title}
+                    onClick={() => handleCategoryClick(category)}
+                    size={isHero ? "lg" : "md"}
+                    className={category.id === 'celebrations' ? 'ring-2 ring-purple-glow/50 shadow-glow' : ''}
+                  />
+                  {category.id === 'celebrations' && (
+                    <div className="absolute -top-1 -right-1 h-3 w-3 bg-purple-glow rounded-full animate-pulse-glow shadow-glow" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
       {/* Experience Detail Modal */}
       <ExperienceDetailModal
@@ -276,34 +303,35 @@ const Services = () => {
         occasionType={selectedOccasion}
       />
 
-      <Card className="animate-fade-in">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" />
-            <CardTitle>Dining Reminders</CardTitle>
-          </div>
-          <CardDescription>Set reminders for your next dining experience</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-center">
-            <CalendarComponent
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">What do you want to eat?</label>
-            <textarea
-              value={reminderNote}
-              onChange={(e) => setReminderNote(e.target.value)}
-              placeholder="e.g., Thai food with friends, Anniversary dinner..."
-              className="w-full min-h-[80px] px-3 py-2 rounded-md border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="animate-fade-in bg-card-premium border-white/10 shadow-premium-glow backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-purple-glow drop-shadow-glow" />
+              <CardTitle className="text-white">Dining Reminders</CardTitle>
+            </div>
+            <CardDescription className="text-white/60">Set reminders for your next dining experience</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+              <CalendarComponent
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border border-white/10 bg-card/50 backdrop-blur-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white/90">What do you want to eat?</label>
+              <textarea
+                value={reminderNote}
+                onChange={(e) => setReminderNote(e.target.value)}
+                placeholder="e.g., Thai food with friends, Anniversary dinner..."
+                className="w-full min-h-[80px] px-3 py-2 rounded-md border border-white/10 bg-card/50 backdrop-blur-sm text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-glow placeholder:text-white/40"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
