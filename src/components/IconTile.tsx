@@ -38,7 +38,7 @@ export const IconTile = ({ icon: Icon, label, onClick, className, emoji }: IconT
       </div>
       
       {/* Label */}
-      <span className="relative text-[11px] font-semibold text-foreground text-center leading-tight group-hover:text-purple transition-colors duration-300">
+      <span className="relative text-[9px] font-medium text-foreground text-center leading-tight group-hover:text-purple transition-colors duration-300">
         {label}
       </span>
     </button>
