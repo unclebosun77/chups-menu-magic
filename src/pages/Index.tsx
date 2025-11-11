@@ -187,7 +187,7 @@ const Index = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <ChefHat className="h-16 w-16 text-muted-foreground/40" />
+                        <ChefHat className="h-12 w-12 text-muted-foreground/40" />
                       </div>
                     )}
                     {restaurant.is_open && (
@@ -266,7 +266,7 @@ const Index = () => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <ChefHat className="h-14 w-14 text-muted-foreground/40" />
+                            <ChefHat className="h-10 w-10 text-muted-foreground/40" />
                           </div>
                         )}
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
@@ -357,7 +357,7 @@ const Index = () => {
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                        <ChefHat className="h-10 w-10 text-muted-foreground/40" />
+                        <ChefHat className="h-8 w-8 text-muted-foreground/40" />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
