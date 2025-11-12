@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { getMenuImage } from "@/utils/menuImageMapper";
 
 type MenuItem = {
   id: string;
@@ -42,7 +43,7 @@ const MenuItemDialog = ({ item, open, onOpenChange, onAddToOrder }: MenuItemDial
         {item.image_url && (
           <div className="w-full aspect-[4/3] overflow-hidden rounded-lg">
             <img
-              src={item.image_url}
+              src={getMenuImage(item.image_url) || ''}
               alt={item.name}
               className="w-full h-full object-cover"
             />
