@@ -14,6 +14,7 @@ import RestaurantInfo from "@/components/RestaurantInfo";
 import RestaurantGallery from "@/components/RestaurantGallery";
 import SectionNavigation from "@/components/SectionNavigation";
 import EmptyState from "@/components/EmptyState";
+import { getMenuImage } from "@/utils/menuImageMapper";
 
 type Restaurant = {
   id: string;
