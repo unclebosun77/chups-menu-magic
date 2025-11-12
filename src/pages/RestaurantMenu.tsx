@@ -14,6 +14,7 @@ import RestaurantInfo from "@/components/RestaurantInfo";
 import RestaurantGallery from "@/components/RestaurantGallery";
 import SectionNavigation from "@/components/SectionNavigation";
 import EmptyState from "@/components/EmptyState";
+import { getMenuImage } from "@/utils/menuImageMapper";
 
 type Restaurant = {
   id: string;
@@ -263,7 +264,7 @@ const RestaurantMenu = () => {
                           {item.image_url && (
                             <div className="h-48 overflow-hidden">
                               <img
-                                src={item.image_url}
+                                src={getMenuImage(item.image_url) || ''}
                                 alt={item.name}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                               />

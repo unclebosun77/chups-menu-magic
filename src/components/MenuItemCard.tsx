@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { getMenuImage } from "@/utils/menuImageMapper";
 
 type MenuItem = {
   id: string;
@@ -27,7 +28,7 @@ const MenuItemCard = ({ item, onEdit, onDelete, onAddToOrder, isOwner }: MenuIte
       {item.image_url && (
         <div className="h-48 overflow-hidden">
           <img
-            src={item.image_url}
+            src={getMenuImage(item.image_url) || ''}
             alt={item.name}
             className="w-full h-full object-cover"
           />
