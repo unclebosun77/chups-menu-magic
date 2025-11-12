@@ -263,7 +263,7 @@ const RestaurantMenu = () => {
                           {item.image_url && (
                             <div className="h-48 overflow-hidden">
                               <img
-                                src={item.image_url}
+                                src={getMenuImage(item.image_url) || ''}
                                 alt={item.name}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                               />
