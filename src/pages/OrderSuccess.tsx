@@ -1,12 +1,35 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock, ChefHat, Flame, Utensils } from "lucide-react";
 
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { restaurantName, totalAmount, itemCount } = location.state || {};
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const trackingSteps = [
+    { label: "Order received", icon: CheckCircle2, color: "text-purple" },
+    { label: "Chef is prepping", icon: ChefHat, color: "text-orange-500" },
+    { label: "Cooking…", icon: Flame, color: "text-red-500" },
+    { label: "Ready to eat", icon: Utensils, color: "text-green-500" },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStep((prev) => {
+        if (prev < trackingSteps.length - 1) {
+          return prev + 1;
+        }
+        clearInterval(interval);
+        return prev;
+      });
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (!restaurantName) {
     navigate("/");
@@ -54,10 +77,53 @@ const OrderSuccess = () => {
             </div>
           </div>
 
+          {/* Order Tracking Animation */}
+          <div className="bg-muted/50 rounded-xl p-6 space-y-4">
+            <p className="text-sm font-semibold text-foreground mb-4">Order Progress</p>
+            <div className="space-y-3">
+              {trackingSteps.map((step, index) => {
+                const StepIcon = step.icon;
+                const isActive = index <= currentStep;
+                const isCurrent = index === currentStep;
+
+                return (
+                  <div
+                    key={step.label}
+                    className={`flex items-center gap-3 transition-all duration-500 ${
+                      isActive ? "opacity-100" : "opacity-30"
+                    }`}
+                  >
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
+                        isActive
+                          ? `${step.color} border-current bg-current/10 ${isCurrent ? "animate-pulse" : ""}`
+                          : "border-muted-foreground/20"
+                      }`}
+                    >
+                      <StepIcon className={`h-5 w-5 ${isActive ? step.color : "text-muted-foreground"}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className={`text-sm font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                        {step.label}
+                      </p>
+                    </div>
+                    {isCurrent && (
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Fun Note */}
           <div className="bg-muted/50 rounded-xl p-4">
             <p className="text-sm text-foreground">
-              🍳 Your order is being prepared with care. CHUPS AI will keep learning your preferences for next time.
+              🍳 CHUPS AI will keep learning your preferences for next time.
             </p>
           </div>
 

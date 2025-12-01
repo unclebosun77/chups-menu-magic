@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Star, Sparkles } from "lucide-react";
+import { Star, Sparkles, Search } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
@@ -16,6 +16,8 @@ import EmptyState from "@/components/EmptyState";
 import DishQuickView from "@/components/menu/DishQuickView";
 import SkeletonCard from "@/components/SkeletonCard";
 import { getMenuImage } from "@/utils/menuImageMapper";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Restaurant = {
   id: string;
@@ -55,6 +57,8 @@ const RestaurantMenu = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -299,7 +303,53 @@ const RestaurantMenu = () => {
 
   if (!restaurant) return null;
 
-  const groupedItems = menuItems.reduce((acc, item) => {
+  const categories = ["All", "Popular", "Spicy", "Vegan", "Chef's Special", "Comfort Food", "Seafood", "Chicken", "Beef"];
+
+  const filterDishByCategory = (item: MenuItem): boolean => {
+    if (selectedCategory === "All") return true;
+    
+    const itemName = item.name.toLowerCase();
+    const itemCategory = item.category.toLowerCase();
+    
+    if (selectedCategory === "Seafood") {
+      return itemName.includes("shrimp") || itemName.includes("fish") || itemName.includes("salmon") || itemName.includes("seafood");
+    }
+    if (selectedCategory === "Chicken") {
+      return itemName.includes("chicken");
+    }
+    if (selectedCategory === "Beef") {
+      return itemName.includes("beef");
+    }
+    if (selectedCategory === "Comfort Food") {
+      return itemName.includes("rice") || itemName.includes("pasta") || itemName.includes("noodles");
+    }
+    
+    return itemCategory.includes(selectedCategory.toLowerCase());
+  };
+
+  const filterDishBySearch = (item: MenuItem): boolean => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const itemName = item.name.toLowerCase();
+    const itemDesc = (item.description || "").toLowerCase();
+    const itemCategory = item.category.toLowerCase();
+    
+    return itemName.includes(query) || 
+           itemDesc.includes(query) || 
+           itemCategory.includes(query) ||
+           (itemName.includes("shrimp") && query.includes("shrimp")) ||
+           (itemName.includes("chicken") && query.includes("chicken")) ||
+           (itemName.includes("beef") && query.includes("beef")) ||
+           (itemName.includes("vegan") && query.includes("vegan")) ||
+           (itemName.includes("fish") && query.includes("fish"));
+  };
+
+  const filteredMenuItems = menuItems.filter(item => 
+    filterDishByCategory(item) && filterDishBySearch(item)
+  );
+
+  const groupedItems = filteredMenuItems.reduce((acc, item) => {
     if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
     return acc;
@@ -329,6 +379,35 @@ const RestaurantMenu = () => {
               <p className="font-semibold text-foreground">Chef's Special 추천 for your vibe today</p>
               <p className="text-sm text-muted-foreground">CHUPS AI picked these just for you</p>
             </div>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search this menu…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-12 text-base"
+          />
+        </div>
+
+        {/* Category Filters */}
+        <div className="mb-6 overflow-x-auto pb-2">
+          <div className="flex gap-2 min-w-min">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className={selectedCategory === category ? "bg-purple text-white hover:bg-purple-hover" : ""}
+              >
+                {category}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -374,7 +453,13 @@ const RestaurantMenu = () => {
           </TabsList>
 
           <TabsContent value="menu" className="mt-6">
-            {Object.entries(groupedItems).length === 0 ? (
+            {filteredMenuItems.length === 0 ? (
+              <EmptyState
+                icon="🔍"
+                title="No dishes match your search"
+                description="Try adjusting your filters or search terms."
+              />
+            ) : Object.entries(groupedItems).length === 0 ? (
               <EmptyState
                 icon="🍽️"
                 title="No menu items available yet"
