@@ -20,6 +20,7 @@ import MyOrders from "./pages/MyOrders";
 import MyBookings from "./pages/MyBookings";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
+import AIOrderChat from "./pages/AIOrderChat";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/ai-chat" element={<AIOrderChat />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/:restaurantId" element={<RestaurantMenu />} />

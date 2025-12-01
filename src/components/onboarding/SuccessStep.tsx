@@ -34,7 +34,7 @@ const SuccessStep = ({ restaurantName }: SuccessStepProps) => {
           <div className="flex-1 space-y-2">
             <h3 className="text-xl font-bold text-foreground">AI Engine Activated</h3>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Our AI is now analyzing your menu to optimize for real customer tastes and preferences. Get ready for smarter ordering experiences.
+              Our AI taste engine will now learn your menu and elevate customer cravings.
             </p>
           </div>
         </div>
