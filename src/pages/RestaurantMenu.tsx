@@ -190,6 +190,17 @@ const RestaurantMenu = () => {
 
       {/* Add padding for fixed header + navigation */}
       <div className="container mx-auto px-4 pt-8 pb-8">
+        {/* AI Suggestion Banner */}
+        <div className="mb-6 bg-gradient-to-r from-purple/10 to-secondary/10 border border-purple/20 rounded-2xl p-4 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">✨</div>
+            <div>
+              <p className="font-semibold text-foreground">Chef's Special 추천 for your vibe today</p>
+              <p className="text-sm text-muted-foreground">CHUPS AI picked these just for you</p>
+            </div>
+          </div>
+        </div>
+
         {/* Restaurant Info Cards */}
         <div 
           id="info"
