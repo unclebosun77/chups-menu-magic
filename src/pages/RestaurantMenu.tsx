@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Star } from "lucide-react";
-import OrderDialog from "@/components/OrderDialog";
 import MenuItemDialog from "@/components/MenuItemDialog";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
@@ -45,11 +44,11 @@ type OrderItem = MenuItem & { quantity: number };
 
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [order, setOrder] = useState<OrderItem[]>([]);
-  const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
 
@@ -138,6 +137,16 @@ const RestaurantMenu = () => {
     setShowItemDialog(true);
   };
 
+  const handleViewOrder = () => {
+    navigate("/order-summary", {
+      state: {
+        restaurantName: restaurant?.name,
+        restaurantId: restaurant?.id,
+        items: order,
+      },
+    });
+  };
+
   const handleNavigate = (section: "info" | "gallery" | "menu" | "reviews") => {
     const element = document.getElementById(section);
     if (element) {
@@ -183,7 +192,7 @@ const RestaurantMenu = () => {
         description={restaurant.description}
         isOpen={restaurant.is_open}
         orderCount={order.length}
-        onCartClick={() => setShowOrderDialog(true)}
+        onCartClick={handleViewOrder}
       />
 
       <SectionNavigation onNavigate={handleNavigate} />
@@ -318,21 +327,6 @@ const RestaurantMenu = () => {
           </Tabs>
         </div>
       </div>
-
-      <OrderDialog
-        open={showOrderDialog}
-        onOpenChange={setShowOrderDialog}
-        order={order}
-        restaurantId={restaurant.id}
-        restaurantName={restaurant.name}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveFromOrder}
-        totalAmount={totalAmount}
-        onSuccess={() => {
-          setOrder([]);
-          setShowOrderDialog(false);
-        }}
-      />
 
       <MenuItemDialog
         item={selectedItem}
