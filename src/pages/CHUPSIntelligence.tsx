@@ -54,10 +54,15 @@ const CHUPSIntelligence = () => {
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
         {/* Header */}
         <div className="text-center space-y-6 animate-fade-in-up">
-          <div className="inline-block">
-            <Badge className="text-sm px-4 py-2 mb-4 bg-gradient-warm text-white border-0">
-              AI-Powered Restaurant Intelligence
+          <div className="inline-block space-y-2">
+            <Badge className="text-sm px-4 py-2 bg-muted text-foreground border-border">
+              Demo Mode · No Deliveries · Kitchen-Focused
             </Badge>
+            <div>
+              <Badge className="text-sm px-4 py-2 bg-gradient-warm text-white border-0">
+                AI-Powered Restaurant Intelligence
+              </Badge>
+            </div>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold leading-tight">
             The taste engine that{" "}

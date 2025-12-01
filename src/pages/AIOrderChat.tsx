@@ -1,15 +1,13 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { ArrowLeft, Sparkles, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useOrder } from "@/context/OrderContext";
 
 const AIOrderChat = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number }>>([]);
+  const { orderItems, addToOrder, totalAmount, totalItems } = useOrder();
 
   const messages = [
     {
@@ -27,10 +25,10 @@ const AIOrderChat = () => {
   ];
 
   const handleAddSuggestion = (dish: { name: string; price: number }) => {
-    setOrderItems([...orderItems, dish]);
-    toast({
-      title: "Added to order",
-      description: `${dish.name} has been added to your order.`,
+    addToOrder({
+      id: `dish-${Date.now()}`,
+      name: dish.name,
+      price: dish.price,
     });
   };
 
@@ -124,30 +122,40 @@ const AIOrderChat = () => {
           ))}
         </div>
 
-        {/* Order Summary */}
-        {orderItems.length > 0 && (
-          <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t">
-            <div className="max-w-lg mx-auto">
+        {/* Helper Text + Order Summary */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+          <div className="max-w-lg mx-auto p-4 space-y-3">
+            <p className="text-sm text-muted-foreground text-center">
+              We'll remember what you liked as you explore menus.
+            </p>
+            {totalItems > 0 ? (
               <Card className="p-4 bg-gradient-warm text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm opacity-90">{orderItems.length} items in order</p>
+                    <p className="text-sm opacity-90">{totalItems} items in order</p>
                     <p className="text-2xl font-bold">
-                      ${orderItems.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+                      ${totalAmount.toFixed(2)}
                     </p>
                   </div>
                   <Button
                     variant="secondary"
                     size="lg"
-                    onClick={() => navigate("/restaurant/1")}
+                    onClick={() => navigate("/discover")}
                   >
-                    View Order
+                    Continue to Menu
                   </Button>
                 </div>
               </Card>
-            </div>
+            ) : (
+              <Button
+                onClick={() => navigate("/discover")}
+                className="w-full h-12 bg-purple text-white hover:bg-purple-hover"
+              >
+                Continue to Menu
+              </Button>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
