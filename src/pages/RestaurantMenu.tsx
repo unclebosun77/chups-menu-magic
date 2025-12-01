@@ -156,6 +156,59 @@ const RestaurantMenu = () => {
     return isMatch;
   };
 
+  const getMatchExplanation = (item: MenuItem): string | null => {
+    if (!profile) return null;
+
+    const reasons: string[] = [];
+    const itemName = item.name.toLowerCase();
+    const itemDesc = (item.description || "").toLowerCase();
+
+    // Check spice match
+    if (profile.spiceLevel === "hot" && item.category.toLowerCase().includes("spicy")) {
+      reasons.push("spicy");
+    } else if (profile.spiceLevel === "mild" && !item.category.toLowerCase().includes("spicy")) {
+      reasons.push("mild");
+    }
+
+    // Check protein match
+    const matchedProteins: string[] = [];
+    profile.proteins.forEach(protein => {
+      const p = protein.toLowerCase();
+      if (itemName.includes(p) || itemDesc.includes(p)) {
+        matchedProteins.push(protein);
+      }
+      if (p === "seafood" && (itemName.includes("shrimp") || itemName.includes("fish") || 
+          itemName.includes("salmon") || itemDesc.includes("seafood"))) {
+        matchedProteins.push("seafood");
+      }
+    });
+
+    // Check cuisine match
+    const cuisineMatch = restaurant && profile.cuisines.includes(restaurant.cuisine_type);
+
+    // Build explanation
+    if (reasons.length === 0 && matchedProteins.length === 0 && !cuisineMatch) {
+      return null;
+    }
+
+    let explanation = "Matches your love for ";
+    const parts: string[] = [];
+
+    if (reasons.length > 0) parts.push(reasons[0]);
+    if (matchedProteins.length > 0) parts.push(matchedProteins[0]);
+    if (cuisineMatch) parts.push(restaurant!.cuisine_type);
+
+    if (parts.length === 1) {
+      explanation += parts[0];
+    } else if (parts.length === 2) {
+      explanation += `${parts[0]} ${parts[1]}`;
+    } else {
+      explanation += `${parts[0]}, ${parts[1]} ${parts[2]}`;
+    }
+
+    return explanation;
+  };
+
   const handleAddToOrder = (item: MenuItem) => {
     setOrder((prev) => {
       const existing = prev.find((i) => i.id === item.id);
@@ -347,6 +400,11 @@ const RestaurantMenu = () => {
                                 <p className="text-xl font-bold text-primary">
                                   ${item.price.toFixed(2)}
                                 </p>
+                                {getMatchExplanation(item) && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {getMatchExplanation(item)}
+                                  </p>
+                                )}
                               </div>
                               {!item.available && (
                                 <Badge variant="secondary" className="shrink-0">
