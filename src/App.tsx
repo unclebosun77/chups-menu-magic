@@ -19,6 +19,7 @@ import AIAssistant from "./pages/AIAssistant";
 import MyOrders from "./pages/MyOrders";
 import MyBookings from "./pages/MyBookings";
 import NotFound from "./pages/NotFound";
+import OrderSuccess from "./pages/OrderSuccess";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/discover" element={<Discover />} />
           <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/:restaurantId" element={<RestaurantMenu />} />

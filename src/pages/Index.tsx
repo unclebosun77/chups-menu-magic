@@ -102,9 +102,18 @@ const Index = () => {
             
             <div className="relative z-10">
               <h1 className="text-2xl font-bold mb-2 animate-fade-in text-white">
-                Discover your next bite 🍴
+                Find food you already know you'll crave.
               </h1>
-              <p className="text-white/95 text-sm mb-4">CHUPS knows where to take you.</p>
+              
+              {/* AI Suggestion Chips */}
+              <div className="flex gap-2 mb-4">
+                <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs backdrop-blur-sm">
+                  🔥 Matches your taste
+                </Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs backdrop-blur-sm">
+                  ⏳ Quick prep picks
+                </Badge>
+              </div>
               
               {/* Search Bar */}
               <div className="relative">
