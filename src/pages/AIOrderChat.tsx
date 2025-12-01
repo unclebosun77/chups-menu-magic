@@ -111,6 +111,17 @@ const AIOrderChat = () => {
                   }`}
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
+                  {message.role === "assistant" && profile && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {profile.spiceLevel === "hot" && profile.cuisines.includes("Afro-Caribbean")
+                        ? "I picked this because you like spicy Afro-Caribbean flavours."
+                        : profile.spiceLevel === "mild" && profile.proteins.includes("seafood")
+                        ? "I picked this because you prefer milder seafood dishes."
+                        : profile.cuisines.length > 0
+                        ? `I picked this because you enjoy ${profile.cuisines[0]} cuisine.`
+                        : "I picked this based on what people with similar tastes usually enjoy."}
+                    </p>
+                  )}
                 </Card>
 
                 {message.suggestion && (
