@@ -488,15 +488,6 @@ const RestaurantMenu = () => {
                           style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
                           onClick={() => handleItemClick(item)}
                         >
-                          {item.image_url && (
-                            <div className="h-48 overflow-hidden">
-                              <img
-                                src={getMenuImage(item.image_url) || ''}
-                                alt={item.name}
-                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                              />
-                            </div>
-                          )}
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
@@ -511,6 +502,7 @@ const RestaurantMenu = () => {
                                     </Badge>
                                   )}
                                 </div>
+                                <p className="text-xs text-muted-foreground mb-2">Tap to view dish</p>
                                 {item.description && (
                                   <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                                     {item.description}
