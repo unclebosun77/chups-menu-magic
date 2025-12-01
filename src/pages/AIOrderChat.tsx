@@ -112,7 +112,7 @@ const AIOrderChat = () => {
                         className="flex-shrink-0"
                       >
                         <Plus className="w-4 h-4 mr-1" />
-                        Add to Order
+                        Add this to my order
                       </Button>
                     </div>
                   </Card>
@@ -151,7 +151,7 @@ const AIOrderChat = () => {
                 onClick={() => navigate("/discover")}
                 className="w-full h-12 bg-purple text-white hover:bg-purple-hover"
               >
-                Continue to Menu
+                Continue browsing restaurants
               </Button>
             )}
           </div>

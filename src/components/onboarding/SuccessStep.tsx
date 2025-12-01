@@ -79,7 +79,7 @@ const SuccessStep = ({ restaurantName }: SuccessStepProps) => {
           onClick={() => navigate("/discover")}
           className="w-full h-12 text-base"
         >
-          View your menu like a diner → Discover
+          View your menu as a customer
         </Button>
         <Button
           variant="ghost"
