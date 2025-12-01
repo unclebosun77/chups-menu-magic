@@ -20,6 +20,7 @@ import MyOrders from "./pages/MyOrders";
 import MyBookings from "./pages/MyBookings";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
+import OrderSummary from "./pages/OrderSummary";
 import AIOrderChat from "./pages/AIOrderChat";
 import CHUPSIntelligence from "./pages/CHUPSIntelligence";
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/ai-chat" element={<AIOrderChat />} />
           <Route path="/chups-intelligence" element={<CHUPSIntelligence />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />

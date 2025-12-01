@@ -19,10 +19,10 @@ const SuccessStep = ({ restaurantName }: SuccessStepProps) => {
           </div>
         </div>
         <h2 className="text-4xl font-bold bg-gradient-warm bg-clip-text text-transparent">
-          Welcome to CHUPS!
+          Restaurant successfully onboarded on CHUPS.
         </h2>
         <p className="text-xl text-muted-foreground max-w-md mx-auto">
-          <span className="font-semibold text-foreground">{restaurantName}</span> successfully onboarded
+          <span className="font-semibold text-foreground">{restaurantName}</span> is now live on the platform
         </p>
       </div>
 
@@ -32,7 +32,7 @@ const SuccessStep = ({ restaurantName }: SuccessStepProps) => {
             <Sparkles className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1 space-y-2">
-            <h3 className="text-xl font-bold text-foreground">AI Engine Activated</h3>
+            <h3 className="text-xl font-bold text-foreground">AI Taste Engine Activated</h3>
             <p className="text-base text-muted-foreground leading-relaxed">
               Our AI taste engine will now learn your menu and elevate customer cravings.
             </p>

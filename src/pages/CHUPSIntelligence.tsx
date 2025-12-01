@@ -45,6 +45,7 @@ const CHUPSIntelligence = () => {
   ];
 
   const handleResetDemo = () => {
+    // Clear any demo state if needed
     navigate("/restaurant/onboarding");
   };
 
