@@ -10,6 +10,7 @@ import { Search, MapPin, Star, Clock, Filter, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
+import SkeletonCard from "@/components/SkeletonCard";
 
 type Restaurant = {
   id: string;
@@ -218,8 +219,10 @@ const Discover = () => {
       {/* Restaurant Grid */}
       <div className="container mx-auto px-4 py-8">
         {isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading restaurants...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonCard key={i} type="grid" />
+            ))}
           </div>
         ) : filteredRestaurants.length === 0 ? (
           <div className="text-center py-12">

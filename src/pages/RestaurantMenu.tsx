@@ -7,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Star, Sparkles } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
-import MenuItemDialog from "@/components/MenuItemDialog";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
 import RestaurantInfo from "@/components/RestaurantInfo";
 import RestaurantGallery from "@/components/RestaurantGallery";
 import SectionNavigation from "@/components/SectionNavigation";
 import EmptyState from "@/components/EmptyState";
+import DishQuickView from "@/components/menu/DishQuickView";
+import SkeletonCard from "@/components/SkeletonCard";
 import { getMenuImage } from "@/utils/menuImageMapper";
 
 type Restaurant = {
@@ -53,11 +54,13 @@ const RestaurantMenu = () => {
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!restaurantId) return;
     
     const loadData = async () => {
+      setIsLoading(true);
       const { data: restaurantData, error: restError } = await supabase
         .from("restaurants")
         .select("*")
@@ -66,6 +69,7 @@ const RestaurantMenu = () => {
 
       if (restError || !restaurantData) {
         toast({ title: "Restaurant not found", variant: "destructive" });
+        setIsLoading(false);
         return;
       }
 
@@ -87,6 +91,8 @@ const RestaurantMenu = () => {
       } else {
         setMenuItems(menuData || []);
       }
+      
+      setIsLoading(false);
     };
 
     loadData();
@@ -209,15 +215,15 @@ const RestaurantMenu = () => {
     return explanation;
   };
 
-  const handleAddToOrder = (item: MenuItem) => {
+  const handleAddToOrder = (item: MenuItem, quantity: number = 1) => {
     setOrder((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
-        return prev.map((i) => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map((i) => i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i);
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity }];
     });
-    toast({ title: `Added ${item.name} to order` });
+    toast({ title: `Added ${quantity}x ${item.name} to order` });
   };
 
   const handleItemClick = (item: MenuItem) => {
@@ -262,6 +268,34 @@ const RestaurantMenu = () => {
   };
 
   const totalAmount = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Skeleton Header */}
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-muted animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-6 bg-muted rounded w-48 animate-pulse" />
+                <div className="h-4 bg-muted rounded w-32 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 pt-8 pb-8">
+          {/* Skeleton Menu Items */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonCard key={i} type="grid" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!restaurant) return null;
 
@@ -429,10 +463,10 @@ const RestaurantMenu = () => {
         </div>
       </div>
 
-      <MenuItemDialog
-        item={selectedItem}
-        open={showItemDialog}
-        onOpenChange={setShowItemDialog}
+      <DishQuickView
+        dish={selectedItem}
+        isOpen={showItemDialog}
+        onClose={() => setShowItemDialog(false)}
         onAddToOrder={handleAddToOrder}
       />
     </div>
