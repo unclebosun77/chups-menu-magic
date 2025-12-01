@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Star } from "lucide-react";
+import { Star, Sparkles } from "lucide-react";
+import { useTasteProfile } from "@/context/TasteProfileContext";
 import MenuItemDialog from "@/components/MenuItemDialog";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantHeader from "@/components/RestaurantHeader";
@@ -46,6 +47,7 @@ const RestaurantMenu = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile } = useTasteProfile();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [order, setOrder] = useState<OrderItem[]>([]);
@@ -119,6 +121,39 @@ const RestaurantMenu = () => {
     }
 
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+  };
+
+  const isItemRecommended = (item: MenuItem): boolean => {
+    if (!profile) return false;
+    
+    let isMatch = false;
+    const itemName = item.name.toLowerCase();
+    const itemDesc = (item.description || "").toLowerCase();
+    
+    // Check spice preference
+    if (profile.spiceLevel === "hot" && item.category.toLowerCase().includes("spicy")) {
+      isMatch = true;
+    }
+    
+    // Check protein preferences
+    profile.proteins.forEach(protein => {
+      const p = protein.toLowerCase();
+      if (itemName.includes(p) || itemDesc.includes(p)) {
+        isMatch = true;
+      }
+      // Handle seafood variations
+      if (p === "seafood" && (itemName.includes("shrimp") || itemName.includes("fish") || 
+          itemName.includes("salmon") || itemDesc.includes("seafood"))) {
+        isMatch = true;
+      }
+    });
+    
+    // Boost if restaurant cuisine matches profile
+    if (restaurant && profile.cuisines.includes(restaurant.cuisine_type)) {
+      isMatch = true;
+    }
+    
+    return isMatch;
   };
 
   const handleAddToOrder = (item: MenuItem) => {
@@ -293,9 +328,17 @@ const RestaurantMenu = () => {
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-lg mb-1 truncate">
-                                  {item.name}
-                                </h4>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold text-lg truncate">
+                                    {item.name}
+                                  </h4>
+                                  {isItemRecommended(item) && (
+                                    <Badge variant="default" className="bg-purple text-purple-foreground shrink-0 gap-1">
+                                      <Sparkles className="h-3 w-3" />
+                                      For you
+                                    </Badge>
+                                  )}
+                                </div>
                                 {item.description && (
                                   <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                                     {item.description}

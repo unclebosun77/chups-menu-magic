@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { ArrowLeft, Sparkles, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useTasteProfile } from "@/context/TasteProfileContext";
 
 const AIOrderChat = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile } = useTasteProfile();
   const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number }>>([]);
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    if (profile && profile.cuisines.length > 0) {
+      const spiceText = profile.spiceLevel === "hot" ? "bold, spicy" : 
+                       profile.spiceLevel === "medium" ? "flavorful" : "mild";
+      const cuisineText = profile.cuisines[0];
+      setGreeting(`You like ${spiceText} food and ${cuisineText} flavours, so I'll lean into those options for you.`);
+    } else {
+      setGreeting("I know the menu inside out and can help you find exactly what you'll love");
+    }
+  }, [profile]);
 
   const messages = [
     {
@@ -67,7 +81,7 @@ const AIOrderChat = () => {
             </div>
             <h2 className="text-xl font-bold mb-2">Ask me anything</h2>
             <p className="text-sm text-muted-foreground">
-              I know the menu inside out and can help you find exactly what you'll love
+              {greeting}
             </p>
           </div>
 
