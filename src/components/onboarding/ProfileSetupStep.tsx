@@ -150,6 +150,17 @@ const ProfileSetupStep = ({ formData, onUpdate }: ProfileSetupStepProps) => {
         />
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="story" className="text-base font-semibold">Restaurant Story</Label>
+        <Textarea
+          id="story"
+          value={formData.story || ""}
+          onChange={(e) => onUpdate("story", e.target.value)}
+          placeholder="Tell customers what makes your kitchen special."
+          className="min-h-[100px] text-base resize-none"
+        />
+      </div>
+
       <div className="bg-gradient-purple-glow border border-primary/20 rounded-xl p-4 mt-6">
         <div className="flex items-start gap-3">
           <div className="bg-primary/10 rounded-full p-2 mt-0.5">

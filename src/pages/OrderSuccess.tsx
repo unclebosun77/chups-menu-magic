@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Clock, ChefHat, Flame, Utensils } from "lucide-react";
+import { vibrate } from "@/utils/haptics";
 
 const OrderSuccess = () => {
   const navigate = useNavigate();
@@ -18,9 +19,13 @@ const OrderSuccess = () => {
   ];
 
   useEffect(() => {
+    // Haptic feedback on order success
+    vibrate(30);
+
     const interval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev < trackingSteps.length - 1) {
+          vibrate(15);
           return prev + 1;
         }
         clearInterval(interval);

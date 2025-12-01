@@ -18,6 +18,9 @@ import SkeletonCard from "@/components/SkeletonCard";
 import { getMenuImage } from "@/utils/menuImageMapper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SwipeableDishRow } from "@/components/menu/SwipeableDishRow";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { vibrate } from "@/utils/haptics";
 
 type Restaurant = {
   id: string;
@@ -32,6 +35,7 @@ type Restaurant = {
   city: string | null;
   phone: string | null;
   hours: Record<string, string> | null;
+  story?: string | null;
 };
 
 type MenuItem = {
@@ -220,6 +224,7 @@ const RestaurantMenu = () => {
   };
 
   const handleAddToOrder = (item: MenuItem, quantity: number = 1) => {
+    vibrate(20);
     setOrder((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
@@ -231,6 +236,7 @@ const RestaurantMenu = () => {
   };
 
   const handleItemClick = (item: MenuItem) => {
+    vibrate(20);
     setSelectedItem(item);
     setShowItemDialog(true);
   };
@@ -355,6 +361,14 @@ const RestaurantMenu = () => {
     return acc;
   }, {} as Record<string, MenuItem[]>);
 
+  // Get Today's Specials
+  const todaysSpecials = menuItems.filter(item => {
+    const tags = item.category.toLowerCase();
+    return tags.includes("popular") || tags.includes("chef's special") || tags.includes("spicy") || tags.includes("trending");
+  }).slice(0, 3);
+
+  const specialsToShow = todaysSpecials.length > 0 ? todaysSpecials : menuItems.slice(0, 3);
+
   return (
     <div className="min-h-screen bg-background">
       <RestaurantHeader
@@ -369,8 +383,48 @@ const RestaurantMenu = () => {
 
       <SectionNavigation onNavigate={handleNavigate} />
 
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Add padding for fixed header + navigation */}
       <div className="container mx-auto px-4 pt-8 pb-8">
+        {/* Restaurant Story */}
+        {restaurant.story && (
+          <Card className="mb-6 border border-border/50">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold mb-2 text-foreground">Our Story</h3>
+              <p className="text-sm text-muted-foreground line-clamp-4">{restaurant.story}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Today's Specials */}
+        {specialsToShow.length > 0 && (
+          <div className="mb-6">
+            <div className="mb-3">
+              <h3 className="text-xl font-bold text-foreground">🔥 Today's Specials</h3>
+              <p className="text-sm text-muted-foreground">Handpicked highlights from the kitchen.</p>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {specialsToShow.map((item) => (
+                <Card
+                  key={item.id}
+                  className="min-w-[200px] cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale flex-shrink-0"
+                  onClick={() => handleItemClick(item)}
+                >
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-base mb-1 truncate">{item.name}</h4>
+                    <Badge variant="secondary" className="text-xs">{item.category}</Badge>
+                    <p className="text-lg font-bold text-primary mt-2">${item.price.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* AI Suggestion Banner */}
         <div className="mb-6 bg-gradient-to-r from-purple/10 to-secondary/10 border border-purple/20 rounded-2xl p-4 animate-fade-in">
           <div className="flex items-center gap-3">
@@ -482,49 +536,54 @@ const RestaurantMenu = () => {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {items.map((item, itemIdx) => (
-                        <Card
+                        <SwipeableDishRow
                           key={item.id}
-                          className="cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in-up overflow-hidden"
-                          style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
-                          onClick={() => handleItemClick(item)}
+                          onAddToOrder={() => handleAddToOrder(item)}
+                          onView={() => handleItemClick(item)}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-semibold text-lg truncate">
-                                    {item.name}
-                                  </h4>
-                                  {isItemRecommended(item) && (
-                                    <Badge variant="default" className="bg-purple text-purple-foreground shrink-0 gap-1">
-                                      <Sparkles className="h-3 w-3" />
-                                      For you
-                                    </Badge>
+                          <Card
+                            className="cursor-pointer hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in-up overflow-hidden"
+                            style={{ animationDelay: `${(idx * 0.1) + (itemIdx * 0.05)}s` }}
+                            onClick={() => handleItemClick(item)}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="font-semibold text-lg truncate">
+                                      {item.name}
+                                    </h4>
+                                    {isItemRecommended(item) && (
+                                      <Badge variant="default" className="bg-purple text-purple-foreground shrink-0 gap-1">
+                                        <Sparkles className="h-3 w-3" />
+                                        For you
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mb-2">Tap to view dish</p>
+                                  {item.description && (
+                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                      {item.description}
+                                    </p>
+                                  )}
+                                  <p className="text-xl font-bold text-primary">
+                                    ${item.price.toFixed(2)}
+                                  </p>
+                                  {getMatchExplanation(item) && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {getMatchExplanation(item)}
+                                    </p>
                                   )}
                                 </div>
-                                <p className="text-xs text-muted-foreground mb-2">Tap to view dish</p>
-                                {item.description && (
-                                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                    {item.description}
-                                  </p>
-                                )}
-                                <p className="text-xl font-bold text-primary">
-                                  ${item.price.toFixed(2)}
-                                </p>
-                                {getMatchExplanation(item) && (
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {getMatchExplanation(item)}
-                                  </p>
+                                {!item.available && (
+                                  <Badge variant="secondary" className="shrink-0">
+                                    Unavailable
+                                  </Badge>
                                 )}
                               </div>
-                              {!item.available && (
-                                <Badge variant="secondary" className="shrink-0">
-                                  Unavailable
-                                </Badge>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
+                            </CardContent>
+                          </Card>
+                        </SwipeableDishRow>
                       ))}
                     </div>
                   </div>
