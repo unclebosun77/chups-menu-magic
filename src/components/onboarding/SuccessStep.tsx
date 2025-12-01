@@ -76,10 +76,10 @@ const SuccessStep = ({ restaurantName }: SuccessStepProps) => {
         </Button>
         <Button
           variant="outline"
-          onClick={() => navigate("/restaurant/menu")}
+          onClick={() => navigate("/chups-intelligence")}
           className="w-full h-12 text-base"
         >
-          View My Menu
+          Learn About CHUPS Intelligence
         </Button>
       </div>
 
