@@ -19,7 +19,6 @@ import { getMenuImage } from "@/utils/menuImageMapper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SwipeableDishRow } from "@/components/menu/SwipeableDishRow";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { vibrate } from "@/utils/haptics";
 
 type Restaurant = {
@@ -382,11 +381,6 @@ const RestaurantMenu = () => {
       />
 
       <SectionNavigation onNavigate={handleNavigate} />
-
-      {/* Theme Toggle - Fixed Position */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
 
       {/* Add padding for fixed header + navigation */}
       <div className="container mx-auto px-4 pt-8 pb-8">
