@@ -14,6 +14,7 @@ import RestaurantGallery from "@/components/RestaurantGallery";
 import SectionNavigation from "@/components/SectionNavigation";
 import EmptyState from "@/components/EmptyState";
 import { getMenuImage } from "@/utils/menuImageMapper";
+import { useOrder } from "@/context/OrderContext";
 
 type Restaurant = {
   id: string;
@@ -40,15 +41,13 @@ type MenuItem = {
   available: boolean;
 };
 
-type OrderItem = MenuItem & { quantity: number };
-
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addToOrder, totalItems } = useOrder();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [order, setOrder] = useState<OrderItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showItemDialog, setShowItemDialog] = useState(false);
 
@@ -122,14 +121,12 @@ const RestaurantMenu = () => {
   };
 
   const handleAddToOrder = (item: MenuItem) => {
-    setOrder((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) {
-        return prev.map((i) => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-      }
-      return [...prev, { ...item, quantity: 1 }];
+    addToOrder({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image_url || undefined,
     });
-    toast({ title: `Added ${item.name} to order` });
   };
 
   const handleItemClick = (item: MenuItem) => {
@@ -142,7 +139,6 @@ const RestaurantMenu = () => {
       state: {
         restaurantName: restaurant?.name,
         restaurantId: restaurant?.id,
-        items: order,
       },
     });
   };
@@ -161,20 +157,6 @@ const RestaurantMenu = () => {
     }
   };
 
-  const handleRemoveFromOrder = (itemId: string) => {
-    setOrder((prev) => prev.filter((i) => i.id !== itemId));
-  };
-
-  const handleUpdateQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveFromOrder(itemId);
-      return;
-    }
-    setOrder((prev) => prev.map((i) => i.id === itemId ? { ...i, quantity } : i));
-  };
-
-  const totalAmount = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
   if (!restaurant) return null;
 
   const groupedItems = menuItems.reduce((acc, item) => {
@@ -191,7 +173,7 @@ const RestaurantMenu = () => {
         cuisineType={restaurant.cuisine_type}
         description={restaurant.description}
         isOpen={restaurant.is_open}
-        orderCount={order.length}
+        orderCount={totalItems}
         onCartClick={handleViewOrder}
       />
 

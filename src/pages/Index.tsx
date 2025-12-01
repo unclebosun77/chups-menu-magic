@@ -90,6 +90,66 @@ const Index = () => {
           </div>
         )}
 
+        {/* CHUPS Demo Shortcuts */}
+        <div>
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-foreground">
+            <span className="text-purple">🚀</span> CHUPS Demo Shortcuts
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Card 
+              className="p-4 cursor-pointer hover:shadow-hover transition-all bg-white border border-border"
+              onClick={() => navigate("/restaurant/onboarding")}
+            >
+              <div className="space-y-2">
+                <div className="text-2xl">🏪</div>
+                <h3 className="font-bold text-sm">For Restaurants</h3>
+                <p className="text-xs text-muted-foreground">
+                  Onboard your restaurant and set up your smart menu.
+                </p>
+              </div>
+            </Card>
+            
+            <Card 
+              className="p-4 cursor-pointer hover:shadow-hover transition-all bg-white border border-border"
+              onClick={() => navigate("/discover")}
+            >
+              <div className="space-y-2">
+                <div className="text-2xl">🍽️</div>
+                <h3 className="font-bold text-sm">For Diners</h3>
+                <p className="text-xs text-muted-foreground">
+                  Explore menus with AI guidance.
+                </p>
+              </div>
+            </Card>
+            
+            <Card 
+              className="p-4 cursor-pointer hover:shadow-hover transition-all bg-white border border-border"
+              onClick={() => navigate("/ai-chat")}
+            >
+              <div className="space-y-2">
+                <div className="text-2xl">💬</div>
+                <h3 className="font-bold text-sm">AI Order Chat</h3>
+                <p className="text-xs text-muted-foreground">
+                  Talk to CHUPS AI and get recommended dishes.
+                </p>
+              </div>
+            </Card>
+            
+            <Card 
+              className="p-4 cursor-pointer hover:shadow-hover transition-all bg-white border border-border"
+              onClick={() => navigate("/chups-intelligence")}
+            >
+              <div className="space-y-2">
+                <div className="text-2xl">🧠</div>
+                <h3 className="font-bold text-sm">CHUPS Intelligence</h3>
+                <p className="text-xs text-muted-foreground">
+                  See how CHUPS thinks about food and taste signals.
+                </p>
+              </div>
+            </Card>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <div className="pt-2">
           <div className="bg-gradient-hero p-6 rounded-3xl shadow-hover text-white relative overflow-hidden">
