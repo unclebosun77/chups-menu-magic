@@ -3,7 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Upload, Image as ImageIcon } from "lucide-react";
+import { useRef } from "react";
 
 const cuisineTypes = [
   "Italian", "Mexican", "Chinese", "Japanese", "Indian", "Thai", "French", "American",
@@ -23,6 +25,19 @@ interface ProfileSetupStepProps {
 }
 
 const ProfileSetupStep = ({ formData, onUpdate }: ProfileSetupStepProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdate("logo", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="text-center space-y-2 mb-8">
@@ -32,6 +47,39 @@ const ProfileSetupStep = ({ formData, onUpdate }: ProfileSetupStepProps) => {
         <p className="text-muted-foreground">
           Tell us about your restaurant
         </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-base font-semibold">Restaurant Logo</Label>
+        <div className="flex flex-col gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            className="hidden"
+            id="logo-upload"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-32 border-2 border-dashed"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {formData.logo ? (
+              <div className="flex flex-col items-center gap-3">
+                <img src={formData.logo} alt="Logo Preview" className="h-20 w-20 object-contain rounded" />
+                <span className="text-sm">Change Logo</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <Upload className="w-8 h-8" />
+                <span>Upload Restaurant Logo</span>
+                <span className="text-xs text-muted-foreground">Recommended: Square image, min 200x200px</span>
+              </div>
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-2">

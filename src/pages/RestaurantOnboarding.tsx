@@ -30,7 +30,8 @@ const RestaurantOnboarding = () => {
     cuisine: "",
     priceRange: "",
     hours: "",
-    description: ""
+    description: "",
+    logo: ""
   });
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -90,6 +91,7 @@ const RestaurantOnboarding = () => {
         name: profileData.name,
         cuisine_type: profileData.cuisine,
         description: profileData.description,
+        logo_url: profileData.logo || null,
         brand_style: "modern",
         primary_color: "#8B5CF6",
         secondary_color: "#10B981",
