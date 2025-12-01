@@ -12,8 +12,9 @@ import SuccessStep from "@/components/onboarding/SuccessStep";
 interface MenuItem {
   id: string;
   name: string;
-  price: string;
+  price: number;
   tags: string[];
+  image?: string;
 }
 
 const RestaurantOnboarding = () => {
@@ -118,9 +119,10 @@ const RestaurantOnboarding = () => {
       const itemsToInsert = menuItems.map(item => ({
         restaurant_id: restaurantId,
         name: item.name,
-        price: parseFloat(item.price),
+        price: item.price,
         category: "General",
         description: item.tags.join(", "),
+        image_url: item.image || null,
         available: true
       }));
 

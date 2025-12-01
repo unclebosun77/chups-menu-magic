@@ -7,7 +7,7 @@ import { Sparkles } from "lucide-react";
 
 const cuisineTypes = [
   "Italian", "Mexican", "Chinese", "Japanese", "Indian", "Thai", "French", "American",
-  "Mediterranean", "Middle Eastern", "Korean", "Vietnamese", "Fast Food", "Fusion", "Other"
+  "Mediterranean", "Middle Eastern", "Korean", "Vietnamese", "Afro-Caribbean", "Fast Food", "Fusion", "Other"
 ];
 
 const priceRanges = [
@@ -113,7 +113,7 @@ const ProfileSetupStep = ({ formData, onUpdate }: ProfileSetupStepProps) => {
               <Badge variant="secondary" className="text-xs">SMART</Badge>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Our AI will analyze your menu to help customers discover dishes faster and provide personalized recommendations based on real taste preferences.
+              CHUPS AI will analyze your menu to help customers order faster and smarter.
             </p>
           </div>
         </div>
