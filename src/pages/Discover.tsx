@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, MapPin, Star, Clock, Filter } from "lucide-react";
+import { Search, MapPin, Star, Clock, Filter, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTasteProfile } from "@/context/TasteProfileContext";
+import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 
 type Restaurant = {
   id: string;
@@ -21,11 +23,13 @@ type Restaurant = {
   primary_color: string;
   average_rating?: number;
   review_count?: number;
+  matchScore?: number;
 };
 
 const Discover = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile, isComplete } = useTasteProfile();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,6 +37,7 @@ const Discover = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [showTasteDialog, setShowTasteDialog] = useState(false);
 
   useEffect(() => {
     loadRestaurants();
@@ -86,6 +91,28 @@ const Discover = () => {
   const filterRestaurants = () => {
     let filtered = [...restaurants];
 
+    // Calculate match scores if profile exists
+    if (profile) {
+      filtered = filtered.map((r) => {
+        let score = 0;
+        
+        // Cuisine match
+        if (profile.cuisines.includes(r.cuisine_type)) {
+          score += 3;
+        }
+        
+        // Boost for open restaurants
+        if (r.is_open) {
+          score += 1;
+        }
+        
+        return { ...r, matchScore: score };
+      });
+      
+      // Sort by match score descending
+      filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    }
+
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter(
@@ -120,9 +147,20 @@ const Discover = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Discover Restaurants</h1>
-            <Button variant="ghost" onClick={() => navigate("/")}>
-              Home
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant={isComplete ? "outline" : "default"} 
+                size="sm"
+                onClick={() => setShowTasteDialog(true)}
+                className="gap-2"
+              >
+                <User className="h-4 w-4" />
+                {isComplete ? "Taste profile active" : "Set your taste"}
+              </Button>
+              <Button variant="ghost" onClick={() => navigate("/")}>
+                Home
+              </Button>
+            </div>
           </div>
 
           {/* Search Bar */}
@@ -210,7 +248,7 @@ const Discover = () => {
                       <CardTitle className="text-xl group-hover:text-primary transition-colors">
                         {restaurant.name}
                       </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-1">
+                      <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
                         <Badge variant="secondary">{restaurant.cuisine_type}</Badge>
                         {restaurant.is_open ? (
                           <Badge className="bg-green-500">
@@ -219,6 +257,11 @@ const Discover = () => {
                           </Badge>
                         ) : (
                           <Badge variant="secondary">Closed</Badge>
+                        )}
+                        {restaurant.matchScore && restaurant.matchScore >= 3 && (
+                          <Badge variant="default" className="bg-purple text-purple-foreground">
+                            Matches your taste
+                          </Badge>
                         )}
                       </CardDescription>
                     </div>
@@ -253,6 +296,8 @@ const Discover = () => {
           </div>
         )}
       </div>
+
+      <TasteProfileDialog open={showTasteDialog} onOpenChange={setShowTasteDialog} />
     </div>
   );
 };

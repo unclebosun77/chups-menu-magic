@@ -5,9 +5,11 @@ import { Sparkles, Brain, Zap, TrendingUp, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTasteProfile } from "@/context/TasteProfileContext";
 
 const CHUPSIntelligence = () => {
   const navigate = useNavigate();
+  const { profile } = useTasteProfile();
 
   const { data: menuItems } = useQuery({
     queryKey: ["demo-menu-items"],
@@ -68,6 +70,11 @@ const CHUPSIntelligence = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             CHUPS learns menus, taste patterns, and dish-level data to power smarter restaurant growth and faster customer decisions. Built for kitchens, fueled by human behavior.
           </p>
+          {profile && (
+            <p className="text-sm text-purple mt-2">
+              This view and recommendations adapt to each diner's taste profile.
+            </p>
+          )}
         </div>
 
         {/* Value Points */}
