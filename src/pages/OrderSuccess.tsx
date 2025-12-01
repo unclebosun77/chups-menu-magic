@@ -63,7 +63,7 @@ const OrderSuccess = () => {
 
           {/* CTA Button */}
           <Button
-            onClick={() => navigate("/discover")}
+            onClick={() => navigate("/")}
             className="w-full h-12 text-base font-semibold bg-purple text-white hover:bg-purple-hover"
           >
             Back to exploring 🍽️

@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { ArrowLeft, Sparkles, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useOrder } from "@/context/OrderContext";
+import { useToast } from "@/hooks/use-toast";
 
 const AIOrderChat = () => {
   const navigate = useNavigate();
-  const { orderItems, addToOrder, totalAmount, totalItems } = useOrder();
+  const { toast } = useToast();
+  const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number }>>([]);
 
   const messages = [
     {
@@ -25,10 +27,10 @@ const AIOrderChat = () => {
   ];
 
   const handleAddSuggestion = (dish: { name: string; price: number }) => {
-    addToOrder({
-      id: `dish-${Date.now()}`,
-      name: dish.name,
-      price: dish.price,
+    setOrderItems([...orderItems, dish]);
+    toast({
+      title: "Added to order",
+      description: `${dish.name} has been added to your order.`,
     });
   };
 
@@ -112,7 +114,7 @@ const AIOrderChat = () => {
                         className="flex-shrink-0"
                       >
                         <Plus className="w-4 h-4 mr-1" />
-                        Add this to my order
+                        Add to Order
                       </Button>
                     </div>
                   </Card>
@@ -122,40 +124,30 @@ const AIOrderChat = () => {
           ))}
         </div>
 
-        {/* Helper Text + Order Summary */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
-          <div className="max-w-lg mx-auto p-4 space-y-3">
-            <p className="text-sm text-muted-foreground text-center">
-              We'll remember what you liked as you explore menus.
-            </p>
-            {totalItems > 0 ? (
+        {/* Order Summary */}
+        {orderItems.length > 0 && (
+          <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t">
+            <div className="max-w-lg mx-auto">
               <Card className="p-4 bg-gradient-warm text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm opacity-90">{totalItems} items in order</p>
+                    <p className="text-sm opacity-90">{orderItems.length} items in order</p>
                     <p className="text-2xl font-bold">
-                      ${totalAmount.toFixed(2)}
+                      ${orderItems.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
                     </p>
                   </div>
                   <Button
                     variant="secondary"
                     size="lg"
-                    onClick={() => navigate("/discover")}
+                    onClick={() => navigate("/restaurant/1")}
                   >
-                    Continue to Menu
+                    View Order
                   </Button>
                 </div>
               </Card>
-            ) : (
-              <Button
-                onClick={() => navigate("/discover")}
-                className="w-full h-12 bg-purple text-white hover:bg-purple-hover"
-              >
-                Continue browsing restaurants
-              </Button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

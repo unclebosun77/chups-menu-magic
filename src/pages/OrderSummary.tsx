@@ -7,23 +7,49 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Minus, Plus, Trash2, Rocket } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useOrder } from "@/context/OrderContext";
+
+interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  tags?: string[];
+}
 
 const OrderSummary = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { orderItems, updateQuantity, removeFromOrder, totalAmount, totalItems, clearOrder } = useOrder();
   
-  const { restaurantName, restaurantId } = location.state || {};
+  const { restaurantName, restaurantId, items: initialItems } = location.state || {};
   
+  const [orderItems, setOrderItems] = useState<OrderItem[]>(initialItems || []);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
   if (!restaurantName) {
-    navigate("/discover");
+    navigate("/");
     return null;
   }
+
+  const updateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setOrderItems(orderItems.map(item => 
+      item.id === id ? { ...item, quantity: newQuantity } : item
+    ));
+  };
+
+  const removeItem = (id: string) => {
+    setOrderItems(orderItems.filter(item => item.id !== id));
+    toast({
+      title: "Item removed",
+      description: "Item has been removed from your order",
+    });
+  };
+
+  const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handlePlaceOrder = () => {
     if (!customerName || !customerPhone) {
@@ -44,7 +70,7 @@ const OrderSummary = () => {
       return;
     }
 
-    // Navigate to success page and clear order
+    // Navigate to success page
     navigate("/order-success", {
       state: {
         restaurantName,
@@ -52,7 +78,6 @@ const OrderSummary = () => {
         itemCount: totalItems,
       },
     });
-    clearOrder();
   };
 
   return (
@@ -122,6 +147,7 @@ const OrderSummary = () => {
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
@@ -139,7 +165,7 @@ const OrderSummary = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeFromOrder(item.id)}
+                        onClick={() => removeItem(item.id)}
                         className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
                       >
                         <Trash2 className="h-4 w-4" />
