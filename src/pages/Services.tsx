@@ -5,7 +5,7 @@ import {
   UtensilsCrossed, Users, Calendar, Gift, MapPin, Phone, Bell,
   Wine, ChefHat, Crown, PartyPopper, Heart, Sparkles, Home, 
   Music, GlassWater, Cake, Coffee, Wheat, Map, Award, BookOpen,
-  Leaf, Shield
+  Leaf, Shield, Rocket
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +61,7 @@ const Services = () => {
       items: [
         { name: "Private Dining", icon: Users, emoji: "👥", description: "Intimate setups or hidden chef's tables" },
         { name: "Chef's Table Nights", icon: ChefHat, emoji: "👨‍🍳", description: "Behind-the-scenes tasting menus" },
-        { name: "Pop-Up Restaurants & Food Events", icon: Sparkles, emoji: "⚡", description: "Limited-time culinary adventures" },
+        { name: "Pop-Up Events", icon: Sparkles, emoji: "⚡", description: "Limited-time culinary adventures" },
       ],
     },
     {
@@ -85,7 +85,7 @@ const Services = () => {
       emoji: "🌿",
       color: "bg-gradient-to-br from-green-500/10 to-blue-500/10",
       items: [
-        { name: "Meal Prep Plans", icon: Calendar, emoji: "📅", description: "Weekly healthy meal subscriptions integrated with your calendar" },
+        { name: "Meal Prep Plans", icon: Calendar, emoji: "📅", description: "Weekly healthy meal subscriptions" },
         { name: "Cooking Classes", icon: ChefHat, emoji: "👩‍🍳", description: "Master new cuisines & techniques" },
         { name: "Chef Masterclasses", icon: Award, emoji: "🏆", description: "Learn from culinary legends" },
         { name: "Ingredient Workshops", icon: Wheat, emoji: "🌾", description: "Deep dive into quality ingredients" },
@@ -103,7 +103,7 @@ const Services = () => {
       emoji: "🎉",
       color: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
       items: [
-        { name: "CHUPS Concierge", icon: Sparkles, emoji: "🤖", description: "AI-powered event planning assistant" },
+        { name: "Outa Concierge", icon: Rocket, emoji: "🚀", description: "AI-powered event planning assistant" },
         { name: "Special Occasions", icon: PartyPopper, emoji: "🎊", description: "Celebrate life's big moments" },
         { name: "Proposal Packages", icon: Heart, emoji: "💍", description: "Make your moment unforgettable" },
         { name: "Seasonal Events", icon: Calendar, emoji: "🎄", description: "Festive seasonal celebrations" },
@@ -126,7 +126,7 @@ const Services = () => {
   ];
 
   const handleCategoryClick = (category: typeof experienceCategories[0]) => {
-    // Special handling for Occasions & Celebrations - open event planner for CHUPS Concierge
+    // Special handling for Occasions & Celebrations - open event planner for Outa Concierge
     if (category.id === "celebrations") {
       setIsEventPlannerOpen(true);
       setSelectedOccasion(undefined);
@@ -137,7 +137,7 @@ const Services = () => {
   };
 
   const handleExperienceItemClick = (categoryId: string, itemName: string) => {
-    if (categoryId === "celebrations" && itemName === "CHUPS Concierge") {
+    if (categoryId === "celebrations" && itemName === "Outa Concierge") {
       setIsEventPlannerOpen(true);
       setSelectedOccasion(undefined);
     } else if (categoryId === "celebrations") {
@@ -150,15 +150,15 @@ const Services = () => {
   return (
     <div className="p-4 space-y-6 pb-24">
       <div className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold bg-gradient-purple-glow bg-clip-text text-transparent">Services & Experiences</h1>
-        <p className="text-muted-foreground mt-1">Explore everything CHUPS offers</p>
+        <h1 className="text-3xl font-bold text-gradient-neon">Services & Experiences</h1>
+        <p className="text-muted-foreground mt-1">Explore everything Outa offers</p>
       </div>
 
       {/* Quick Services */}
-      <div className="space-y-4 p-5 rounded-3xl bg-gradient-to-br from-purple/5 via-background to-purple/5 border border-purple/10 shadow-soft">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
+      <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
+        <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
           <span className="text-2xl">⚡</span> 
-          <span className="bg-gradient-purple-glow bg-clip-text text-transparent">Quick Services</span>
+          <span className="text-gradient-neon">Quick Services</span>
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {quickServices.map((service) => (
@@ -174,10 +174,10 @@ const Services = () => {
       </div>
 
       {/* Experiences */}
-      <div className="space-y-4 p-5 rounded-3xl bg-gradient-to-br from-accent/10 via-background to-accent/10 border border-accent/20 shadow-soft">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
+      <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
+        <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
           <span className="text-2xl">✨</span> 
-          <span className="bg-gradient-purple-glow bg-clip-text text-transparent">Curated Experiences</span>
+          <span className="text-gradient-neon">Curated Experiences</span>
         </h2>
         <div className="grid grid-cols-3 gap-3">
           {experienceCategories.map((category) => (
@@ -187,7 +187,7 @@ const Services = () => {
               emoji={category.emoji}
               label={category.title}
               onClick={() => handleCategoryClick(category)}
-              className={category.id === 'celebrations' ? 'ring-2 ring-primary animate-pulse-glow' : ''}
+              className={category.id === 'celebrations' ? 'ring-2 ring-purple animate-pulse-glow' : ''}
             />
           ))}
         </div>
@@ -214,15 +214,15 @@ const Services = () => {
         occasionType={selectedOccasion}
       />
 
-      <Card className="animate-fade-in border-2 border-primary/20 shadow-hover bg-gradient-to-br from-background via-primary/5 to-background">
+      <Card className="animate-fade-in border border-purple/30 shadow-hover bg-card">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <Bell className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-xl bg-purple/20">
+              <Bell className="h-5 w-5 text-purple" />
             </div>
-            <CardTitle className="bg-gradient-purple-glow bg-clip-text text-transparent">Dining Reminders</CardTitle>
+            <CardTitle className="text-gradient-neon">Dining Reminders</CardTitle>
           </div>
-          <CardDescription>Set reminders for your next dining experience</CardDescription>
+          <CardDescription>Set reminders for your next outing</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex justify-center">
@@ -230,16 +230,16 @@ const Services = () => {
               mode="single"
               selected={date}
               onSelect={setDate}
-              className="rounded-md border"
+              className="rounded-md border border-border bg-card"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">What do you want to eat?</label>
+            <label className="text-sm font-medium text-foreground">What's the vibe?</label>
             <textarea
               value={reminderNote}
               onChange={(e) => setReminderNote(e.target.value)}
               placeholder="e.g., Thai food with friends, Anniversary dinner..."
-              className="w-full min-h-[80px] px-3 py-2 rounded-md border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full min-h-[80px] px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple"
             />
           </div>
         </CardContent>
