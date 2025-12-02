@@ -62,11 +62,12 @@ html {
     --gradient-hero: linear-gradient(180deg, hsl(270 100% 60% / 0.08) 0%, hsl(270 20% 98%) 100%);
     --gradient-purple-glow: linear-gradient(135deg, hsl(270 100% 60% / 0.1), hsl(270 100% 60% / 0.03));
     --gradient-neon: linear-gradient(135deg, hsl(270 100% 60%), hsl(330 100% 60%));
-    --shadow-soft: 0 2px 12px -2px hsl(270 30% 50% / 0.08);
-    --shadow-hover: 0 8px 30px -4px hsl(270 100% 60% / 0.2);
-    --shadow-glow: 0 0 20px hsl(270 100% 60% / 0.25), 0 0 40px hsl(330 100% 60% / 0.1);
-    --shadow-neon: 0 0 15px hsl(270 100% 60% / 0.3);
-    --shadow-card: 0 4px 20px -2px hsl(270 30% 50% / 0.1);
+    --shadow-soft: 0 2px 8px -2px hsl(270 30% 50% / 0.06);
+    --shadow-hover: 0 6px 20px -4px hsl(270 100% 60% / 0.12);
+    --shadow-glow: 0 0 12px hsl(270 100% 60% / 0.15), 0 0 24px hsl(330 100% 60% / 0.06);
+    --shadow-neon: 0 0 10px hsl(270 100% 60% / 0.18);
+    --shadow-card: 0 2px 12px -2px hsl(270 30% 50% / 0.06);
+    --shadow-pill: 0 1px 4px hsl(270 30% 50% / 0.08);
   }
 
   .dark {
