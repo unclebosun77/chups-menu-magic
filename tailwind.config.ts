@@ -75,6 +75,7 @@ export default {
         'glow': 'var(--shadow-glow)',
         'neon': 'var(--shadow-neon)',
         'card': 'var(--shadow-card)',
+        'pill': 'var(--shadow-pill)',
       },
       borderRadius: {
         lg: "var(--radius)",
