@@ -74,6 +74,7 @@ export default {
         'hover': 'var(--shadow-hover)',
         'glow': 'var(--shadow-glow)',
         'neon': 'var(--shadow-neon)',
+        'card': 'var(--shadow-card)',
       },
       borderRadius: {
         lg: "var(--radius)",
