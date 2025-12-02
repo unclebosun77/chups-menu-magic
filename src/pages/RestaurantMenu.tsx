@@ -335,7 +335,7 @@ const RestaurantMenu = () => {
   const filterDishBySearch = (item: MenuItem): boolean => {
     if (!searchQuery) return true;
     
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
     const itemName = item.name.toLowerCase();
     const itemDesc = (item.description || "").toLowerCase();
     const itemCategory = item.category.toLowerCase();
