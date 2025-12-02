@@ -1,50 +1,57 @@
-import { MapPin, Search, Compass } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { MapPin, Search, Rocket } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="pt-1">
-      <div className="bg-card px-4 py-4 rounded-2xl shadow-soft border border-purple/10 relative overflow-hidden">
-        {/* Floating accent icon */}
-        <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-purple/10 flex items-center justify-center">
-          <Compass className="h-4 w-4 text-purple" />
-        </div>
+      <div className="bg-card p-5 rounded-2xl shadow-card border border-purple/15 relative overflow-hidden">
+        {/* Subtle gradient border glow */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple/5 via-transparent to-neon-pink/5 pointer-events-none" />
         
         <div className="relative z-10">
-          {/* Title + Subtitle - Tight grouping */}
-          <h1 className="text-lg font-semibold text-foreground leading-tight">
+          <h1 className="text-xl font-semibold mb-1 text-foreground">
             Where are we heading tonight?
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5 mb-3">
+          <p className="text-sm text-muted-foreground mb-4">
             Discover places that match your vibe.
           </p>
           
-          {/* Subtle divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-purple/15 to-transparent mb-3" />
-          
-          {/* Chip Filters - Slim, grouped */}
-          <div className="flex gap-1.5 mb-3 overflow-x-auto scrollbar-hide -mx-1 px-1">
-            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/20 text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-all hover:border-purple/35 shadow-pill">
+          {/* AI Suggestion Chips - Horizontal Scroll */}
+          <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide -mx-1 px-1">
+            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/25 text-xs px-3 py-1.5 rounded-full cursor-pointer transition-all hover:border-purple/40 shadow-pill">
               🔥 Vibes match
             </Badge>
-            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/20 text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-all hover:border-purple/35 shadow-pill">
+            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/25 text-xs px-3 py-1.5 rounded-full cursor-pointer transition-all hover:border-purple/40 shadow-pill">
               ⚡ Ready now
             </Badge>
-            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/20 text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-all hover:border-purple/35 shadow-pill">
+            <Badge className="flex-shrink-0 bg-card hover:bg-secondary text-foreground border border-purple/25 text-xs px-3 py-1.5 rounded-full cursor-pointer transition-all hover:border-purple/40 shadow-pill">
               🐝 Budget-friendly
             </Badge>
           </div>
           
-          {/* Search Bar - Slim, elegant */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
-            <MapPin className="absolute left-7 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-purple/70" />
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <MapPin className="absolute left-8 top-1/2 -translate-y-1/2 h-4 w-4 text-purple" />
             <Input
               placeholder="Find your next spot..."
-              className="pl-12 bg-card border border-purple/15 focus:border-purple/40 text-foreground placeholder:text-muted-foreground/60 rounded-xl h-9 text-sm shadow-pill"
+              className="pl-14 bg-card border border-purple/20 focus:border-purple/50 text-foreground placeholder:text-muted-foreground rounded-xl h-11 shadow-soft"
             />
           </div>
+          
+          {/* Let's goo button with rocket */}
+          <Button 
+            className="w-full bg-purple text-primary-foreground hover:bg-purple-hover rounded-xl h-11 font-medium shadow-soft flex items-center justify-center gap-2"
+            onClick={() => navigate("/discover")}
+          >
+            <span>Let's goo</span>
+            <Rocket className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>
