@@ -46,6 +46,14 @@ export default {
           foreground: "hsl(var(--purple-foreground))",
           hover: "hsl(var(--purple-hover))",
         },
+        "neon-pink": {
+          DEFAULT: "hsl(var(--neon-pink))",
+          foreground: "hsl(var(--neon-pink-foreground))",
+        },
+        "neon-blue": {
+          DEFAULT: "hsl(var(--neon-blue))",
+          foreground: "hsl(var(--neon-blue-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -59,10 +67,13 @@ export default {
         'gradient-warm': 'var(--gradient-warm)',
         'gradient-fresh': 'var(--gradient-fresh)',
         'gradient-social': 'var(--gradient-social)',
+        'gradient-neon': 'var(--gradient-neon)',
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',
         'hover': 'var(--shadow-hover)',
+        'glow': 'var(--shadow-glow)',
+        'neon': 'var(--shadow-neon)',
       },
       borderRadius: {
         lg: "var(--radius)",

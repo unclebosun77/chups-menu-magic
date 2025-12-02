@@ -23,7 +23,7 @@ import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import OrderSummary from "./pages/OrderSummary";
 import AIOrderChat from "./pages/AIOrderChat";
-import CHUPSIntelligence from "./pages/CHUPSIntelligence";
+import OutaIntelligence from "./pages/OutaIntelligence";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +52,7 @@ const App = () => (
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/ai-chat" element={<AIOrderChat />} />
-          <Route path="/chups-intelligence" element={<CHUPSIntelligence />} />
+          <Route path="/outa-intelligence" element={<OutaIntelligence />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/:restaurantId" element={<RestaurantMenu />} />

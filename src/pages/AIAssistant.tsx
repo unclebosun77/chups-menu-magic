@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Sparkles, ArrowLeft } from "lucide-react";
+import { Send, Rocket, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Message = {
@@ -18,7 +18,7 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "👋 Hi! I'm your CHUPS AI assistant. I can help you discover restaurants, plan outings, estimate budgets, and provide personalized recommendations. What would you like to explore today?",
+      content: "Hey! 👋 I'm Outa, your AI outing companion. I can help you discover spots, plan your night out, estimate budgets, and give you personalized recommendations. Where we heading? 🚀",
     },
   ]);
   const [input, setInput] = useState("");
@@ -144,21 +144,21 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col">
+    <div className="min-h-screen bg-gradient-app flex flex-col">
       {/* Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="text-foreground hover:bg-secondary">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
+              <div className="h-10 w-10 rounded-full bg-gradient-warm flex items-center justify-center shadow-glow">
+                <Rocket className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">Ask CHUPS</h1>
-                <p className="text-sm text-muted-foreground">Your personal dining companion</p>
+                <h1 className="text-xl font-bold text-foreground">Ask Outa</h1>
+                <p className="text-sm text-muted-foreground">Your AI outing companion</p>
               </div>
             </div>
           </div>
@@ -175,10 +175,10 @@ const AIAssistant = () => {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
               >
                 <Card
-                  className={`max-w-[80%] ${
+                  className={`max-w-[80%] border-0 ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-secondary text-foreground"
+                      : "bg-gradient-warm text-white shadow-glow"
                   }`}
                 >
                   <div className="p-4">
@@ -189,12 +189,12 @@ const AIAssistant = () => {
             ))}
             {isLoading && messages[messages.length - 1]?.role === "user" && (
               <div className="flex justify-start">
-                <Card className="bg-muted max-w-[80%]">
+                <Card className="bg-gradient-warm text-white shadow-glow max-w-[80%] border-0">
                   <div className="p-4">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <div className="w-2 h-2 rounded-full bg-white animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <div className="w-2 h-2 rounded-full bg-white animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <div className="w-2 h-2 rounded-full bg-white animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   </div>
                 </Card>
@@ -206,14 +206,14 @@ const AIAssistant = () => {
         {/* Input Area */}
         <div className="mt-4 flex gap-2">
           <Input
-            placeholder="Ask me anything about restaurants, planning outings, or dietary preferences..."
+            placeholder="Where we heading tonight? 🌙"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 bg-card border-border text-foreground"
           />
-          <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon">
+          <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon" className="bg-gradient-warm hover:opacity-90 shadow-glow">
             <Send className="h-4 w-4" />
           </Button>
         </div>

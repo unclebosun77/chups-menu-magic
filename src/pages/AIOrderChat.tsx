@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { ArrowLeft, Sparkles, Plus } from "lucide-react";
+import { ArrowLeft, Rocket, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTasteProfile } from "@/context/TasteProfileContext";
@@ -52,21 +52,22 @@ const AIOrderChat = () => {
     <div className="min-h-screen bg-background pb-20">
       <div className="max-w-lg mx-auto">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 border-b border-border">
           <div className="flex items-center gap-3 p-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
+              className="text-foreground hover:bg-secondary"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2 flex-1">
-              <div className="bg-gradient-warm rounded-full p-2">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="bg-gradient-warm rounded-full p-2 shadow-glow">
+                <Rocket className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold">CHUPS AI</h1>
+                <h1 className="text-lg font-bold text-foreground">Outa AI</h1>
                 <p className="text-xs text-muted-foreground">Your taste assistant</p>
               </div>
             </div>
@@ -76,10 +77,10 @@ const AIOrderChat = () => {
         {/* Chat Messages */}
         <div className="p-4 space-y-4">
           <div className="text-center py-6">
-            <div className="bg-gradient-warm rounded-full p-4 inline-block mb-3 animate-pulse-glow">
-              <Sparkles className="w-8 h-8 text-white" />
+            <div className="bg-gradient-warm rounded-full p-4 inline-block mb-3 animate-pulse-glow shadow-glow">
+              <Rocket className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-bold mb-2">Ask me anything</h2>
+            <h2 className="text-xl font-bold mb-2 text-foreground">Ask me anything</h2>
             <p className="text-sm text-muted-foreground">
               {greeting}
             </p>
@@ -93,21 +94,21 @@ const AIOrderChat = () => {
               }`}
             >
               <Avatar className={`w-10 h-10 flex-shrink-0 ${
-                message.role === "assistant" ? "bg-gradient-warm" : "bg-primary"
+                message.role === "assistant" ? "bg-gradient-warm shadow-glow" : "bg-secondary"
               }`}>
                 {message.role === "assistant" ? (
-                  <Sparkles className="w-5 h-5 text-white m-auto" />
+                  <Rocket className="w-5 h-5 text-white m-auto" />
                 ) : (
-                  <span className="text-white text-sm font-semibold m-auto">You</span>
+                  <span className="text-foreground text-sm font-semibold m-auto">You</span>
                 )}
               </Avatar>
 
               <div className="flex-1 max-w-[80%]">
                 <Card
-                  className={`p-4 ${
+                  className={`p-4 border-0 ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground ml-auto"
-                      : "bg-card"
+                      ? "bg-secondary text-foreground ml-auto"
+                      : "bg-card border border-border"
                   }`}
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
@@ -125,18 +126,18 @@ const AIOrderChat = () => {
                 </Card>
 
                 {message.suggestion && (
-                  <Card className="mt-2 p-4 border-2 border-primary/20 bg-gradient-purple-glow">
+                  <Card className="mt-2 p-4 border border-purple/30 bg-gradient-purple-glow">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold">{message.suggestion.name}</p>
-                        <p className="text-sm text-primary font-bold">
+                        <p className="font-semibold text-foreground">{message.suggestion.name}</p>
+                        <p className="text-sm text-purple font-bold">
                           ${message.suggestion.price.toFixed(2)}
                         </p>
                       </div>
                       <Button
                         size="sm"
                         onClick={() => handleAddSuggestion(message.suggestion!)}
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 bg-gradient-warm hover:opacity-90 shadow-glow"
                       >
                         <Plus className="w-4 h-4 mr-1" />
                         Add to Order
@@ -151,9 +152,9 @@ const AIOrderChat = () => {
 
         {/* Order Summary */}
         {orderItems.length > 0 && (
-          <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t">
+          <div className="fixed bottom-20 left-0 right-0 p-4 bg-card border-t border-border">
             <div className="max-w-lg mx-auto">
-              <Card className="p-4 bg-gradient-warm text-white">
+              <Card className="p-4 bg-gradient-warm text-white border-0 shadow-glow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm opacity-90">{orderItems.length} items in order</p>
@@ -165,6 +166,7 @@ const AIOrderChat = () => {
                     variant="secondary"
                     size="lg"
                     onClick={() => navigate("/restaurant/1")}
+                    className="bg-white text-purple hover:bg-white/90"
                   >
                     View Order
                   </Button>

@@ -6,93 +6,107 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Outa Design System - Dark, Premium, Nightlife x AI
+   Base: Black + Deep Purple
+   Accents: Electric Blue, Neon Pink
+   All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 240 14% 98%;
-    --foreground: 0 0% 13%;
+    --background: 260 20% 6%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card: 260 25% 10%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover: 260 25% 10%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 270 78% 61%;
+    --primary: 270 100% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 270 65% 50%;
+    --primary-hover: 270 100% 55%;
 
-    --secondary: 270 45% 35%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 270 45% 30%;
+    --secondary: 260 30% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-hover: 260 30% 25%;
 
-    --accent: 270 78% 61%;
-    --accent-foreground: 0 0% 13%;
+    --accent: 195 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --purple: 270 78% 61%;
+    --neon-pink: 330 100% 65%;
+    --neon-pink-foreground: 0 0% 100%;
+    --neon-blue: 195 100% 50%;
+    --neon-blue-foreground: 0 0% 100%;
+
+    --purple: 270 100% 65%;
     --purple-foreground: 0 0% 100%;
-    --purple-hover: 270 65% 50%;
+    --purple-hover: 270 100% 55%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 0 0% 47%;
+    --muted: 260 20% 15%;
+    --muted-foreground: 260 10% 60%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
-    --ring: 270 78% 61%;
+    --border: 260 20% 18%;
+    --input: 260 20% 18%;
+    --ring: 270 100% 65%;
 
     --radius: 0.75rem;
     
-    --gradient-warm: linear-gradient(135deg, hsl(270 78% 61%), hsl(270 65% 50%));
-    --gradient-fresh: linear-gradient(135deg, hsl(142 71% 45%), hsl(174 72% 56%));
-    --gradient-social: linear-gradient(135deg, hsl(270 78% 61%), hsl(270 45% 35%));
-    --gradient-app-bg: linear-gradient(180deg, hsl(240 14% 98%) 0%, hsl(240 20% 99%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(270 78% 61%) 0%, hsl(0 0% 7%) 100%);
-    --gradient-purple-glow: linear-gradient(135deg, hsl(270 78% 61% / 0.08), hsl(270 78% 61% / 0.02));
-    --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.08);
-    --shadow-hover: 0 8px 24px -4px hsl(270 78% 61% / 0.2);
-    --shadow-glow: 0 0 20px hsl(270 78% 61% / 0.3), 0 0 40px hsl(0 0% 0% / 0.15);
+    --gradient-warm: linear-gradient(135deg, hsl(270 100% 65%), hsl(330 100% 65%));
+    --gradient-fresh: linear-gradient(135deg, hsl(195 100% 50%), hsl(270 100% 65%));
+    --gradient-social: linear-gradient(135deg, hsl(330 100% 65%), hsl(270 100% 65%));
+    --gradient-app-bg: linear-gradient(180deg, hsl(260 20% 6%) 0%, hsl(260 25% 8%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(270 100% 65% / 0.3) 0%, hsl(260 20% 6%) 100%);
+    --gradient-purple-glow: linear-gradient(135deg, hsl(270 100% 65% / 0.15), hsl(270 100% 65% / 0.05));
+    --gradient-neon: linear-gradient(135deg, hsl(195 100% 50%), hsl(330 100% 65%));
+    --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.4);
+    --shadow-hover: 0 8px 24px -4px hsl(270 100% 65% / 0.35);
+    --shadow-glow: 0 0 25px hsl(270 100% 65% / 0.5), 0 0 50px hsl(330 100% 65% / 0.2);
+    --shadow-neon: 0 0 20px hsl(195 100% 50% / 0.4), 0 0 40px hsl(270 100% 65% / 0.2);
   }
 
   .dark {
-    --background: 0 0% 7%;
+    --background: 260 20% 6%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 10%;
+    --card: 260 25% 10%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 10%;
+    --popover: 260 25% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 270 78% 61%;
+    --primary: 270 100% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 270 65% 50%;
+    --primary-hover: 270 100% 55%;
 
-    --secondary: 270 45% 35%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 270 45% 30%;
+    --secondary: 260 30% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-hover: 260 30% 25%;
 
-    --accent: 270 78% 61%;
-    --accent-foreground: 0 0% 13%;
+    --accent: 195 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --purple: 270 78% 61%;
+    --neon-pink: 330 100% 65%;
+    --neon-pink-foreground: 0 0% 100%;
+    --neon-blue: 195 100% 50%;
+    --neon-blue-foreground: 0 0% 100%;
+
+    --purple: 270 100% 65%;
     --purple-foreground: 0 0% 100%;
-    --purple-hover: 270 65% 50%;
+    --purple-hover: 270 100% 55%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 260 20% 15%;
+    --muted-foreground: 260 10% 60%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 270 78% 61%;
+    --border: 260 20% 18%;
+    --input: 260 20% 18%;
+    --ring: 270 100% 65%;
   }
 }
 
@@ -119,8 +133,23 @@ All colors MUST be HSL.
     background: var(--gradient-purple-glow);
   }
   
+  .bg-gradient-neon {
+    background: var(--gradient-neon);
+  }
+  
   .shadow-glow {
     box-shadow: var(--shadow-glow);
+  }
+  
+  .shadow-neon {
+    box-shadow: var(--shadow-neon);
+  }
+  
+  .text-gradient-neon {
+    background: var(--gradient-neon);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   
   .animate-pulse-glow {
@@ -151,14 +180,22 @@ All colors MUST be HSL.
     animation: fade-in-text 0.6s ease-in-out;
   }
   
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
   @keyframes pulse-glow {
     0%, 100% {
       opacity: 1;
-      box-shadow: 0 0 20px hsl(270 78% 61% / 0.3), 0 0 40px hsl(0 0% 0% / 0.15);
+      box-shadow: 0 0 25px hsl(270 100% 65% / 0.5), 0 0 50px hsl(330 100% 65% / 0.2);
     }
     50% {
       opacity: 0.95;
-      box-shadow: 0 0 30px hsl(270 78% 61% / 0.5), 0 0 50px hsl(0 0% 0% / 0.2);
+      box-shadow: 0 0 35px hsl(270 100% 65% / 0.7), 0 0 60px hsl(330 100% 65% / 0.3);
     }
   }
   
@@ -173,12 +210,12 @@ All colors MUST be HSL.
   
   @keyframes shimmer-border {
     0%, 100% {
-      border-color: hsl(0 0% 91%);
-      box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.08);
+      border-color: hsl(260 20% 18%);
+      box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.4);
     }
     50% {
-      border-color: hsl(270 78% 61% / 0.15);
-      box-shadow: 0 2px 12px -2px hsl(270 78% 61% / 0.1);
+      border-color: hsl(270 100% 65% / 0.3);
+      box-shadow: 0 2px 12px -2px hsl(270 100% 65% / 0.2);
     }
   }
   
@@ -208,6 +245,24 @@ All colors MUST be HSL.
     }
     100% {
       opacity: 1;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  
+  @keyframes glow-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px hsl(270 100% 65% / 0.6));
+    }
+    50% {
+      filter: drop-shadow(0 0 16px hsl(270 100% 65% / 0.9));
     }
   }
   
