@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChefHat, MapPin, Sparkles, Rocket } from "lucide-react";
+import { MapPin, Sparkles, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
@@ -9,6 +9,7 @@ import LoadingState from "@/components/LoadingState";
 import HeroSection from "@/components/home/HeroSection";
 import SmartActionPills from "@/components/home/SmartActionPills";
 import UniversalRestaurantCard from "@/components/home/UniversalRestaurantCard";
+import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 
 type Restaurant = {
   id: string;
@@ -24,10 +25,7 @@ type Restaurant = {
 const Index = () => {
   const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [isLoading, setIsLoading] = useState(true);
-  
-  const categories = ["All", "Afro", "Italian", "Asian", "Fast Food", "Desserts"];
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -141,52 +139,7 @@ const Index = () => {
         </div>
 
         {/* Explore Dishes Section */}
-        <div>
-          <div className="mb-3">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              🍽️ Explore Dishes
-            </h2>
-            <p className="text-sm text-muted-foreground">Craving something specific?</p>
-          </div>
-          
-          {/* Category Filters - Compact Chips */}
-          <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  selectedCategory === category 
-                    ? "bg-purple text-primary-foreground shadow-soft" 
-                    : "bg-card text-foreground border border-purple/20 hover:border-purple/40"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <SkeletonCard key={i} type="grid" />
-              ))}
-            </div>
-          ) : restaurants.length === 0 ? (
-            <EmptyState
-              icon={ChefHat}
-              title="Menu's being curated 👨🏽‍🍳"
-              description="Fresh picks are on the way!"
-              compact
-            />
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {restaurants.map((restaurant) => (
-                <UniversalRestaurantCard key={restaurant.id} restaurant={restaurant} />
-              ))}
-            </div>
-          )}
-        </div>
+        <ExploreDishesSection />
       </div>
     </div>
   );
