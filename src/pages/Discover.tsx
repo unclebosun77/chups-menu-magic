@@ -114,13 +114,16 @@ const Discover = () => {
       filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
     }
 
-    // Search filter
+    // Search filter - search across multiple fields
     if (searchQuery) {
+      const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
         (r) =>
-          r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.cuisine_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.city?.toLowerCase().includes(searchQuery.toLowerCase())
+          r.name.toLowerCase().includes(query) ||
+          r.cuisine_type.toLowerCase().includes(query) ||
+          r.description?.toLowerCase().includes(query) ||
+          r.city?.toLowerCase().includes(query) ||
+          r.address?.toLowerCase().includes(query)
       );
     }
 
