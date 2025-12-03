@@ -11,9 +11,9 @@ const FloatingAIButton = () => {
       <Button
         onClick={() => setIsOpen(true)}
         size="icon"
-        className="fixed bottom-20 right-4 h-16 w-16 rounded-full bg-gradient-warm shadow-glow hover:shadow-hover hover:scale-105 transition-all z-40 animate-pulse-glow"
+        className="fixed bottom-24 right-5 h-14 w-14 rounded-full bg-purple shadow-lg hover:shadow-xl hover:scale-105 transition-all z-40"
       >
-        <Rocket className="h-7 w-7 text-white" />
+        <Rocket className="h-6 w-6 text-white" />
       </Button>
       <AIAssistantModal open={isOpen} onOpenChange={setIsOpen} />
     </>
