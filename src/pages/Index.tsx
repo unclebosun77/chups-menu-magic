@@ -47,10 +47,10 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen bg-background">
-      <div className="space-y-8 p-5 pb-24">
+      <div className="px-4 pb-28">
         {/* Dev: Quick Onboarding Access */}
         {restaurants.length === 0 && !isLoading && (
-          <div className="bg-secondary/30 border border-border rounded-xl p-4">
+          <div className="bg-secondary/30 border border-border rounded-xl p-4 mt-4">
             <p className="text-sm text-foreground mb-2">👋 No spots yet!</p>
             <Button 
               onClick={() => navigate("/restaurant/onboarding")}
@@ -67,26 +67,26 @@ const Index = () => {
         <HeroSection />
 
         {/* AI Smart Actions */}
-        <div className="pt-2">
-          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-            <span className="text-purple">✨</span> Outa suggests
+        <div className="mt-6">
+          <p className="text-[11px] text-muted-foreground/60 mb-2 flex items-center gap-1 tracking-tight">
+            <span className="text-purple/80">✨</span> Outa suggests
           </p>
           <SmartActionPills />
         </div>
 
         {/* Discover Section */}
-        <div className="pt-4">
-          <div className="mb-2">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+        <div className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2 tracking-tight">
               🥢 Discover
             </h2>
-            <p className="text-xs text-muted-foreground/70">Trending around you</p>
+            <p className="text-[11px] text-muted-foreground/50 mt-1">Trending around you</p>
           </div>
           
           {isLoading ? (
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {[1, 2, 3].map((i) => (
-                <SkeletonCard key={i} type="vertical" className="flex-shrink-0 w-44" />
+                <SkeletonCard key={i} type="vertical" className="flex-shrink-0 w-40" />
               ))}
             </div>
           ) : restaurants.length === 0 ? (
@@ -97,7 +97,7 @@ const Index = () => {
               compact
             />
           ) : (
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {restaurants.map((restaurant) => (
                 <UniversalRestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))}
@@ -106,12 +106,12 @@ const Index = () => {
         </div>
 
         {/* Your Next Spot Section */}
-        <div className="pt-4">
+        <div className="mt-8">
           <YourNextSpotSection />
         </div>
 
         {/* Explore Dishes Section */}
-        <div className="pt-4">
+        <div className="mt-8">
           <ExploreDishesSection />
         </div>
       </div>
