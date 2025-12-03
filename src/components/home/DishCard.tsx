@@ -39,12 +39,12 @@ const DishCard = ({ dish }: DishCardProps) => {
 
   return (
     <div 
-      className="flex-shrink-0 w-40 cursor-pointer group"
+      className="flex-shrink-0 w-36 cursor-pointer group"
       onClick={handleClick}
     >
-      <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-purple/10 transition-all duration-200 group-hover:shadow-md group-hover:border-purple/20">
+      <div className="bg-card rounded-xl overflow-hidden shadow-sm border border-border transition-all duration-200 group-hover:shadow-md">
         {/* Dish Image */}
-        <div className="relative h-32 overflow-hidden">
+        <div className="relative h-24 overflow-hidden">
           <img 
             src={dish.image} 
             alt={dish.name}
@@ -54,25 +54,25 @@ const DishCard = ({ dish }: DishCardProps) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           
           {/* Dish name on image */}
-          <div className="absolute bottom-2 left-2 right-2">
-            <h3 className="text-white font-medium text-sm leading-tight drop-shadow-md">
+          <div className="absolute bottom-1.5 left-2 right-2">
+            <h3 className="text-white font-medium text-xs leading-tight drop-shadow-md">
               {dish.name}
             </h3>
           </div>
         </div>
         
         {/* Card bottom info */}
-        <div className="p-2.5">
+        <div className="p-2">
           {/* Restaurant list */}
-          <p className="text-[10px] text-muted-foreground truncate">
+          <p className="text-[9px] text-muted-foreground truncate">
             {restaurantText()}
           </p>
           
           {/* AI suggestion tag */}
           {dish.aiSuggested && (
-            <div className="flex items-center gap-1 mt-1.5">
-              <Sparkles className="h-2.5 w-2.5 text-purple" />
-              <span className="text-[9px] text-purple/80">For your taste</span>
+            <div className="flex items-center gap-0.5 mt-1">
+              <Sparkles className="h-2 w-2 text-purple" />
+              <span className="text-[8px] text-purple/70">For your taste</span>
             </div>
           )}
         </div>
