@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Sparkles, Rocket } from "lucide-react";
+import { MapPin, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
-import LoadingState from "@/components/LoadingState";
 import HeroSection from "@/components/home/HeroSection";
 import SmartActionPills from "@/components/home/SmartActionPills";
 import UniversalRestaurantCard from "@/components/home/UniversalRestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
+import YourNextSpotSection from "@/components/home/YourNextSpotSection";
 
 type Restaurant = {
   id: string;
@@ -108,35 +108,7 @@ const Index = () => {
         </div>
 
         {/* Your Next Spot Section */}
-        <div>
-          <div className="mb-3">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              🌙 Your Next Spot
-            </h2>
-            <p className="text-sm text-muted-foreground">Picked for you ✨</p>
-          </div>
-          
-          {isLoading ? (
-            <LoadingState message="Outa's got you... ✨" />
-          ) : restaurants.length === 0 ? (
-            <EmptyState
-              icon={Sparkles}
-              title="No vibes matched yet 😎"
-              description="Check back soon or ask Outa for personalized picks!"
-              compact
-            />
-          ) : (
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-              {restaurants.map((restaurant) => (
-                <UniversalRestaurantCard 
-                  key={restaurant.id} 
-                  restaurant={restaurant} 
-                  variant="personalized"
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <YourNextSpotSection />
 
         {/* Explore Dishes Section */}
         <ExploreDishesSection />
