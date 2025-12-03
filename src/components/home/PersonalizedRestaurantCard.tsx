@@ -28,10 +28,19 @@ interface PersonalizedRestaurantCardProps {
 const PersonalizedRestaurantCard = ({ restaurant }: PersonalizedRestaurantCardProps) => {
   const navigate = useNavigate();
 
+  const handleNavigate = () => {
+    // Check if it's a demo restaurant
+    if (restaurant.id.includes("-demo")) {
+      navigate(`/restaurant/demo/${restaurant.id}`);
+    } else {
+      navigate(`/restaurant/${restaurant.id}`);
+    }
+  };
+
   return (
     <Card
       className="flex-shrink-0 w-72 overflow-hidden hover:shadow-lg transition-all cursor-pointer group bg-card rounded-2xl border border-border shadow-card"
-      onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+      onClick={handleNavigate}
     >
       {/* Image Section */}
       <div className="relative h-36 overflow-hidden">
@@ -116,7 +125,7 @@ const PersonalizedRestaurantCard = ({ restaurant }: PersonalizedRestaurantCardPr
             className="flex-1 text-[10px] h-7 rounded-full border-purple/30 text-purple hover:bg-purple/5"
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/restaurant/${restaurant.id}`);
+              handleNavigate();
             }}
           >
             <UtensilsCrossed className="h-3 w-3 mr-1" />
