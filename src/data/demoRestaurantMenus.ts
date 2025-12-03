@@ -47,6 +47,8 @@ export interface DemoRestaurant {
   signatureDishes: string[];
   logoUrl: string;
   heroImage: string;
+  galleryImages: string[];
+  galleryTheme: "light" | "dark";
   rating: number;
   distance: string;
   isOpen: boolean;
@@ -71,6 +73,16 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
     signatureDishes: ["Smoked Jollof Risotto", "Fire-Grilled Suya Steak", "Yam Croquettes"],
     logoUrl: "/images/yakoyo-logo-new.png",
     heroImage: "/images/yakoyo-jollof-seafood.jpeg",
+    galleryImages: [
+      "/images/yakoyo-jollof-seafood.jpeg",
+      yakoyoJollofRice,
+      yakoyoGrilledSuya,
+      yakoyoYamCroquettes,
+      yakoyoEgusiPasta,
+      yakoyoFriedPlantain,
+      yakoyoSuyaFries
+    ],
+    galleryTheme: "light",
     rating: 4.8,
     distance: "1.2 km",
     isOpen: true,
@@ -123,6 +135,15 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
     signatureDishes: ["Truffle Butter Tagliatelle", "Heritage Tomato Burrata", "Lemon Parmigiano Risotto"],
     logoUrl: "/images/cosby-logo.png",
     heroImage: cosbyBurrataTomato,
+    galleryImages: [
+      cosbyBurrataTomato,
+      cosbyTruffleTaqliatelle,
+      cosbyLemonRisotto,
+      cosbyPappardelleBolognese,
+      cosbyPannaCotta,
+      cosbyPistachioTiramisu
+    ],
+    galleryTheme: "light",
     rating: 4.9,
     distance: "0.8 km",
     isOpen: true,
@@ -175,6 +196,15 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
     signatureDishes: ["Green Curry", "Pad Thai", "Tom Yum Soup"],
     logoUrl: "/the-prox-logo.png",
     heroImage: proxGreenCurry,
+    galleryImages: [
+      proxGreenCurry,
+      proxPadThai,
+      proxTomYum,
+      proxThaifriedRice,
+      proxBasilChicken,
+      proxMangoStickyRice
+    ],
+    galleryTheme: "dark",
     rating: 4.7,
     distance: "1.5 km",
     isOpen: true,
