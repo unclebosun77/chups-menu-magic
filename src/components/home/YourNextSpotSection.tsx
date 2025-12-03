@@ -1,8 +1,29 @@
+import { useMemo } from "react";
 import { Sparkles } from "lucide-react";
 import PersonalizedRestaurantCard from "./PersonalizedRestaurantCard";
 import { personalizedRestaurants } from "@/data/personalizedRestaurants";
+import { useUserBehavior } from "@/context/UserBehaviorContext";
+import { useSearch } from "@/context/SearchContext";
 
 const YourNextSpotSection = () => {
+  const { shouldBoostCuisine, behavior } = useUserBehavior();
+  const { highlightedCuisine } = useSearch();
+
+  // Sort restaurants based on user behavior
+  const sortedRestaurants = useMemo(() => {
+    return [...personalizedRestaurants]
+      .map(restaurant => ({
+        ...restaurant,
+        boostScore: (
+          (shouldBoostCuisine(restaurant.cuisine) ? 5 : 0) +
+          (behavior.visitedRestaurants.some(r => r.cuisine === restaurant.cuisine) ? 3 : 0) +
+          (highlightedCuisine && restaurant.cuisine.toLowerCase().includes(highlightedCuisine.toLowerCase()) ? 10 : 0) +
+          restaurant.matchScore / 10
+        )
+      }))
+      .sort((a, b) => (b.boostScore || 0) - (a.boostScore || 0));
+  }, [shouldBoostCuisine, behavior.visitedRestaurants, highlightedCuisine]);
+
   return (
     <div>
       <div className="mb-4">
@@ -15,7 +36,7 @@ const YourNextSpotSection = () => {
       </div>
       
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-        {personalizedRestaurants.map((restaurant) => (
+        {sortedRestaurants.map((restaurant) => (
           <PersonalizedRestaurantCard key={restaurant.id} restaurant={restaurant} />
         ))}
       </div>

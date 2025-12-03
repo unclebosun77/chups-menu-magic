@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TasteProfileProvider } from "@/context/TasteProfileContext";
+import { UserBehaviorProvider } from "@/context/UserBehaviorContext";
+import { SearchProvider } from "@/context/SearchContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -32,9 +34,11 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <TasteProfileProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+        <UserBehaviorProvider>
+          <SearchProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
         <Routes>
           {/* Main app routes with bottom nav */}
           <Route path="/" element={<Layout><Index /></Layout>} />
@@ -62,7 +66,9 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+          </BrowserRouter>
+          </SearchProvider>
+        </UserBehaviorProvider>
       </TasteProfileProvider>
     </TooltipProvider>
   </QueryClientProvider>
