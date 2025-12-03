@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DishCard from "./DishCard";
 import { seedDishes, dishCategories, type DishCategory } from "@/data/dishes";
+import { useUserBehavior } from "@/context/UserBehaviorContext";
+import { useSearch } from "@/context/SearchContext";
 
 const ExploreDishesSection = () => {
   const [selectedCategory, setSelectedCategory] = useState<DishCategory>("All");
+  const { behavior, shouldBoostCuisine } = useUserBehavior();
+  const { highlightedCuisine } = useSearch();
 
-  const filteredDishes = selectedCategory === "All" 
-    ? seedDishes 
-    : seedDishes.filter(dish => dish.category === selectedCategory);
+  const filteredDishes = useMemo(() => {
+    const baseDishes = selectedCategory === "All" ? [...seedDishes] : seedDishes.filter(dish => dish.category === selectedCategory);
+    const withScores = baseDishes.map(dish => ({
+      dish,
+      boostScore: (shouldBoostCuisine(dish.category) ? 3 : 0) + (highlightedCuisine && dish.category.toLowerCase().includes(highlightedCuisine.toLowerCase()) ? 5 : 0)
+    }));
+    withScores.sort((a, b) => b.boostScore - a.boostScore);
+    return withScores.map(item => item.dish);
+  }, [selectedCategory, shouldBoostCuisine, highlightedCuisine]);
 
   return (
     <div>
