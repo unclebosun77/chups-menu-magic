@@ -27,7 +27,13 @@ const DishCard = ({ dish }: DishCardProps) => {
   const handleClick = () => {
     // Navigate to first restaurant that serves this dish
     if (dish.restaurants.length > 0) {
-      navigate(`/restaurant/${dish.restaurants[0].id}`);
+      const restaurantId = dish.restaurants[0].id;
+      // Check if it's a demo restaurant
+      if (restaurantId.includes("-demo")) {
+        navigate(`/restaurant/demo/${restaurantId}`);
+      } else {
+        navigate(`/restaurant/${restaurantId}`);
+      }
     }
   };
 
