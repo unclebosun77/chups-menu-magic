@@ -1,5 +1,27 @@
 // Complete menu data for demo restaurants
 
+// Import menu images
+import yakoyoJollofRice from "@/assets/menu/yakoyo-jollof-rice.jpg";
+import yakoyoGrilledSuya from "@/assets/menu/yakoyo-grilled-suya.jpg";
+import yakoyoYamCroquettes from "@/assets/menu/yakoyo-yam-croquettes.jpg";
+import yakoyoEgusiPasta from "@/assets/menu/yakoyo-egusi-pasta.jpg";
+import yakoyoFriedPlantain from "@/assets/menu/yakoyo-fried-plantain.jpg";
+import yakoyoSuyaFries from "@/assets/menu/yakoyo-suya-fries.jpg";
+
+import cosbyTruffleTaqliatelle from "@/assets/menu/cosby-truffle-tagliatelle.jpg";
+import cosbyBurrataTomato from "@/assets/menu/cosby-burrata-tomato.jpg";
+import cosbyLemonRisotto from "@/assets/menu/cosby-lemon-risotto.jpg";
+import cosbyPappardelleBolognese from "@/assets/menu/cosby-pappardelle-bolognese.jpg";
+import cosbyPannaCotta from "@/assets/menu/cosby-panna-cotta.jpg";
+import cosbyPistachioTiramisu from "@/assets/menu/cosby-pistachio-tiramisu.jpg";
+
+import proxGreenCurry from "@/assets/menu/prox-green-curry.jpg";
+import proxPadThai from "@/assets/menu/prox-pad-thai.jpg";
+import proxTomYum from "@/assets/menu/prox-tom-yum.jpg";
+import proxThaifriedRice from "@/assets/menu/prox-thai-fried-rice.jpg";
+import proxBasilChicken from "@/assets/menu/prox-basil-chicken.jpg";
+import proxMangoStickyRice from "@/assets/menu/prox-mango-sticky-rice.jpg";
+
 export type DietaryTag = "spicy" | "veg" | "vegan" | "gluten-free" | "popular" | "chef-pick" | "sharing";
 
 export interface DemoMenuItem {
@@ -54,21 +76,21 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
     isOpen: true,
     menu: [
       // Starters
-      { id: "y-s1", name: "Yam Croquettes", description: "Golden crispy yam bites with spiced aioli", price: 9, category: "starters", tags: ["veg", "popular"], image: "/images/yakoyo-rice-peas-plantain.jpeg" },
+      { id: "y-s1", name: "Yam Croquettes", description: "Golden crispy yam bites with spiced aioli", price: 9, category: "starters", tags: ["veg", "popular"], image: yakoyoYamCroquettes },
       { id: "y-s2", name: "Pepper Soup (Goat)", description: "Traditional spicy broth with tender goat meat", price: 10, category: "starters", tags: ["spicy", "chef-pick"] },
       { id: "y-s3", name: "Pepper Soup (Fish)", description: "Aromatic fish broth with West African spices", price: 10, category: "starters", tags: ["spicy"] },
-      { id: "y-s4", name: "Suya Spice Chicken Bites", description: "Grilled chicken in smoky suya spice blend", price: 8, category: "starters", tags: ["spicy", "popular"] },
+      { id: "y-s4", name: "Suya Spice Chicken Bites", description: "Grilled chicken in smoky suya spice blend", price: 8, category: "starters", tags: ["spicy", "popular"], image: yakoyoGrilledSuya },
       
       // Mains
-      { id: "y-m1", name: "Smoked Jollof Risotto", description: "Signature fusion dish with smoky jollof flavors in creamy risotto", price: 15, category: "mains", tags: ["chef-pick", "popular"], image: "/images/yakoyo-jollof-seafood.jpeg" },
-      { id: "y-m2", name: "Fire-Grilled Suya Steak", description: "Premium cut steak marinated in suya spices, chargrilled to perfection", price: 19, category: "mains", tags: ["spicy", "chef-pick"], image: "/images/yakoyo-grilled-fish.jpeg" },
+      { id: "y-m1", name: "Smoked Jollof Risotto", description: "Signature fusion dish with smoky jollof flavors in creamy risotto", price: 15, category: "mains", tags: ["chef-pick", "popular"], image: yakoyoJollofRice },
+      { id: "y-m2", name: "Fire-Grilled Suya Steak", description: "Premium cut steak marinated in suya spices, chargrilled to perfection", price: 19, category: "mains", tags: ["spicy", "chef-pick"], image: yakoyoGrilledSuya },
       { id: "y-m3", name: "Ofada Bowl with Ayamase", description: "Local rice with spicy green pepper sauce", price: 14, category: "mains", tags: ["spicy", "veg"] },
-      { id: "y-m4", name: "Egusi Cream Pasta", description: "Fusion pasta with rich egusi cream sauce", price: 16, category: "mains", tags: ["chef-pick"] },
+      { id: "y-m4", name: "Egusi Cream Pasta", description: "Fusion pasta with rich egusi cream sauce", price: 16, category: "mains", tags: ["chef-pick"], image: yakoyoEgusiPasta },
       
       // Sides
-      { id: "y-si1", name: "Fried Plantain", description: "Sweet caramelized plantain slices", price: 5, category: "sides", tags: ["veg", "vegan", "gluten-free"] },
-      { id: "y-si2", name: "Jollof Rice", description: "Classic smoky party jollof", price: 5, category: "sides", tags: ["veg", "popular"] },
-      { id: "y-si3", name: "Suya Fries", description: "Crispy fries dusted with suya spice", price: 6, category: "sides", tags: ["spicy", "veg"] },
+      { id: "y-si1", name: "Fried Plantain", description: "Sweet caramelized plantain slices", price: 5, category: "sides", tags: ["veg", "vegan", "gluten-free"], image: yakoyoFriedPlantain },
+      { id: "y-si2", name: "Jollof Rice", description: "Classic smoky party jollof", price: 5, category: "sides", tags: ["veg", "popular"], image: yakoyoJollofRice },
+      { id: "y-si3", name: "Suya Fries", description: "Crispy fries dusted with suya spice", price: 6, category: "sides", tags: ["spicy", "veg"], image: yakoyoSuyaFries },
       
       // Desserts
       { id: "y-d1", name: "Puff-Puff with Caramel Drizzle", description: "Nigerian doughnuts with sweet caramel sauce", price: 7, category: "desserts", tags: ["popular", "sharing"] },
@@ -100,21 +122,21 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
     },
     signatureDishes: ["Truffle Butter Tagliatelle", "Heritage Tomato Burrata", "Lemon Parmigiano Risotto"],
     logoUrl: "/images/cosby-logo.png",
-    heroImage: "/images/yakoyo-grilled-fish.jpeg",
+    heroImage: cosbyBurrataTomato,
     rating: 4.9,
     distance: "0.8 km",
     isOpen: true,
     menu: [
       // Starters
-      { id: "c-s1", name: "Burrata & Tomato", description: "Creamy burrata with heritage tomatoes and basil oil", price: 12, category: "starters", tags: ["veg", "chef-pick", "popular"] },
+      { id: "c-s1", name: "Burrata & Tomato", description: "Creamy burrata with heritage tomatoes and basil oil", price: 12, category: "starters", tags: ["veg", "chef-pick", "popular"], image: cosbyBurrataTomato },
       { id: "c-s2", name: "Arancini al Tartufo", description: "Truffle-infused risotto balls with parmesan", price: 10, category: "starters", tags: ["veg"] },
       { id: "c-s3", name: "Bruschetta Classica", description: "Toasted ciabatta with vine tomatoes and garlic", price: 8, category: "starters", tags: ["veg", "vegan"] },
       
       // Mains
-      { id: "c-m1", name: "Truffle Tagliatelle", description: "Fresh pasta ribbons with black truffle butter and parmesan", price: 18, category: "mains", tags: ["veg", "chef-pick", "popular"] },
-      { id: "c-m2", name: "Pappardelle Bolognese", description: "Slow-cooked beef ragù with wide ribbon pasta", price: 17, category: "mains", tags: ["popular"] },
+      { id: "c-m1", name: "Truffle Tagliatelle", description: "Fresh pasta ribbons with black truffle butter and parmesan", price: 18, category: "mains", tags: ["veg", "chef-pick", "popular"], image: cosbyTruffleTaqliatelle },
+      { id: "c-m2", name: "Pappardelle Bolognese", description: "Slow-cooked beef ragù with wide ribbon pasta", price: 17, category: "mains", tags: ["popular"], image: cosbyPappardelleBolognese },
       { id: "c-m3", name: "Seabass Fillet", description: "Pan-seared seabass with lemon oil and capers", price: 22, category: "mains", tags: ["gluten-free", "chef-pick"] },
-      { id: "c-m4", name: "Lemon Parmigiano Risotto", description: "Creamy arborio rice with aged parmesan and lemon zest", price: 17, category: "mains", tags: ["veg", "gluten-free"] },
+      { id: "c-m4", name: "Lemon Parmigiano Risotto", description: "Creamy arborio rice with aged parmesan and lemon zest", price: 17, category: "mains", tags: ["veg", "gluten-free"], image: cosbyLemonRisotto },
       
       // Sides
       { id: "c-si1", name: "Garlic Parmesan Fries", description: "Crispy fries with garlic butter and parmesan", price: 5, category: "sides", tags: ["veg"] },
@@ -122,8 +144,8 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
       { id: "c-si3", name: "Seasonal Greens", description: "Sautéed vegetables with olive oil", price: 6, category: "sides", tags: ["veg", "vegan", "gluten-free"] },
       
       // Desserts
-      { id: "c-d1", name: "Pistachio Tiramisu", description: "Classic tiramisu with pistachio cream layers", price: 9, category: "desserts", tags: ["veg", "chef-pick", "popular"] },
-      { id: "c-d2", name: "Panna Cotta al Limone", description: "Silky lemon panna cotta with berry compote", price: 8, category: "desserts", tags: ["veg", "gluten-free"] },
+      { id: "c-d1", name: "Pistachio Tiramisu", description: "Classic tiramisu with pistachio cream layers", price: 9, category: "desserts", tags: ["veg", "chef-pick", "popular"], image: cosbyPistachioTiramisu },
+      { id: "c-d2", name: "Panna Cotta al Limone", description: "Silky lemon panna cotta with berry compote", price: 8, category: "desserts", tags: ["veg", "gluten-free"], image: cosbyPannaCotta },
       { id: "c-d3", name: "Affogato", description: "Vanilla gelato drowned in espresso", price: 6, category: "desserts", tags: ["veg", "gluten-free"] },
       
       // Drinks
@@ -134,6 +156,56 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
       
       // Specials
       { id: "c-sp1", name: "Chef's Tasting Menu", description: "5-course journey through Italian flavors", price: 55, category: "specials", tags: ["chef-pick", "sharing"] },
+    ]
+  },
+  "prox-demo": {
+    id: "prox-demo",
+    name: "The Prox",
+    cuisine: "Premium Thai",
+    address: "24 Colmore Row",
+    city: "Birmingham B3 2QE",
+    priceLevel: "££–£££",
+    description: "The Prox brings authentic Thai flavors with a premium twist. Rich curries, fresh herbs, and traditional recipes crafted with care in a warm, intimate setting.",
+    vibe: ["Cozy", "Authentic", "Aromatic", "Premium"],
+    openingHours: {
+      "Mon–Thu": "12pm – 10pm",
+      "Fri–Sat": "12pm – 11pm",
+      "Sun": "1pm – 9pm"
+    },
+    signatureDishes: ["Green Curry", "Pad Thai", "Tom Yum Soup"],
+    logoUrl: "/the-prox-logo.png",
+    heroImage: proxGreenCurry,
+    rating: 4.7,
+    distance: "1.5 km",
+    isOpen: true,
+    menu: [
+      // Starters
+      { id: "p-s1", name: "Tom Yum Soup", description: "Hot and sour soup with prawns, lemongrass, and kaffir lime", price: 9, category: "starters", tags: ["spicy", "chef-pick", "popular"], image: proxTomYum },
+      { id: "p-s2", name: "Thai Spring Rolls", description: "Crispy rolls with vegetables and sweet chili dip", price: 7, category: "starters", tags: ["veg", "vegan"] },
+      { id: "p-s3", name: "Satay Skewers", description: "Grilled chicken with peanut sauce", price: 8, category: "starters", tags: ["popular", "gluten-free"] },
+      
+      // Mains
+      { id: "p-m1", name: "Green Curry", description: "Creamy coconut curry with Thai basil and bamboo shoots", price: 14, category: "mains", tags: ["spicy", "chef-pick", "popular"], image: proxGreenCurry },
+      { id: "p-m2", name: "Pad Thai", description: "Wok-fried rice noodles with prawns, peanuts, and lime", price: 13, category: "mains", tags: ["popular", "gluten-free"], image: proxPadThai },
+      { id: "p-m3", name: "Thai Fried Rice", description: "Jasmine rice with egg, vegetables, and Thai herbs", price: 12, category: "mains", tags: ["veg"], image: proxThaifriedRice },
+      { id: "p-m4", name: "Spicy Basil Chicken", description: "Pad Krapow with holy basil, chili, and fried egg", price: 13, category: "mains", tags: ["spicy", "chef-pick"], image: proxBasilChicken },
+      
+      // Sides
+      { id: "p-si1", name: "Jasmine Rice", description: "Fragrant Thai jasmine rice", price: 3, category: "sides", tags: ["veg", "vegan", "gluten-free"] },
+      { id: "p-si2", name: "Coconut Rice", description: "Sweet coconut-infused rice", price: 4, category: "sides", tags: ["veg", "vegan", "gluten-free"] },
+      { id: "p-si3", name: "Prawn Crackers", description: "Light and crispy Thai crackers", price: 4, category: "sides", tags: ["popular"] },
+      
+      // Desserts
+      { id: "p-d1", name: "Mango Sticky Rice", description: "Sweet coconut rice with fresh mango slices", price: 8, category: "desserts", tags: ["veg", "vegan", "gluten-free", "popular"], image: proxMangoStickyRice },
+      { id: "p-d2", name: "Coconut Ice Cream", description: "Creamy coconut ice cream with peanuts", price: 6, category: "desserts", tags: ["veg", "gluten-free"] },
+      
+      // Drinks
+      { id: "p-dr1", name: "Thai Iced Tea", description: "Sweet orange-hued tea with condensed milk", price: 5, category: "drinks", tags: ["popular"] },
+      { id: "p-dr2", name: "Lemongrass Cooler", description: "Refreshing lemongrass and lime drink", price: 4, category: "drinks", tags: ["vegan"] },
+      { id: "p-dr3", name: "Singha Beer", description: "Classic Thai lager", price: 6, category: "drinks", tags: [] },
+      
+      // Specials
+      { id: "p-sp1", name: "Thai Feast for Two", description: "Selection of curries, noodles, and sides", price: 45, category: "specials", tags: ["sharing", "popular"] },
     ]
   }
 };

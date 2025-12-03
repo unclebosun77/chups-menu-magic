@@ -1,4 +1,6 @@
-// Restaurant images from public folder
+// Restaurant images - using generated images
+import cosbyBurrataTomato from "@/assets/menu/cosby-burrata-tomato.jpg";
+import proxGreenCurry from "@/assets/menu/prox-green-curry.jpg";
 
 export const personalizedRestaurants = [
   {
@@ -37,7 +39,7 @@ export const personalizedRestaurants = [
     distance: "0.8 km",
     rating: 4.9,
     logoUrl: "/images/cosby-logo.png",
-    imageUrl: "/images/yakoyo-grilled-fish.jpeg",
+    imageUrl: cosbyBurrataTomato,
     openingHours: {
       "Tue–Thu": "12pm – 10pm",
       "Fri–Sat": "12pm – 11pm",
@@ -45,5 +47,27 @@ export const personalizedRestaurants = [
       "Mon": "Closed"
     },
     signatureDishes: ["Truffle Tagliatelle", "Burrata & Tomato", "Lemon Parmigiano Risotto"]
+  },
+  {
+    id: "prox-demo",
+    name: "The Prox",
+    cuisine: "Premium Thai",
+    address: "24 Colmore Row, Birmingham City Centre, B3 2QE",
+    description: "Authentic Thai flavors with a premium twist. Rich curries, fresh herbs, and traditional recipes crafted with care.",
+    ambience: ["Cozy", "Authentic", "Aromatic", "Premium"],
+    priceLevel: "££–£££",
+    matchScore: 85,
+    aiReason: "Suggested for your love of Asian cuisine.",
+    isOpen: true,
+    distance: "1.5 km",
+    rating: 4.7,
+    logoUrl: "/the-prox-logo.png",
+    imageUrl: proxGreenCurry,
+    openingHours: {
+      "Mon–Thu": "12pm – 10pm",
+      "Fri–Sat": "12pm – 11pm",
+      "Sun": "1pm – 9pm"
+    },
+    signatureDishes: ["Green Curry", "Pad Thai", "Mango Sticky Rice"]
   }
 ];
