@@ -31,12 +31,10 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
 
   return (
     <Card
-      className={`flex-shrink-0 w-44 overflow-hidden hover:shadow-hover transition-all cursor-pointer group bg-card rounded-2xl border shadow-card ${
-        variant === "personalized" ? "border-purple/20 ring-1 ring-purple/10" : "border-border"
-      }`}
+      className={`flex-shrink-0 w-40 overflow-hidden hover:shadow-md transition-all cursor-pointer group bg-card rounded-xl border border-border shadow-sm`}
       onClick={() => navigate(`/restaurant/${restaurant.id}`)}
     >
-      <div className="relative h-28 overflow-hidden">
+      <div className="relative h-24 overflow-hidden">
         {restaurant.logo_url ? (
           <img
             src={restaurant.logo_url}
@@ -45,42 +43,35 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
           />
         ) : (
           <div className="w-full h-full bg-secondary flex items-center justify-center">
-            <ChefHat className="h-8 w-8 text-muted-foreground/30" />
+            <ChefHat className="h-6 w-6 text-muted-foreground/30" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
         
         {/* Open indicator */}
         {restaurant.is_open && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 bg-card/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px]">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+          <div className="absolute top-1.5 right-1.5 flex items-center gap-1 bg-card/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[9px]">
+            <span className="w-1 h-1 bg-green-500 rounded-full" />
             <span className="text-foreground font-medium">Open</span>
-          </div>
-        )}
-
-        {/* Personalized badge */}
-        {variant === "personalized" && (
-          <div className="absolute bottom-2 left-2">
-            <span className="text-[10px] text-foreground/90 font-medium bg-purple/20 backdrop-blur-sm px-2 py-0.5 rounded-full">For you ✨</span>
           </div>
         )}
       </div>
       
-      <CardContent className="p-3">
-        <h3 className="font-semibold text-sm mb-1.5 line-clamp-1 text-foreground">{restaurant.name}</h3>
+      <CardContent className="p-2.5">
+        <h3 className="font-medium text-sm mb-1 line-clamp-1 text-foreground">{restaurant.name}</h3>
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-purple" />
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1.5">
+          <div className="flex items-center gap-0.5">
+            <MapPin className="h-2.5 w-2.5 text-purple" />
             <span>2.4 km</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 fill-purple text-purple" />
+          <div className="flex items-center gap-0.5">
+            <Star className="h-2.5 w-2.5 fill-purple text-purple" />
             <span className="font-medium text-foreground">4.8</span>
           </div>
         </div>
         
-        <Badge className="text-[10px] bg-secondary text-foreground border-0 rounded-full px-2 py-0.5">
+        <Badge className="text-[9px] bg-secondary/50 text-muted-foreground border-0 rounded-full px-1.5 py-0">
           {getCuisineTag(restaurant.cuisine_type)}
         </Badge>
       </CardContent>

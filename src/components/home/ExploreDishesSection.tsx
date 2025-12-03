@@ -11,23 +11,23 @@ const ExploreDishesSection = () => {
 
   return (
     <div>
-      <div className="mb-3">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <div className="mb-2">
+        <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
           🍽️ Explore Dishes
         </h2>
-        <p className="text-sm text-muted-foreground">Craving something specific?</p>
+        <p className="text-xs text-muted-foreground/70">Craving something specific?</p>
       </div>
       
       {/* Category Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
+      <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-5 px-5 scrollbar-hide">
         {dishCategories.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-all ${
               selectedCategory === category 
-                ? "bg-purple text-primary-foreground shadow-sm" 
-                : "bg-card text-foreground border border-purple/20 hover:border-purple/40"
+                ? "bg-purple text-primary-foreground" 
+                : "bg-card text-foreground border border-border hover:border-purple/30"
             }`}
           >
             {category}
@@ -37,11 +37,11 @@ const ExploreDishesSection = () => {
       
       {/* Dish Cards Grid */}
       {filteredDishes.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground text-sm">No dishes found in this category</p>
+        <div className="text-center py-6">
+          <p className="text-muted-foreground text-xs">No dishes found in this category</p>
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+        <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
           {filteredDishes.map((dish) => (
             <DishCard key={dish.id} dish={dish} />
           ))}
