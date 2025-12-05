@@ -3,7 +3,6 @@ import {
   Sparkles, MapPin, UtensilsCrossed, Bookmark, Settings, ChevronRight,
   Heart, Users, TrendingUp, Globe, Star
 } from "lucide-react";
-import { motion, Variants } from "framer-motion";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -74,251 +73,106 @@ const Services = () => {
     },
   ];
 
-  // Animation variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.06,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const headerVariants: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 25,
-      },
-    },
-  };
-
-  const cardVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: 14,
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 320,
-        damping: 26,
-      },
-    },
-  };
-
-  const iconVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      scale: 0.75,
-    },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 400,
-        damping: 18,
-        delay: 0.08,
-      },
-    },
-  };
-
-  const tileVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: 12,
-      scale: 0.97,
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 24,
-      },
-    },
-  };
-
-  const curatedContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.35,
-      },
-    },
-  };
-
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden">
+    <div className="relative min-h-screen bg-background">
       <div className="px-4 pb-28">
         {/* Header with entrance animation */}
-        <motion.div 
-          className="pt-8 pb-6"
-          variants={headerVariants}
-          initial="hidden"
-          animate="visible"
+        <div 
+          className="pt-8 pb-6 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
+          style={{ opacity: 0 }}
         >
-          <motion.h1 
-            className="text-xl font-semibold text-foreground tracking-tight"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1, duration: 0.35 }}
-          >
+          <h1 className="text-xl font-semibold text-foreground tracking-tight">
             Services
-          </motion.h1>
-          <motion.p 
-            className="text-[13px] text-muted-foreground/60 mt-1.5 font-light"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.35 }}
-          >
+          </h1>
+          <p className="text-[13px] text-muted-foreground/60 mt-1.5 font-light">
             Everything Outa offers, beautifully organized.
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
         {/* Services List with staggered animations */}
-        <motion.div 
-          className="space-y-2.5"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="space-y-2.5">
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <motion.button
+              <button
                 key={service.title}
-                variants={cardVariants}
-                whileHover={{ 
-                  scale: 1.015,
-                  boxShadow: "0 4px 16px -4px rgba(139,92,246,0.12)",
-                }}
-                whileTap={{ scale: 0.96 }}
                 onClick={() => navigate(service.route)}
-                className="w-full flex items-center gap-4 p-4 bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:border-purple/25 transition-colors group"
+                className="w-full flex items-center gap-4 p-4 bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_-4px_rgba(139,92,246,0.12)] hover:border-purple/25 hover:scale-[1.01] transition-all duration-200 active:scale-[0.97] active:shadow-[0_1px_4px_-1px_rgba(0,0,0,0.06)] group animate-[fadeSlideUp_0.3s_ease-out_forwards]"
+                style={{ 
+                  opacity: 0,
+                  animationDelay: `${80 + index * 50}ms`
+                }}
               >
-                <motion.div 
-                  className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-purple/8 to-purple/15 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
-                  variants={iconVariants}
+                <div 
+                  className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-purple/8 to-purple/15 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] animate-[iconPop_0.25s_ease-out_forwards]"
+                  style={{ 
+                    opacity: 0,
+                    transform: 'scale(0.9)',
+                    animationDelay: `${150 + index * 50}ms`
+                  }}
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.15, rotate: 3 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  >
-                    <Icon className="h-[17px] w-[17px] text-purple" strokeWidth={1.5} />
-                  </motion.div>
-                </motion.div>
+                  <Icon className="h-[17px] w-[17px] text-purple transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
+                </div>
                 <div className="flex-1 text-left">
                   <p className="text-[14px] font-medium text-foreground tracking-tight">{service.title}</p>
                   <p className="text-[11px] text-muted-foreground/50 mt-0.5 font-light">{service.subtitle}</p>
                 </div>
-                <motion.div
-                  initial={{ x: 0 }}
-                  whileHover={{ x: 3 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                >
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-purple/50 transition-colors" strokeWidth={1.5} />
-                </motion.div>
-              </motion.button>
+                <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-purple/50 group-hover:translate-x-0.5 transition-all duration-200" strokeWidth={1.5} />
+              </button>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* Curated Experiences Preview - Premium Design */}
-        <motion.div 
-          className="mt-12"
-          variants={curatedContainerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div 
-            className="mb-6"
-            variants={headerVariants}
+        <div className="mt-12">
+          <div 
+            className="mb-6 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
+            style={{ 
+              opacity: 0,
+              animationDelay: '400ms'
+            }}
           >
             <div className="flex items-center gap-2.5">
-              <motion.div 
-                className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center shadow-[0_1px_3px_rgba(139,92,246,0.1)]"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 15,
-                  delay: 0.4 
-                }}
-              >
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center shadow-[0_1px_3px_rgba(139,92,246,0.1)]">
                 <Sparkles className="h-3.5 w-3.5 text-purple" strokeWidth={1.5} />
-              </motion.div>
-              <motion.h2 
-                className="text-[17px] font-semibold text-foreground tracking-tight"
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.45, duration: 0.35 }}
-              >
+              </div>
+              <h2 className="text-[17px] font-semibold text-foreground tracking-tight">
                 Curated Experiences
-              </motion.h2>
+              </h2>
             </div>
-            <motion.p 
-              className="text-[12px] text-muted-foreground/50 mt-2.5 ml-[34px] font-light tracking-wide"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.35 }}
-            >
+            <p className="text-[12px] text-muted-foreground/50 mt-2.5 ml-[34px] font-light tracking-wide">
               Handpicked collections for every mood
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
 
           {/* Premium Tile Grid */}
-          <motion.div className="grid grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-2 gap-3.5">
             {curatedExperiences.map((experience, index) => {
               const Icon = experience.icon;
               return (
-                <motion.button
+                <button
                   key={experience.label}
-                  variants={tileVariants}
-                  whileHover={{ 
-                    scale: 1.03,
-                    boxShadow: "0 8px 24px -8px rgba(139,92,246,0.15), 0 2px 6px rgba(139,92,246,0.06)",
-                  }}
-                  whileTap={{ scale: 0.96 }}
                   onClick={() => navigate(experience.route)}
-                  className="relative flex flex-col items-start gap-3 p-4 bg-gradient-to-br from-card via-card to-secondary/40 border border-border/30 rounded-[20px] shadow-[0_4px_12px_-4px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.03)] hover:border-purple/25 transition-colors group"
+                  className="relative flex flex-col items-start gap-3 p-4 bg-gradient-to-br from-card via-card to-secondary/40 border border-border/30 rounded-[20px] shadow-[0_4px_12px_-4px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_-8px_rgba(139,92,246,0.15),0_2px_6px_rgba(139,92,246,0.06)] hover:border-purple/25 hover:scale-[1.02] transition-all duration-250 active:scale-[0.97] active:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] group animate-[tileSlideUp_0.35s_ease-out_forwards]"
+                  style={{ 
+                    opacity: 0,
+                    animationDelay: `${450 + index * 70}ms`
+                  }}
                 >
                   {/* Subtle gradient overlay */}
                   <div className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-purple/[0.02] via-transparent to-purple/[0.04] pointer-events-none" />
                   
                   {/* Icon in circular capsule */}
-                  <motion.div 
-                    className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple/8 via-purple/10 to-purple/16 flex items-center justify-center shadow-[0_2px_8px_-2px_rgba(139,92,246,0.12),inset_0_1px_1px_rgba(255,255,255,0.6)]"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ 
-                      delay: 0.5 + index * 0.06,
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 18,
+                  <div 
+                    className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple/8 via-purple/10 to-purple/16 flex items-center justify-center shadow-[0_2px_8px_-2px_rgba(139,92,246,0.12),inset_0_1px_1px_rgba(255,255,255,0.6)] animate-[iconPop_0.3s_ease-out_forwards]"
+                    style={{ 
+                      opacity: 0,
+                      transform: 'scale(0.85)',
+                      animationDelay: `${520 + index * 70}ms`
                     }}
                   >
-                    <motion.div
-                      whileHover={{ scale: 1.2 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    >
-                      <Icon className="h-[18px] w-[18px] text-purple" strokeWidth={1.5} />
-                    </motion.div>
-                  </motion.div>
+                    <Icon className="h-[18px] w-[18px] text-purple transition-all duration-200 group-hover:scale-110 group-hover:text-purple" strokeWidth={1.5} />
+                  </div>
                   
                   {/* Text content */}
                   <div className="relative flex flex-col items-start">
@@ -329,12 +183,48 @@ const Services = () => {
                       {experience.subtitle}
                     </span>
                   </div>
-                </motion.button>
+                </button>
               );
             })}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes fadeSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes tileSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes iconPop {
+          from {
+            opacity: 0;
+            transform: scale(0.85);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 };
