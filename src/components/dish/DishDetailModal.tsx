@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { X, MapPin, ChefHat, Sparkles, DollarSign } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 import { seedDishes } from "@/data/dishes";
+import { personalizedRestaurants } from "@/data/personalizedRestaurants";
+import UniversalRestaurantCard from "@/components/restaurant/UniversalRestaurantCard";
 
 export type DishDetail = {
   id: string;
@@ -30,24 +32,19 @@ const DishDetailModal = ({ dish, open, onOpenChange }: DishDetailModalProps) => 
 
   if (!dish) return null;
 
-  const handleRestaurantClick = (restaurantId: string) => {
-    addDishView({ id: dish.id, name: dish.name, category: dish.category });
-    onOpenChange(false);
-    if (restaurantId.includes("-demo")) {
-      navigate(`/restaurant/demo/${restaurantId}`);
-    } else {
-      navigate(`/restaurant/${restaurantId}`);
-    }
-  };
-
   // Find similar dishes
   const similarDishes = seedDishes
     .filter(d => d.category === dish.category && d.id !== dish.id)
     .slice(0, 3);
 
+  // Get full restaurant data for restaurants that serve this dish
+  const getRestaurantData = (restaurantId: string) => {
+    return personalizedRestaurants.find(r => r.id === restaurantId);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
+      <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Hero Image */}
         <div className="relative aspect-[16/10] overflow-hidden">
           <img 
@@ -85,43 +82,63 @@ const DishDetailModal = ({ dish, open, onOpenChange }: DishDetailModalProps) => 
         {/* Content */}
         <div className="p-5">
           {/* Description */}
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-5">
             {dish.description || `A delicious ${dish.category} dish prepared with the finest ingredients and traditional techniques.`}
           </p>
 
-          {/* Price comparison (if multiple restaurants) */}
+          {/* Restaurants that serve this dish - Universal Cards */}
           {dish.restaurants.length > 0 && (
             <div className="mb-5">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-purple" />
+                <span className="text-purple">📍</span>
                 Available at
               </h3>
-              <div className="space-y-2">
-                {dish.restaurants.map((restaurant) => (
-                  <button
-                    key={restaurant.id}
-                    onClick={() => handleRestaurantClick(restaurant.id)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center">
-                        <ChefHat className="h-4 w-4 text-purple" />
-                      </div>
-                      <span className="font-medium text-sm">{restaurant.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <DollarSign className="h-3.5 w-3.5" />
-                      <span className="text-sm">View Menu</span>
-                    </div>
-                  </button>
-                ))}
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
+                {dish.restaurants.map((restaurant) => {
+                  const restaurantData = getRestaurantData(restaurant.id);
+                  if (restaurantData) {
+                    return (
+                      <UniversalRestaurantCard
+                        key={restaurant.id}
+                        restaurant={{
+                          id: restaurantData.id,
+                          name: restaurantData.name,
+                          cuisine: restaurantData.cuisine,
+                          description: restaurantData.description,
+                          ambience: restaurantData.ambience,
+                          priceLevel: restaurantData.priceLevel,
+                          matchScore: restaurantData.matchScore,
+                          aiReason: restaurantData.aiReason,
+                          isOpen: restaurantData.isOpen,
+                          distance: restaurantData.distance,
+                          rating: restaurantData.rating,
+                          logoUrl: restaurantData.logoUrl,
+                          imageUrl: restaurantData.imageUrl,
+                        }}
+                        size="compact"
+                      />
+                    );
+                  }
+                  // Fallback for non-demo restaurants
+                  return (
+                    <UniversalRestaurantCard
+                      key={restaurant.id}
+                      restaurant={{
+                        id: restaurant.id,
+                        name: restaurant.name,
+                        cuisine: "Restaurant",
+                      }}
+                      size="compact"
+                    />
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Similar dishes */}
           {similarDishes.length > 0 && (
-            <div>
+            <div className="mb-4">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-purple" />
                 Outa suggests similar
@@ -130,16 +147,13 @@ const DishDetailModal = ({ dish, open, onOpenChange }: DishDetailModalProps) => 
                 {similarDishes.map((similar) => (
                   <div 
                     key={similar.id}
-                    className="flex-shrink-0 w-20 cursor-pointer"
-                    onClick={() => {
-                      // Could open this dish detail
-                    }}
+                    className="flex-shrink-0 w-20 cursor-pointer group"
                   >
-                    <div className="aspect-square rounded-xl overflow-hidden mb-1">
+                    <div className="aspect-square rounded-xl overflow-hidden mb-1 ring-1 ring-border/30 group-hover:ring-purple/40 transition-all">
                       <img 
                         src={similar.image}
                         alt={similar.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       />
                     </div>
                     <p className="text-[10px] text-center text-muted-foreground truncate">{similar.name}</p>
@@ -151,7 +165,7 @@ const DishDetailModal = ({ dish, open, onOpenChange }: DishDetailModalProps) => 
 
           {/* Ask Outa button */}
           <Button 
-            className="w-full mt-4 bg-purple hover:bg-purple-hover text-white rounded-xl"
+            className="w-full bg-purple hover:bg-purple-hover text-white rounded-xl"
             onClick={() => {
               onOpenChange(false);
               navigate("/ai-assistant");
