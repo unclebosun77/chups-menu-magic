@@ -28,6 +28,8 @@ import OrderSummary from "./pages/OrderSummary";
 import AIOrderChat from "./pages/AIOrderChat";
 import OutaIntelligence from "./pages/OutaIntelligence";
 import YourNextSpot from "./pages/YourNextSpot";
+import Search from "./pages/Search";
+import SavedRestaurants from "./pages/SavedRestaurants";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +62,8 @@ const App = () => (
           <Route path="/ai-chat" element={<AIOrderChat />} />
           <Route path="/outa-intelligence" element={<OutaIntelligence />} />
           <Route path="/your-next-spot" element={<YourNextSpot />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/saved" element={<SavedRestaurants />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           
