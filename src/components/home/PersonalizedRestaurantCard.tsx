@@ -41,12 +41,7 @@ const PersonalizedRestaurantCard = ({ restaurant }: PersonalizedRestaurantCardPr
       name: restaurant.name,
       cuisine: restaurant.cuisine,
     });
-    
-    if (restaurant.id.includes("-demo")) {
-      navigate(`/restaurant/demo/${restaurant.id}`);
-    } else {
-      navigate(`/restaurant/${restaurant.id}`);
-    }
+    navigate(`/restaurant/${restaurant.id}`);
   }, [navigate, restaurant, addRestaurantVisit]);
 
   const handleLongPressStart = useCallback(() => {
