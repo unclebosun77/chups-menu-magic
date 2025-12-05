@@ -50,21 +50,25 @@ const Services = () => {
     {
       icon: Heart,
       label: "Date Night Spots",
+      subtitle: "Romantic vibes",
       route: "/discover?vibe=date-night",
     },
     {
       icon: Users,
-      label: "Group-Friendly Places",
+      label: "Group-Friendly",
+      subtitle: "Perfect for friends",
       route: "/discover?vibe=groups",
     },
     {
       icon: TrendingUp,
-      label: "Trending This Week",
+      label: "Trending Now",
+      subtitle: "What's hot this week",
       route: "/discover?sort=trending",
     },
     {
       icon: Globe,
-      label: "Around the World",
+      label: "World Flavors",
+      subtitle: "Global cuisines",
       route: "/discover?vibe=international",
     },
   ];
@@ -119,55 +123,66 @@ const Services = () => {
           })}
         </div>
 
-        {/* Curated Experiences Preview with animations */}
-        <div className="mt-10">
+        {/* Curated Experiences Preview - Premium Design */}
+        <div className="mt-12">
           <div 
-            className="mb-5 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
+            className="mb-6 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
             style={{ 
               opacity: 0,
               animationDelay: '400ms'
             }}
           >
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center">
-                <Sparkles className="h-3 w-3 text-purple" strokeWidth={1.5} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center shadow-[0_1px_3px_rgba(139,92,246,0.1)]">
+                <Sparkles className="h-3.5 w-3.5 text-purple" strokeWidth={1.5} />
               </div>
-              <h2 className="text-[16px] font-semibold text-foreground tracking-tight">
+              <h2 className="text-[17px] font-semibold text-foreground tracking-tight">
                 Curated Experiences
               </h2>
             </div>
-            <p className="text-[11px] text-muted-foreground/50 mt-2 ml-7 font-light">
-              Handpicked collections for every mood and moment.
+            <p className="text-[12px] text-muted-foreground/50 mt-2.5 ml-[34px] font-light tracking-wide">
+              Handpicked collections for every mood
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Premium Tile Grid */}
+          <div className="grid grid-cols-2 gap-3.5">
             {curatedExperiences.map((experience, index) => {
               const Icon = experience.icon;
-              const row = Math.floor(index / 2);
               return (
                 <button
                   key={experience.label}
                   onClick={() => navigate(experience.route)}
-                  className="flex items-center gap-3 p-3.5 bg-gradient-to-br from-card to-secondary/30 border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_-4px_rgba(139,92,246,0.1)] hover:border-purple/20 hover:scale-[1.02] transition-all duration-200 active:scale-[0.97] group animate-[fadeSlideUp_0.3s_ease-out_forwards]"
+                  className="relative flex flex-col items-start gap-3 p-4 bg-gradient-to-br from-card via-card to-secondary/40 border border-border/30 rounded-[20px] shadow-[0_4px_12px_-4px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_-8px_rgba(139,92,246,0.15),0_2px_6px_rgba(139,92,246,0.06)] hover:border-purple/25 hover:scale-[1.02] transition-all duration-250 active:scale-[0.97] active:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] group animate-[tileSlideUp_0.35s_ease-out_forwards]"
                   style={{ 
                     opacity: 0,
-                    animationDelay: `${480 + row * 80}ms`
+                    animationDelay: `${450 + index * 70}ms`
                   }}
                 >
+                  {/* Subtle gradient overlay */}
+                  <div className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-purple/[0.02] via-transparent to-purple/[0.04] pointer-events-none" />
+                  
+                  {/* Icon in circular capsule */}
                   <div 
-                    className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-purple/6 to-purple/14 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] animate-[iconPop_0.25s_ease-out_forwards]"
+                    className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple/8 via-purple/10 to-purple/16 flex items-center justify-center shadow-[0_2px_8px_-2px_rgba(139,92,246,0.12),inset_0_1px_1px_rgba(255,255,255,0.6)] animate-[iconPop_0.3s_ease-out_forwards]"
                     style={{ 
                       opacity: 0,
-                      transform: 'scale(0.9)',
-                      animationDelay: `${550 + row * 80}ms`
+                      transform: 'scale(0.85)',
+                      animationDelay: `${520 + index * 70}ms`
                     }}
                   >
-                    <Icon className="h-4 w-4 text-purple/80 transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
+                    <Icon className="h-[18px] w-[18px] text-purple transition-all duration-200 group-hover:scale-110 group-hover:text-purple" strokeWidth={1.5} />
                   </div>
-                  <span className="text-[12px] font-medium text-foreground/90 text-left leading-tight tracking-tight">
-                    {experience.label}
-                  </span>
+                  
+                  {/* Text content */}
+                  <div className="relative flex flex-col items-start">
+                    <span className="text-[13px] font-semibold text-foreground tracking-tight leading-tight">
+                      {experience.label}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground/45 mt-1 font-light tracking-wide">
+                      {experience.subtitle}
+                    </span>
+                  </div>
                 </button>
               );
             })}
@@ -188,10 +203,21 @@ const Services = () => {
           }
         }
         
+        @keyframes tileSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         @keyframes iconPop {
           from {
             opacity: 0;
-            transform: scale(0.9);
+            transform: scale(0.85);
           }
           to {
             opacity: 1;
