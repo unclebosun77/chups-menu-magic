@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Rocket, Sparkles } from "lucide-react";
@@ -10,6 +10,8 @@ import SmartActionPills from "@/components/home/SmartActionPills";
 import UniversalRestaurantCard from "@/components/home/UniversalRestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 import YourNextSpotSection from "@/components/home/YourNextSpotSection";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
 
 type Restaurant = {
   id: string;
@@ -27,27 +29,48 @@ const Index = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadRestaurants = async () => {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, is_open, latitude, longitude")
-        .order("created_at", { ascending: false })
-        .limit(6);
+  const loadRestaurants = useCallback(async () => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from("restaurants")
+      .select("id, name, cuisine_type, description, logo_url, is_open, latitude, longitude")
+      .order("created_at", { ascending: false })
+      .limit(6);
 
-      if (!error && data) {
-        setRestaurants(data);
-      }
-      setIsLoading(false);
-    };
-
-    loadRestaurants();
+    if (!error && data) {
+      setRestaurants(data);
+    }
+    setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    loadRestaurants();
+  }, [loadRestaurants]);
+
+  const handleRefresh = useCallback(async () => {
+    await loadRestaurants();
+    // Small delay for visual feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }, [loadRestaurants]);
+
+  const { pullDistance, isRefreshing, handlers } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
+
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 animate-[pageEnter_0.4s_ease-out_forwards]" style={{ opacity: 0 }}>
-      <div className="px-4 pb-28">
+    <div 
+      className="relative min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 animate-[pageEnter_0.4s_ease-out_forwards]" 
+      style={{ opacity: 0 }}
+      {...handlers}
+    >
+      <PullToRefreshIndicator 
+        pullDistance={pullDistance} 
+        isRefreshing={isRefreshing} 
+      />
+      <div 
+        className="px-4 pb-28 transition-transform duration-100"
+        style={{ transform: pullDistance > 0 ? `translateY(${pullDistance * 0.3}px)` : undefined }}
+      >
         {/* Dev: Quick Onboarding Access */}
         {restaurants.length === 0 && !isLoading && (
           <div 
