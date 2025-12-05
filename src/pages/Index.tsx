@@ -79,7 +79,7 @@ const Index = () => {
 
         {/* Search Bar */}
         <button
-          onClick={() => navigate("/discover")}
+          onClick={() => navigate("/search")}
           className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-card border border-border/60 rounded-2xl text-muted-foreground hover:border-purple/40 hover:shadow-md transition-all"
         >
           <Search className="h-5 w-5 text-purple/60" />

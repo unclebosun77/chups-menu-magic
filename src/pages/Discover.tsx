@@ -154,7 +154,7 @@ const Discover = () => {
 
         {/* Search Shortcut */}
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/search")}
           className="w-full mt-4 flex items-center gap-3 px-4 py-3 bg-card border border-border/60 rounded-xl text-muted-foreground hover:border-purple/40 transition-colors"
         >
           <Search className="h-4 w-4" />
