@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Sparkles } from "lucide-react";
-import PersonalizedRestaurantCard from "./PersonalizedRestaurantCard";
+import RestaurantCard from "@/components/restaurant/RestaurantCard";
 import { personalizedRestaurants } from "@/data/personalizedRestaurants";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 import { useSearch } from "@/context/SearchContext";
@@ -24,6 +24,17 @@ const YourNextSpotSection = () => {
       .sort((a, b) => (b.boostScore || 0) - (a.boostScore || 0));
   }, [shouldBoostCuisine, behavior.visitedRestaurants, highlightedCuisine]);
 
+  // Transform to RestaurantCard format
+  const transformedRestaurants = sortedRestaurants.map(r => ({
+    id: r.id,
+    name: r.name,
+    rating: r.rating,
+    cuisine: r.cuisine,
+    price_level: r.priceLevel,
+    description: r.description,
+    images: [r.imageUrl],
+  }));
+
   return (
     <div>
       <div className="mb-4">
@@ -36,8 +47,8 @@ const YourNextSpotSection = () => {
       </div>
       
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-        {sortedRestaurants.map((restaurant) => (
-          <PersonalizedRestaurantCard key={restaurant.id} restaurant={restaurant} />
+        {transformedRestaurants.map((restaurant) => (
+          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
         ))}
       </div>
     </div>
