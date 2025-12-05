@@ -28,6 +28,7 @@ import OutaIntelligence from "./pages/OutaIntelligence";
 import YourNextSpot from "./pages/YourNextSpot";
 import Search from "./pages/Search";
 import SavedRestaurants from "./pages/SavedRestaurants";
+import CuratedExperiences from "./pages/CuratedExperiences";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
                 <Route path="/your-next-spot" element={<YourNextSpot />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/saved" element={<SavedRestaurants />} />
+                <Route path="/curated-experiences" element={<CuratedExperiences />} />
                 <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
                 
                 {/* Unified Restaurant Profile - single route for all restaurants */}
