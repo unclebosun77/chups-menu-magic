@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Sparkles } from "lucide-react";
-import PersonalizedRestaurantCard from "./PersonalizedRestaurantCard";
+import UniversalRestaurantCard from "@/components/restaurant/UniversalRestaurantCard";
 import { personalizedRestaurants } from "@/data/personalizedRestaurants";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 import { useSearch } from "@/context/SearchContext";
@@ -35,9 +35,27 @@ const YourNextSpotSection = () => {
         </p>
       </div>
       
-      <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
         {sortedRestaurants.map((restaurant) => (
-          <PersonalizedRestaurantCard key={restaurant.id} restaurant={restaurant} />
+          <UniversalRestaurantCard 
+            key={restaurant.id} 
+            restaurant={{
+              id: restaurant.id,
+              name: restaurant.name,
+              cuisine: restaurant.cuisine,
+              description: restaurant.description,
+              address: restaurant.address,
+              ambience: restaurant.ambience,
+              priceLevel: restaurant.priceLevel,
+              matchScore: restaurant.matchScore,
+              aiReason: restaurant.aiReason,
+              isOpen: restaurant.isOpen,
+              distance: restaurant.distance,
+              rating: restaurant.rating,
+              logoUrl: restaurant.logoUrl,
+              imageUrl: restaurant.imageUrl,
+            }}
+          />
         ))}
       </div>
     </div>
