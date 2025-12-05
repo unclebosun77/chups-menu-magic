@@ -154,7 +154,7 @@ const Index = () => {
         {/* Your Next Spot Preview Card */}
         <div className="mt-8">
           <button
-            onClick={() => navigate("/discover")}
+            onClick={() => navigate("/your-next-spot")}
             className="w-full p-4 bg-gradient-to-r from-card via-card to-purple/5 border border-border/60 rounded-2xl hover:border-purple/30 transition-all group"
           >
             <div className="flex items-center gap-3">

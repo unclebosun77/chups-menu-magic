@@ -27,6 +27,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import OrderSummary from "./pages/OrderSummary";
 import AIOrderChat from "./pages/AIOrderChat";
 import OutaIntelligence from "./pages/OutaIntelligence";
+import YourNextSpot from "./pages/YourNextSpot";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/ai-chat" element={<AIOrderChat />} />
           <Route path="/outa-intelligence" element={<OutaIntelligence />} />
+          <Route path="/your-next-spot" element={<YourNextSpot />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           
