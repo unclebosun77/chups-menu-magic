@@ -17,7 +17,7 @@ import Auth from "./pages/Auth";
 import RestaurantOnboarding from "./pages/RestaurantOnboarding";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import RestaurantMenu from "./pages/RestaurantMenu";
-import DemoRestaurantMenu from "./pages/DemoRestaurantMenu";
+import RestaurantProfile from "./pages/RestaurantProfile";
 import Discover from "./pages/Discover";
 import AIAssistant from "./pages/AIAssistant";
 import MyOrders from "./pages/MyOrders";
@@ -60,8 +60,12 @@ const App = () => (
           <Route path="/outa-intelligence" element={<OutaIntelligence />} />
           <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-          <Route path="/restaurant/demo/:demoId" element={<DemoRestaurantMenu />} />
-          <Route path="/restaurant/:restaurantId" element={<RestaurantMenu />} />
+          
+          {/* Unified Restaurant Profile - single route for all restaurants */}
+          <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
+          
+          {/* Legacy route - redirect to unified profile */}
+          <Route path="/restaurant/demo/:demoId" element={<RestaurantMenu />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
