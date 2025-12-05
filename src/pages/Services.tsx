@@ -51,25 +51,25 @@ const Services = () => {
       icon: Heart,
       label: "Date Night Spots",
       subtitle: "Romantic vibes",
-      route: "/discover?vibe=date-night",
+      route: "/curated-experiences",
     },
     {
       icon: Users,
       label: "Group-Friendly",
       subtitle: "Perfect for friends",
-      route: "/discover?vibe=groups",
+      route: "/curated-experiences",
     },
     {
       icon: TrendingUp,
       label: "Trending Now",
       subtitle: "What's hot this week",
-      route: "/discover?sort=trending",
+      route: "/curated-experiences",
     },
     {
       icon: Globe,
       label: "World Flavors",
       subtitle: "Global cuisines",
-      route: "/discover?vibe=international",
+      route: "/curated-experiences",
     },
   ];
 
