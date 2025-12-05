@@ -4,7 +4,7 @@ import { DemoMenuItem } from "@/data/demoRestaurantMenus";
 
 interface SignatureDishCardProps {
   item: DemoMenuItem;
-  onAddToOrder: (item: DemoMenuItem) => void;
+  onAddToOrder: (item: DemoMenuItem, quantity?: number) => void;
 }
 
 const SignatureDishCard = ({ item, onAddToOrder }: SignatureDishCardProps) => {

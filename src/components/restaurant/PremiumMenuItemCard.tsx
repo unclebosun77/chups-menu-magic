@@ -6,7 +6,7 @@ import DishDetailModal from "@/components/restaurant/DishDetailModal";
 
 interface PremiumMenuItemCardProps {
   item: DemoMenuItem;
-  onAddToOrder: (item: DemoMenuItem) => void;
+  onAddToOrder: (item: DemoMenuItem, quantity?: number) => void;
 }
 
 const tagIcons: Record<string, React.ReactNode> = {
