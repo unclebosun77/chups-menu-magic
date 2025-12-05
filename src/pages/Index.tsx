@@ -7,7 +7,7 @@ import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
 import HeroSection from "@/components/home/HeroSection";
 import SmartActionPills from "@/components/home/SmartActionPills";
-import UniversalRestaurantCard from "@/components/restaurant/UniversalRestaurantCard";
+import UniversalRestaurantCard from "@/components/home/UniversalRestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 import YourNextSpotSection from "@/components/home/YourNextSpotSection";
 
@@ -97,20 +97,9 @@ const Index = () => {
               compact
             />
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {restaurants.map((restaurant) => (
-                <UniversalRestaurantCard 
-                  key={restaurant.id} 
-                  restaurant={{
-                    id: restaurant.id,
-                    name: restaurant.name,
-                    cuisine: restaurant.cuisine_type,
-                    description: restaurant.description || undefined,
-                    logoUrl: restaurant.logo_url || undefined,
-                    isOpen: restaurant.is_open,
-                  }}
-                  size="compact"
-                />
+                <UniversalRestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))}
             </div>
           )}
