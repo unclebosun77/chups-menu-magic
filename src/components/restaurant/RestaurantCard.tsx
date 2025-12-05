@@ -83,7 +83,7 @@ const RestaurantCard = ({ restaurant }: RestaurantCardProps) => {
   return (
     <>
       <Card
-        className="flex-shrink-0 w-[200px] overflow-hidden transition-all cursor-pointer group rounded-2xl border-0 shadow-lg hover:shadow-xl active:scale-[0.98] bg-gradient-to-br from-card via-card to-purple/5"
+        className="flex-shrink-0 w-[200px] min-w-[160px] max-w-full overflow-hidden transition-all cursor-pointer group rounded-2xl border-0 shadow-lg hover:shadow-xl active:scale-[0.98] bg-gradient-to-br from-card via-card to-purple/5"
         onClick={handleClick}
         onMouseDown={handleLongPressStart}
         onMouseUp={handleLongPressEnd}
