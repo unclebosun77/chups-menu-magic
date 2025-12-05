@@ -72,8 +72,11 @@ const Services = () => {
   return (
     <div className="relative min-h-screen bg-background">
       <div className="px-4 pb-28">
-        {/* Header */}
-        <div className="pt-8 pb-6">
+        {/* Header with entrance animation */}
+        <div 
+          className="pt-8 pb-6 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
+          style={{ opacity: 0 }}
+        >
           <h1 className="text-xl font-semibold text-foreground tracking-tight">
             Services
           </h1>
@@ -82,18 +85,29 @@ const Services = () => {
           </p>
         </div>
 
-        {/* Services List */}
+        {/* Services List with staggered animations */}
         <div className="space-y-2.5">
-          {services.map((service) => {
+          {services.map((service, index) => {
             const Icon = service.icon;
             return (
               <button
                 key={service.title}
                 onClick={() => navigate(service.route)}
-                className="w-full flex items-center gap-4 p-4 bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_-4px_rgba(139,92,246,0.12)] hover:border-purple/25 transition-all duration-200 active:scale-[0.98] group"
+                className="w-full flex items-center gap-4 p-4 bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_-4px_rgba(139,92,246,0.12)] hover:border-purple/25 transition-all duration-200 active:scale-[0.97] active:shadow-[0_1px_4px_-1px_rgba(0,0,0,0.06)] group animate-[fadeSlideUp_0.3s_ease-out_forwards]"
+                style={{ 
+                  opacity: 0,
+                  animationDelay: `${80 + index * 50}ms`
+                }}
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-purple/8 to-purple/15 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
-                  <Icon className="h-[17px] w-[17px] text-purple" strokeWidth={1.5} />
+                <div 
+                  className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-purple/8 to-purple/15 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] animate-[iconPop_0.25s_ease-out_forwards]"
+                  style={{ 
+                    opacity: 0,
+                    transform: 'scale(0.9)',
+                    animationDelay: `${150 + index * 50}ms`
+                  }}
+                >
+                  <Icon className="h-[17px] w-[17px] text-purple transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-[14px] font-medium text-foreground tracking-tight">{service.title}</p>
@@ -105,9 +119,15 @@ const Services = () => {
           })}
         </div>
 
-        {/* Curated Experiences Preview */}
+        {/* Curated Experiences Preview with animations */}
         <div className="mt-10">
-          <div className="mb-5">
+          <div 
+            className="mb-5 animate-[fadeSlideUp_0.25s_ease-out_forwards]"
+            style={{ 
+              opacity: 0,
+              animationDelay: '400ms'
+            }}
+          >
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center">
                 <Sparkles className="h-3 w-3 text-purple" strokeWidth={1.5} />
@@ -122,16 +142,28 @@ const Services = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {curatedExperiences.map((experience) => {
+            {curatedExperiences.map((experience, index) => {
               const Icon = experience.icon;
+              const row = Math.floor(index / 2);
               return (
                 <button
                   key={experience.label}
                   onClick={() => navigate(experience.route)}
-                  className="flex items-center gap-3 p-3.5 bg-gradient-to-br from-card to-secondary/30 border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_-4px_rgba(139,92,246,0.1)] hover:border-purple/20 transition-all duration-200 active:scale-[0.97] group"
+                  className="flex items-center gap-3 p-3.5 bg-gradient-to-br from-card to-secondary/30 border border-border/40 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_-4px_rgba(139,92,246,0.1)] hover:border-purple/20 hover:scale-[1.02] transition-all duration-200 active:scale-[0.97] group animate-[fadeSlideUp_0.3s_ease-out_forwards]"
+                  style={{ 
+                    opacity: 0,
+                    animationDelay: `${480 + row * 80}ms`
+                  }}
                 >
-                  <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-purple/6 to-purple/14 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)]">
-                    <Icon className="h-4 w-4 text-purple/80" strokeWidth={1.5} />
+                  <div 
+                    className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-purple/6 to-purple/14 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] animate-[iconPop_0.25s_ease-out_forwards]"
+                    style={{ 
+                      opacity: 0,
+                      transform: 'scale(0.9)',
+                      animationDelay: `${550 + row * 80}ms`
+                    }}
+                  >
+                    <Icon className="h-4 w-4 text-purple/80 transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
                   </div>
                   <span className="text-[12px] font-medium text-foreground/90 text-left leading-tight tracking-tight">
                     {experience.label}
@@ -142,6 +174,31 @@ const Services = () => {
           </div>
         </div>
       </div>
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes fadeSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes iconPop {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 };
