@@ -40,10 +40,10 @@ const QuickActionsSheet = ({ restaurant, open, onOpenChange }: QuickActionsSheet
           navigator.share({
             title: restaurant.name,
             text: `Check out ${restaurant.name}!`,
-            url: window.location.origin + `/restaurant/${restaurant.id}`,
+            url: window.location.origin + `/restaurant/demo/${restaurant.id}`,
           });
         } else {
-          navigator.clipboard.writeText(window.location.origin + `/restaurant/${restaurant.id}`);
+          navigator.clipboard.writeText(window.location.origin + `/restaurant/demo/${restaurant.id}`);
           toast({ title: "Link copied!", description: "Share link copied to clipboard" });
         }
         onOpenChange(false);
@@ -56,7 +56,7 @@ const QuickActionsSheet = ({ restaurant, open, onOpenChange }: QuickActionsSheet
       action: () => {
         vibrate(20);
         onOpenChange(false);
-        navigate(`/restaurant/${restaurant.id}`);
+        navigate(`/restaurant/demo/${restaurant.id}`);
       }
     },
     {

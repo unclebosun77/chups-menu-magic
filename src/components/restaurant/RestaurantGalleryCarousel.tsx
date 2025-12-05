@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useEmblaCarousel from "embla-carousel-react";
@@ -31,12 +31,12 @@ const RestaurantGalleryCarousel = ({
   }, [emblaApi]);
 
   // Set up the onSelect callback
-  useEffect(() => {
+  useState(() => {
     if (emblaApi) {
       emblaApi.on("select", onSelect);
       onSelect();
     }
-  }, [emblaApi, onSelect]);
+  });
 
   const scrollTo = useCallback((index: number) => {
     if (emblaApi) emblaApi.scrollTo(index);

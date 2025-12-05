@@ -33,7 +33,11 @@ const DishDetailModal = ({ dish, open, onOpenChange }: DishDetailModalProps) => 
   const handleRestaurantClick = (restaurantId: string) => {
     addDishView({ id: dish.id, name: dish.name, category: dish.category });
     onOpenChange(false);
-    navigate(`/restaurant/${restaurantId}`);
+    if (restaurantId.includes("-demo")) {
+      navigate(`/restaurant/demo/${restaurantId}`);
+    } else {
+      navigate(`/restaurant/${restaurantId}`);
+    }
   };
 
   // Find similar dishes

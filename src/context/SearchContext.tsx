@@ -62,7 +62,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
           name: restaurant.name,
           subtitle: restaurant.cuisine,
           image: restaurant.logoUrl,
-          route: `/restaurant/${restaurant.id}`,
+          route: `/restaurant/demo/${restaurant.id}`,
         });
       }
     });
@@ -80,7 +80,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
           subtitle: dish.category,
           image: dish.image,
           route: dish.restaurants.length > 0 
-            ? `/restaurant/${dish.restaurants[0].id}`
+            ? `/restaurant/demo/${dish.restaurants[0].id}`
             : "/discover",
         });
       }
