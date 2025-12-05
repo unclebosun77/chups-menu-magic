@@ -3,9 +3,17 @@ import {
   Heart, Users, TrendingUp, Star, Globe, Coffee, ChefHat, 
   Gem, Award, Wallet, ArrowLeft, Sparkles
 } from "lucide-react";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
+import { useRef } from "react";
 
 const CuratedExperiences = () => {
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Parallax scroll effect
+  const { scrollY } = useScroll();
+  const headerY = useTransform(scrollY, [0, 150], [0, -30]);
+  const headerOpacity = useTransform(scrollY, [0, 100], [1, 0.6]);
 
   const featuredCollections = [
     {
@@ -75,74 +83,196 @@ const CuratedExperiences = () => {
     },
   ];
 
+  // Animation variants with proper typing
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { 
+      opacity: 0, 
+      y: 12,
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 24,
+      },
+    },
+  };
+
+  const featuredItemVariants: Variants = {
+    hidden: { 
+      opacity: 0, 
+      y: 18,
+      scale: 0.96,
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 280,
+        damping: 22,
+      },
+    },
+  };
+
+  const iconVariants: Variants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.7,
+    },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 20,
+        delay: 0.1,
+      },
+    },
+  };
+
+  const headerVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 25,
+      },
+    },
+  };
+
+  const allExperiencesContainerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.06,
+        delayChildren: 0.4,
+      },
+    },
+  };
+
   return (
-    <div className="relative min-h-screen bg-background">
+    <div ref={containerRef} className="relative min-h-screen bg-background overflow-x-hidden">
       <div className="px-4 pb-28">
-        {/* Header */}
-        <div className="pt-4 pb-6">
-          <button
+        {/* Header with Parallax */}
+        <motion.div 
+          className="pt-4 pb-6"
+          style={{ y: headerY, opacity: headerOpacity }}
+        >
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-foreground transition-colors mb-4 animate-[fadeIn_0.2s_ease-out_forwards]"
-            style={{ opacity: 0 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-foreground transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
             <span className="text-[13px] font-medium">Back</span>
-          </button>
+          </motion.button>
           
-          <div 
-            className="animate-[fadeSlideUp_0.3s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '50ms' }}
+          <motion.div
+            variants={headerVariants}
+            initial="hidden"
+            animate="visible"
           >
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center shadow-[0_2px_6px_rgba(139,92,246,0.1)]">
+              <motion.div 
+                className="w-7 h-7 rounded-xl bg-gradient-to-br from-purple/10 to-purple/20 flex items-center justify-center shadow-[0_2px_6px_rgba(139,92,246,0.1)]"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 15,
+                  delay: 0.2 
+                }}
+              >
                 <Sparkles className="h-4 w-4 text-purple" strokeWidth={1.5} />
-              </div>
-              <h1 className="text-[22px] font-semibold text-foreground tracking-tight">
+              </motion.div>
+              <motion.h1 
+                className="text-[22px] font-semibold text-foreground tracking-tight"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15, duration: 0.4 }}
+              >
                 Curated Experiences
-              </h1>
+              </motion.h1>
             </div>
-            <p className="text-[13px] text-muted-foreground/55 font-light ml-[38px] tracking-wide">
+            <motion.p 
+              className="text-[13px] text-muted-foreground/55 font-light ml-[38px] tracking-wide"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
               Handpicked collections designed for your mood.
-            </p>
-          </div>
-        </div>
+            </motion.p>
+          </motion.div>
+        </motion.div>
 
         {/* Featured Collections */}
-        <div className="mt-4">
-          <h2 
-            className="text-[14px] font-semibold text-foreground/80 tracking-tight mb-4 animate-[fadeSlideUp_0.3s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '120ms' }}
+        <motion.div 
+          className="mt-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h2 
+            className="text-[14px] font-semibold text-foreground/80 tracking-tight mb-4"
+            variants={itemVariants}
           >
             Featured Collections
-          </h2>
+          </motion.h2>
           
-          <div className="space-y-3">
-            {featuredCollections.map((collection, index) => {
+          <motion.div className="space-y-3">
+            {featuredCollections.map((collection) => {
               const Icon = collection.icon;
               return (
-                <button
+                <motion.button
                   key={collection.title}
-                  onClick={() => navigate(collection.route)}
-                  className="w-full relative flex items-center gap-4 p-5 bg-gradient-to-br from-card via-card to-secondary/50 border border-border/30 rounded-[22px] shadow-[0_6px_20px_-6px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_32px_-8px_rgba(139,92,246,0.18),0_4px_8px_rgba(139,92,246,0.06)] hover:border-purple/25 hover:scale-[1.01] transition-all duration-250 active:scale-[0.98] group animate-[fadeSlideUp_0.35s_ease-out_forwards]"
-                  style={{ 
-                    opacity: 0,
-                    animationDelay: `${180 + index * 80}ms`
+                  variants={featuredItemVariants}
+                  whileHover={{ 
+                    scale: 1.02,
+                    boxShadow: "0 12px 32px -8px rgba(139,92,246,0.18), 0 4px 8px rgba(139,92,246,0.06)",
                   }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => navigate(collection.route)}
+                  className="w-full relative flex items-center gap-4 p-5 bg-gradient-to-br from-card via-card to-secondary/50 border border-border/30 rounded-[22px] shadow-[0_6px_20px_-6px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.02)] hover:border-purple/25 transition-colors group"
                 >
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 rounded-[22px] bg-gradient-to-br from-purple/[0.02] via-transparent to-purple/[0.05] pointer-events-none" />
                   
                   {/* Large icon capsule */}
-                  <div 
-                    className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-purple/10 via-purple/12 to-purple/18 flex items-center justify-center shadow-[0_4px_12px_-4px_rgba(139,92,246,0.15),inset_0_1px_2px_rgba(255,255,255,0.6)] animate-[iconPop_0.3s_ease-out_forwards]"
-                    style={{ 
-                      opacity: 0,
-                      transform: 'scale(0.85)',
-                      animationDelay: `${260 + index * 80}ms`
-                    }}
+                  <motion.div 
+                    className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-purple/10 via-purple/12 to-purple/18 flex items-center justify-center shadow-[0_4px_12px_-4px_rgba(139,92,246,0.15),inset_0_1px_2px_rgba(255,255,255,0.6)]"
+                    variants={iconVariants}
                   >
-                    <Icon className="h-6 w-6 text-purple transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
-                  </div>
+                    <motion.div
+                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    >
+                      <Icon className="h-6 w-6 text-purple" strokeWidth={1.5} />
+                    </motion.div>
+                  </motion.div>
                   
                   {/* Text */}
                   <div className="relative flex-1 text-left">
@@ -155,51 +285,71 @@ const CuratedExperiences = () => {
                   </div>
                   
                   {/* Arrow indicator */}
-                  <div className="relative w-8 h-8 rounded-full bg-purple/8 flex items-center justify-center group-hover:bg-purple/12 transition-colors">
-                    <ArrowLeft className="h-4 w-4 text-purple/60 rotate-180 group-hover:translate-x-0.5 transition-transform" strokeWidth={1.5} />
-                  </div>
-                </button>
+                  <motion.div 
+                    className="relative w-8 h-8 rounded-full bg-purple/8 flex items-center justify-center group-hover:bg-purple/12 transition-colors"
+                    whileHover={{ x: 3 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  >
+                    <ArrowLeft className="h-4 w-4 text-purple/60 rotate-180" strokeWidth={1.5} />
+                  </motion.div>
+                </motion.button>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* All Experiences */}
-        <div className="mt-10">
-          <h2 
-            className="text-[14px] font-semibold text-foreground/80 tracking-tight mb-4 animate-[fadeSlideUp_0.3s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '350ms' }}
+        <motion.div 
+          className="mt-10"
+          initial="hidden"
+          animate="visible"
+          variants={allExperiencesContainerVariants}
+        >
+          <motion.h2 
+            className="text-[14px] font-semibold text-foreground/80 tracking-tight mb-4"
+            variants={itemVariants}
           >
             All Experiences
-          </h2>
+          </motion.h2>
           
-          <div className="grid grid-cols-2 gap-3">
+          <motion.div className="grid grid-cols-2 gap-3">
             {allExperiences.map((experience, index) => {
               const Icon = experience.icon;
               return (
-                <button
+                <motion.button
                   key={experience.title}
-                  onClick={() => navigate(experience.route)}
-                  className="relative flex flex-col items-start gap-3 p-4 bg-gradient-to-br from-card via-card to-secondary/35 border border-border/30 rounded-[18px] shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_-8px_rgba(139,92,246,0.14),0_2px_6px_rgba(139,92,246,0.05)] hover:border-purple/22 hover:scale-[1.02] transition-all duration-250 active:scale-[0.97] group animate-[tileSlideUp_0.35s_ease-out_forwards]"
-                  style={{ 
-                    opacity: 0,
-                    animationDelay: `${420 + index * 50}ms`
+                  variants={itemVariants}
+                  whileHover={{ 
+                    scale: 1.03,
+                    boxShadow: "0 8px 24px -8px rgba(139,92,246,0.14), 0 2px 6px rgba(139,92,246,0.05)",
+                    transition: { duration: 0.2 }
                   }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => navigate(experience.route)}
+                  className="relative flex flex-col items-start gap-3 p-4 bg-gradient-to-br from-card via-card to-secondary/35 border border-border/30 rounded-[18px] shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.02)] hover:border-purple/22 transition-colors group"
                 >
                   {/* Subtle gradient overlay */}
                   <div className="absolute inset-0 rounded-[18px] bg-gradient-to-br from-purple/[0.015] via-transparent to-purple/[0.035] pointer-events-none" />
                   
                   {/* Icon capsule */}
-                  <div 
-                    className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple/8 via-purple/10 to-purple/15 flex items-center justify-center shadow-[0_2px_8px_-2px_rgba(139,92,246,0.12),inset_0_1px_1px_rgba(255,255,255,0.5)] animate-[iconPop_0.3s_ease-out_forwards]"
-                    style={{ 
-                      opacity: 0,
-                      transform: 'scale(0.85)',
-                      animationDelay: `${490 + index * 50}ms`
+                  <motion.div 
+                    className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple/8 via-purple/10 to-purple/15 flex items-center justify-center shadow-[0_2px_8px_-2px_rgba(139,92,246,0.12),inset_0_1px_1px_rgba(255,255,255,0.5)]"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ 
+                      delay: 0.5 + index * 0.05,
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 20,
                     }}
                   >
-                    <Icon className="h-[18px] w-[18px] text-purple transition-transform duration-200 group-hover:scale-110" strokeWidth={1.5} />
-                  </div>
+                    <motion.div
+                      whileHover={{ scale: 1.2 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    >
+                      <Icon className="h-[18px] w-[18px] text-purple" strokeWidth={1.5} />
+                    </motion.div>
+                  </motion.div>
                   
                   {/* Text */}
                   <div className="relative flex flex-col items-start">
@@ -210,53 +360,12 @@ const CuratedExperiences = () => {
                       {experience.subtitle}
                     </span>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-
-      {/* Animation keyframes */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes fadeSlideUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes tileSlideUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes iconPop {
-          from {
-            opacity: 0;
-            transform: scale(0.85);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 };
