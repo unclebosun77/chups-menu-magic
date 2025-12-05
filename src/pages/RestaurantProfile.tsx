@@ -84,7 +84,12 @@ const RestaurantProfile = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/15 to-purple/25 flex items-center justify-center animate-pulse">
+            <Sparkles className="h-5 w-5 text-purple" />
+          </div>
+          <div className="text-muted-foreground text-sm">Loading...</div>
+        </div>
       </div>
     );
   }
@@ -149,49 +154,52 @@ const RestaurantProfile = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28">
-      {/* Hero Section with Gallery */}
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28 animate-[pageEnter_0.35s_ease-out_forwards]" style={{ opacity: 0 }}>
+      {/* Hero Section with Gallery - Cinematic */}
       <div className="relative">
-        {/* Top Navigation - Floating */}
-        <div className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center">
+        {/* Top Navigation - Floating with Animation */}
+        <div 
+          className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center animate-[navFloat_0.4s_ease-out_forwards]"
+          style={{ opacity: 0 }}
+        >
           <Button 
             variant="ghost" 
             size="icon"
-            className="h-9 w-9 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30"
+            className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
           </Button>
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             <Button 
               variant="ghost" 
               size="icon"
-              className={`h-9 w-9 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
-                isSaved ? 'bg-purple/20 text-purple' : 'bg-background/80 hover:bg-background'
+              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${
+                isSaved ? 'bg-purple/20 text-purple border-purple/30' : 'bg-background/85 hover:bg-background'
               }`}
               onClick={handleToggleSaved}
             >
-              <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} strokeWidth={1.5} />
+              <Bookmark className={`h-5 w-5 transition-all ${isSaved ? 'fill-current scale-110' : ''}`} strokeWidth={1.5} />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              className={`h-9 w-9 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
-                isFavorite ? 'bg-red-50 text-red-500' : 'bg-background/80 hover:bg-background'
+              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${
+                isFavorite ? 'bg-red-50 text-red-500 border-red-200' : 'bg-background/85 hover:bg-background'
               }`}
               onClick={handleToggleFavorite}
             >
-              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} strokeWidth={1.5} />
+              <Heart className={`h-5 w-5 transition-all ${isFavorite ? 'fill-current scale-110' : ''}`} strokeWidth={1.5} />
             </Button>
             {totalItems > 0 && (
               <Button 
                 variant="ghost" 
                 size="icon"
-                className="h-9 w-9 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30 relative"
+                className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 relative transition-all duration-200 hover:scale-105 active:scale-95"
                 onClick={handleViewOrder}
               >
                 <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
-                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg animate-[badgePop_0.3s_ease-out]">
                   {totalItems}
                 </span>
               </Button>
@@ -199,38 +207,42 @@ const RestaurantProfile = () => {
           </div>
         </div>
 
-        {/* Banner Image */}
+        {/* Cinematic Banner Image */}
         <div 
-          className="relative h-72 overflow-hidden cursor-pointer"
+          className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]"
+          style={{ opacity: 0 }}
           onClick={() => setShowFullGallery(true)}
         >
           <img
             src={restaurant.galleryImages[galleryIndex] || restaurant.heroImage}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
           
-          {/* Gallery dots */}
+          {/* Gallery dots with animation */}
           {restaurant.galleryImages.length > 1 && (
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-1.5">
+            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
               {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
                 <button
                   key={idx}
                   onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    idx === galleryIndex ? "bg-white w-5" : "bg-white/50"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"
                   }`}
                 />
               ))}
             </div>
           )}
 
-          {/* Restaurant Name Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
+          {/* Restaurant Name Overlay - Animated */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]"
+            style={{ opacity: 0, animationDelay: '200ms' }}
+          >
             <div className="flex items-end gap-4">
-              {/* Logo */}
-              <div className="w-16 h-16 rounded-2xl bg-background shadow-xl p-1 border border-border/50 flex-shrink-0">
+              {/* Logo with glow */}
+              <div className="w-18 h-18 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0 transition-transform duration-300 hover:scale-105">
                 <img 
                   src={restaurant.logoUrl} 
                   alt={restaurant.name}
@@ -238,66 +250,75 @@ const RestaurantProfile = () => {
                 />
               </div>
               <div className="flex-1 pb-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">{restaurant.name}</h1>
-                <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
+                <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
+                <p className="text-[14px] text-muted-foreground/80 mt-0.5">{restaurant.cuisine}</p>
               </div>
-              <div className="flex items-center gap-1 bg-purple/15 px-2.5 py-1 rounded-full">
+              <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                 <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
-                <span className="text-[13px] font-bold text-purple">{restaurant.rating}</span>
+                <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Powered by Outa tag */}
-        <div className="absolute bottom-2 right-4">
-          <span className="text-[10px] text-muted-foreground/50 flex items-center gap-1">
+        <div 
+          className="absolute bottom-2 right-4 animate-[fadeIn_0.4s_ease-out_forwards]"
+          style={{ opacity: 0, animationDelay: '400ms' }}
+        >
+          <span className="text-[10px] text-muted-foreground/40 flex items-center gap-1">
             <Sparkles className="h-3 w-3" strokeWidth={1.5} /> Powered by Outa Intelligence
           </span>
         </div>
       </div>
 
-      {/* Action Row */}
-      <div className="px-5 py-4">
+      {/* Action Row - Staggered Animation */}
+      <div 
+        className="px-5 py-5 animate-[sectionSlide_0.45s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '300ms' }}
+      >
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1 h-11 rounded-xl border-border/50 hover:bg-secondary/50 text-[13px]"
-            onClick={() => window.open(`tel:+441234567890`)}
-          >
-            <Phone className="h-4 w-4 mr-1.5 text-purple" strokeWidth={1.5} />
-            Call
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 h-11 rounded-xl border-border/50 hover:bg-secondary/50 text-[13px]"
-            onClick={() => window.open(`https://maps.google.com?q=${restaurant.address}`)}
-          >
-            <Navigation className="h-4 w-4 mr-1.5 text-purple" strokeWidth={1.5} />
-            Directions
-          </Button>
-          <Button
-            className="flex-1 h-11 rounded-xl bg-purple hover:bg-purple/90 text-white text-[13px]"
-            onClick={() => setShowAskOuta(true)}
-          >
-            <Sparkles className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
-            Ask Outa
-          </Button>
+          {[
+            { icon: Phone, label: "Call", onClick: () => window.open(`tel:+441234567890`), variant: "outline" as const },
+            { icon: Navigation, label: "Directions", onClick: () => window.open(`https://maps.google.com?q=${restaurant.address}`), variant: "outline" as const },
+            { icon: Sparkles, label: "Ask Outa", onClick: () => setShowAskOuta(true), variant: "default" as const },
+          ].map((action, index) => (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              className={`flex-1 h-12 rounded-2xl text-[13px] font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] animate-[actionButtonPop_0.35s_ease-out_forwards] ${
+                action.variant === "default" 
+                  ? "bg-purple hover:bg-purple/90 text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.4)]" 
+                  : "border-border/40 hover:bg-secondary/60 hover:border-purple/20"
+              }`}
+              style={{ opacity: 0, animationDelay: `${350 + index * 80}ms` }}
+              onClick={action.onClick}
+            >
+              <action.icon className={`h-4 w-4 mr-2 ${action.variant === "default" ? "" : "text-purple"}`} strokeWidth={1.5} />
+              {action.label}
+            </Button>
+          ))}
         </div>
       </div>
 
-      {/* Gallery Carousel */}
+      {/* Gallery Carousel - Animated */}
       {restaurant.galleryImages.length > 1 && (
-        <div className="px-5 pb-4">
+        <div 
+          className="px-5 pb-5 animate-[sectionSlide_0.45s_ease-out_forwards]"
+          style={{ opacity: 0, animationDelay: '450ms' }}
+        >
           <ScrollArea className="w-full">
-            <div className="flex gap-2 pb-2">
+            <div className="flex gap-2.5 pb-2">
               {restaurant.galleryImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => { setGalleryIndex(idx); setShowFullGallery(true); }}
-                  className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all ${
-                    idx === galleryIndex ? "border-purple shadow-lg" : "border-transparent opacity-70"
+                  className={`flex-shrink-0 w-22 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 active:scale-95 ${
+                    idx === galleryIndex ? "border-purple shadow-[0_4px_12px_-4px_rgba(139,92,246,0.3)]" : "border-transparent opacity-70 hover:opacity-100"
                   }`}
+                  style={{ 
+                    animationDelay: `${500 + idx * 50}ms`
+                  }}
                 >
                   <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -308,49 +329,72 @@ const RestaurantProfile = () => {
         </div>
       )}
 
-      {/* Vibe Tags & Price */}
-      <div className="px-5 pb-4">
+      {/* Vibe Tags & Price - Animated */}
+      <div 
+        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '520ms' }}
+      >
         <div className="flex flex-wrap gap-2 items-center">
           {restaurant.vibe.map((tag, idx) => (
-            <Badge key={idx} variant="secondary" className="text-[11px] bg-secondary/50 text-muted-foreground border-0 rounded-full px-3 py-1">
+            <Badge 
+              key={idx} 
+              variant="secondary" 
+              className="text-[11px] bg-secondary/60 text-muted-foreground border-0 rounded-full px-3.5 py-1.5 font-medium shadow-sm transition-all duration-200 hover:bg-secondary/80 hover:scale-105"
+              style={{ animationDelay: `${560 + idx * 40}ms` }}
+            >
               {tag}
             </Badge>
           ))}
-          <Badge variant="outline" className="text-[11px] border-border/50 rounded-full px-3 py-1">
+          <Badge 
+            variant="outline" 
+            className="text-[11px] border-border/50 rounded-full px-3.5 py-1.5 font-medium"
+          >
             {restaurant.priceLevel}
           </Badge>
         </div>
       </div>
 
-      {/* Description */}
-      <div className="px-5 pb-4">
-        <p className="text-[14px] text-muted-foreground/80 leading-relaxed">
+      {/* Description - Premium Typography */}
+      <div 
+        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '580ms' }}
+      >
+        <p className="text-[14px] text-muted-foreground/75 leading-relaxed font-light">
           {restaurant.description}
         </p>
       </div>
 
-      {/* Outa Intelligence Recommendation */}
-      <div className="px-5 pb-4">
-        <Card className="border-purple/20 bg-gradient-to-r from-purple/5 to-purple/10 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-full bg-purple/15">
-                <Sparkles className="h-5 w-5 text-purple" strokeWidth={1.5} />
+      {/* Outa Intelligence Recommendation - Premium Card */}
+      <div 
+        className="px-5 pb-5 animate-[recommendationReveal_0.5s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '650ms' }}
+      >
+        <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.06] via-purple/[0.03] to-neon-pink/[0.02] shadow-[0_4px_20px_-8px_rgba(139,92,246,0.15)] overflow-hidden">
+          <CardContent className="p-5 relative">
+            {/* Subtle glow effect */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-radial from-purple/10 to-transparent rounded-full blur-2xl" />
+            
+            <div className="flex items-start gap-4 relative">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple/15 to-purple/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]">
+                <Sparkles className="h-5 w-5 text-purple animate-[sparkleFloat_3s_ease-in-out_infinite]" strokeWidth={1.5} />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-sm text-foreground mb-1">Outa's Pick for You</p>
+                <p className="font-semibold text-[15px] text-foreground mb-1.5">Outa's Pick for You</p>
                 {signatureItems.length > 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    Try the <span className="font-medium text-purple">{signatureItems[0]?.name}</span> — it's one of their best dishes and matches your taste profile.
+                  <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
+                    Try the <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> — it's one of their best dishes and matches your taste profile.
                   </p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">
-                    This restaurant matches your preference for <span className="font-medium text-purple">{restaurant.cuisine}</span> cuisine.
+                  <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
+                    This restaurant matches your preference for <span className="font-semibold text-purple">{restaurant.cuisine}</span> cuisine.
                   </p>
                 )}
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 mt-3">
                   {["Date Night", "Cozy Vibes", "Great Service"].map((vibe, idx) => (
-                    <span key={idx} className="text-[10px] text-purple/70 bg-purple/10 px-2 py-0.5 rounded-full">
+                    <span 
+                      key={idx} 
+                      className="text-[10px] text-purple/80 bg-purple/10 px-2.5 py-1 rounded-full font-medium"
+                    >
                       {vibe}
                     </span>
                   ))}
@@ -361,45 +405,58 @@ const RestaurantProfile = () => {
         </Card>
       </div>
 
-      {/* About Section */}
-      <div className="px-5 pb-6">
-        <h2 className="text-lg font-bold mb-3 tracking-tight">About</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {/* Hours */}
-          <Card className="border-border/40 shadow-sm">
+      {/* About Section - Animated Cards */}
+      <div 
+        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '720ms' }}
+      >
+        <h2 className="text-lg font-bold mb-4 tracking-tight">About</h2>
+        <div className="grid grid-cols-2 gap-3.5">
+          {/* Hours Card */}
+          <Card 
+            className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
+            style={{ opacity: 0, animationDelay: '780ms' }}
+          >
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
+                </div>
                 <span className="font-semibold text-[13px]">Hours</span>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {Object.entries(restaurant.openingHours).slice(0, 3).map(([day, hours]) => (
                   <div key={day} className="flex justify-between text-[11px]">
-                    <span className="text-muted-foreground/60">{day}</span>
-                    <span className="font-medium text-foreground/80">{hours}</span>
+                    <span className="text-muted-foreground/50">{day}</span>
+                    <span className="font-medium text-foreground/75">{hours}</span>
                   </div>
                 ))}
                 {Object.keys(restaurant.openingHours).length > 3 && (
-                  <button className="text-[10px] text-purple mt-1">View all hours</button>
+                  <button className="text-[10px] text-purple mt-2 font-medium hover:text-purple/80 transition-colors">View all hours</button>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Location */}
-          <Card className="border-border/40 shadow-sm">
+          {/* Location Card */}
+          <Card 
+            className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
+            style={{ opacity: 0, animationDelay: '840ms' }}
+          >
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
+                  <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
+                </div>
                 <span className="font-semibold text-[13px]">Location</span>
               </div>
-              <p className="text-[11px] text-muted-foreground/60 mb-2 leading-relaxed">
+              <p className="text-[11px] text-muted-foreground/50 mb-3 leading-relaxed">
                 {restaurant.address}<br />{restaurant.city}
               </p>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full text-[10px] h-7 rounded-full border-border/50"
+                className="w-full text-[10px] h-8 rounded-xl border-border/40 hover:bg-purple/5 hover:border-purple/20 transition-all duration-200"
               >
                 Get Directions
                 <ChevronRight className="h-4 w-4 ml-1" strokeWidth={1.5} />
@@ -410,30 +467,38 @@ const RestaurantProfile = () => {
       </div>
 
       {/* Unified Menu Section */}
-      <MenuSection
-        menu={restaurant.menu}
-        signatureDishes={restaurant.signatureDishes}
-        onAddToOrder={handleAddToOrder}
-      />
+      <div 
+        className="animate-[sectionSlide_0.5s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '900ms' }}
+      >
+        <MenuSection
+          menu={restaurant.menu}
+          signatureDishes={restaurant.signatureDishes}
+          onAddToOrder={handleAddToOrder}
+        />
+      </div>
 
       {/* Reviews Placeholder */}
-      <div className="px-5 pb-6">
-        <h2 className="text-lg font-bold mb-3 tracking-tight">Reviews</h2>
-        <Card className="border-border/40">
-          <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground/60 text-sm">Reviews coming soon</p>
+      <div 
+        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '980ms' }}
+      >
+        <h2 className="text-lg font-bold mb-4 tracking-tight">Reviews</h2>
+        <Card className="border-border/30 shadow-sm">
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground/50 text-sm">Reviews coming soon</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Order Bar */}
+      {/* Order Bar - Premium Floating */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border/50 p-4 z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/40 p-4 z-50 animate-[orderBarSlide_0.35s_ease-out_forwards]">
           <Button 
-            className="w-full bg-purple hover:bg-purple/90 text-white h-12 rounded-2xl shadow-lg text-[14px] font-semibold"
+            className="w-full bg-gradient-to-r from-purple to-purple/90 hover:from-purple/95 hover:to-purple/85 text-white h-14 rounded-2xl shadow-[0_8px_32px_-8px_rgba(139,92,246,0.4)] hover:shadow-[0_10px_40px_-8px_rgba(139,92,246,0.5)] text-[15px] font-semibold transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
             onClick={handleViewOrder}
           >
-            <ShoppingCart className="h-5 w-5 mr-2" strokeWidth={1.5} />
+            <ShoppingCart className="h-5 w-5 mr-2.5" strokeWidth={1.5} />
             View Order ({totalItems} items) · £{totalAmount.toFixed(2)}
           </Button>
         </div>
@@ -441,11 +506,11 @@ const RestaurantProfile = () => {
 
       {/* Full Gallery Modal */}
       <FullGalleryModal
+        images={restaurant.galleryImages}
         open={showFullGallery}
         onOpenChange={setShowFullGallery}
-        images={restaurant.galleryImages}
         restaurantName={restaurant.name}
-        theme={restaurant.galleryTheme}
+        initialIndex={galleryIndex}
       />
 
       {/* Ask Outa Modal */}
@@ -456,6 +521,129 @@ const RestaurantProfile = () => {
         menu={restaurant.menu}
         onAddToOrder={handleAddToOrder}
       />
+
+      {/* Premium Animation Keyframes */}
+      <style>{`
+        @keyframes pageEnter {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes navFloat {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes bannerReveal {
+          from {
+            opacity: 0;
+            transform: scale(1.02);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes titleReveal {
+          from {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes sectionSlide {
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes actionButtonPop {
+          from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.96);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes recommendationReveal {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes cardPop {
+          from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.97);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes badgePop {
+          from {
+            transform: scale(0);
+          }
+          to {
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes orderBarSlide {
+          from {
+            opacity: 0;
+            transform: translateY(100%);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes sparkleFloat {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-2px);
+          }
+        }
+      `}</style>
     </div>
   );
 };
