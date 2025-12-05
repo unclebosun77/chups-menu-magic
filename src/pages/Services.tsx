@@ -1,238 +1,141 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { 
-  UtensilsCrossed, Users, Calendar, Gift, MapPin, Phone, Bell,
-  Wine, ChefHat, Crown, PartyPopper, Heart, Sparkles, Home, 
-  Music, GlassWater, Cake, Coffee, Wheat, Map, Award, BookOpen,
-  Leaf, Shield, Rocket
-} from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { ExperienceDetailModal } from "@/components/ExperienceDetailModal";
-import { EventPlannerModal } from "@/components/EventPlannerModal";
-import { IconTile } from "@/components/IconTile";
+import { 
+  Sparkles, MapPin, UtensilsCrossed, Bookmark, Settings, ChevronRight,
+  Heart, Users, TrendingUp, Globe, Star
+} from "lucide-react";
 
 const Services = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [reminderNote, setReminderNote] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<typeof experienceCategories[0] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEventPlannerOpen, setIsEventPlannerOpen] = useState(false);
-  const [selectedOccasion, setSelectedOccasion] = useState<string | undefined>();
 
-  const quickServices = [
+  const services = [
     {
-      icon: UtensilsCrossed,
-      label: "Dine-In",
-      onClick: () => navigate("/discover"),
-    },
-    {
-      icon: Gift,
-      label: "Rewards",
-      onClick: () => navigate("/rewards"),
+      icon: Sparkles,
+      title: "Ask Outa",
+      subtitle: "Your AI dining assistant.",
+      route: "/ai-assistant",
     },
     {
       icon: MapPin,
-      label: "Locations",
-      onClick: () => navigate("/discover"),
+      title: "Your Next Spot",
+      subtitle: "A personalized pick chosen for you.",
+      route: "/your-next-spot",
     },
     {
-      icon: Phone,
-      label: "Book Table",
-      onClick: () => navigate("/bookings"),
-    },
-  ];
-
-  const experienceCategories = [
-    {
-      id: "dining",
-      title: "Exclusive",
       icon: UtensilsCrossed,
-      color: "bg-gradient-to-br from-orange-500/10 to-red-500/10",
-      items: [
-        { name: "Private Dining", icon: Users, description: "Intimate setups or hidden chef's tables" },
-        { name: "Chef's Table Nights", icon: ChefHat, description: "Behind-the-scenes tasting menus" },
-        { name: "Pop-Up Events", icon: Sparkles, description: "Limited-time culinary adventures" },
-      ],
+      title: "Discover Restaurants",
+      subtitle: "Explore top restaurants around you.",
+      route: "/discover",
     },
     {
-      id: "pairings",
-      title: "Pairings",
-      icon: Wine,
-      color: "bg-gradient-to-br from-purple-500/10 to-pink-500/10",
-      items: [
-        { name: "Wine Pairing Nights", icon: Wine, description: "Perfect wine & food combinations" },
-        { name: "Cocktail Mixology", icon: GlassWater, description: "Learn to craft signature cocktails" },
-        { name: "Dessert Pairings", icon: Cake, description: "Sweet endings with perfect drinks" },
-        { name: "Craft Beer Tastings", icon: Coffee, description: "Explore local & international brews" },
-        { name: "Food & Music Pairing", icon: Music, description: "Harmonize flavors with melodies" },
-      ],
+      icon: Star,
+      title: "Explore Menus & Profiles",
+      subtitle: "See menus, galleries, and restaurant details.",
+      route: "/restaurant/yakoyo-demo",
     },
     {
-      id: "wellness",
-      title: "Health",
-      icon: Leaf,
-      color: "bg-gradient-to-br from-green-500/10 to-blue-500/10",
-      items: [
-        { name: "Meal Prep Plans", icon: Calendar, description: "Weekly healthy meal subscriptions" },
-        { name: "Cooking Classes", icon: ChefHat, description: "Master new cuisines & techniques" },
-        { name: "Chef Masterclasses", icon: Award, description: "Learn from culinary legends" },
-        { name: "Ingredient Workshops", icon: Wheat, description: "Deep dive into quality ingredients" },
-        { name: "Dietary Menus", icon: BookOpen, description: "Keto, vegan, paleo & more" },
-        { name: "Nutritionist-Approved", icon: Heart, description: "Healthy & delicious balanced meals" },
-        { name: "Calorie Tracking", icon: Award, description: "Know exactly what you're eating" },
-        { name: "Allergen-Free Options", icon: Shield, description: "Safe meals for all dietary needs" },
-        { name: "Organic & Local", icon: Leaf, description: "Farm-fresh sustainable ingredients" },
-      ],
+      icon: Bookmark,
+      title: "Saved Restaurants",
+      subtitle: "Your favourite places in one place.",
+      route: "/activity",
     },
     {
-      id: "celebrations",
-      title: "Events",
-      icon: PartyPopper,
-      color: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
-      items: [
-        { name: "Outa Concierge", icon: Rocket, description: "AI-powered event planning assistant" },
-        { name: "Special Occasions", icon: PartyPopper, description: "Celebrate life's big moments" },
-        { name: "Proposal Packages", icon: Heart, description: "Make your moment unforgettable" },
-        { name: "Seasonal Events", icon: Calendar, description: "Festive seasonal celebrations" },
-        { name: "Themed Nights", icon: Sparkles, description: "Immersive culinary themes" },
-        { name: "Group Dining", icon: Users, description: "Perfect for parties & gatherings" },
-      ],
-    },
-    {
-      id: "addons",
-      title: "Add-Ons",
-      icon: Gift,
-      color: "bg-gradient-to-br from-indigo-500/10 to-violet-500/10",
-      items: [
-        { name: "Experience Gifting", icon: Gift, description: "Give memorable dining experiences" },
-        { name: "Dine & Stay Packages", icon: Home, description: "Complete getaway experiences" },
-        { name: "Restaurant Tours", icon: Map, description: "Behind-the-scenes kitchen tours" },
-      ],
+      icon: Settings,
+      title: "Preferences",
+      subtitle: "Tell Outa what you like.",
+      route: "/account",
     },
   ];
 
-  const handleCategoryClick = (category: typeof experienceCategories[0]) => {
-    // Special handling for Occasions & Celebrations - open event planner for Outa Concierge
-    if (category.id === "celebrations") {
-      setIsEventPlannerOpen(true);
-      setSelectedOccasion(undefined);
-      return;
-    }
-    setSelectedCategory(category);
-    setIsModalOpen(true);
-  };
-
-  const handleExperienceItemClick = (categoryId: string, itemName: string) => {
-    if (categoryId === "celebrations" && itemName === "Outa Concierge") {
-      setIsEventPlannerOpen(true);
-      setSelectedOccasion(undefined);
-    } else if (categoryId === "celebrations") {
-      // For specific occasion types, open event planner with context
-      setSelectedOccasion(itemName);
-      setIsEventPlannerOpen(true);
-    }
-  };
+  const curatedExperiences = [
+    {
+      icon: Heart,
+      label: "Date Night Spots",
+      route: "/discover?vibe=date-night",
+    },
+    {
+      icon: Users,
+      label: "Group-Friendly Places",
+      route: "/discover?vibe=groups",
+    },
+    {
+      icon: TrendingUp,
+      label: "Trending This Week",
+      route: "/discover?sort=trending",
+    },
+    {
+      icon: Globe,
+      label: "Around the World",
+      route: "/discover?vibe=international",
+    },
+  ];
 
   return (
-    <div className="p-4 space-y-6 pb-24">
-      <div className="pt-4 pb-2">
-        <h1 className="text-3xl font-bold text-gradient-neon">Services & Experiences</h1>
-        <p className="text-muted-foreground mt-1">Explore everything Outa offers</p>
-      </div>
+    <div className="relative min-h-screen bg-background">
+      <div className="px-4 pb-28">
+        {/* Header */}
+        <div className="pt-6 pb-4">
+          <h1 className="text-lg font-bold text-foreground tracking-tight">
+            Services
+          </h1>
+          <p className="text-[13px] text-muted-foreground/70 mt-1">
+            Everything Outa offers, in one place.
+          </p>
+        </div>
 
-      {/* Quick Services */}
-      <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
-        <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-          <Rocket className="h-5 w-5 text-purple" strokeWidth={1.5} />
-          <span className="text-gradient-neon">Quick Services</span>
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {quickServices.map((service) => (
-            <IconTile
-              key={service.label}
-              icon={service.icon}
-              label={service.label}
-              onClick={service.onClick}
-            />
-          ))}
+        {/* Services List */}
+        <div className="space-y-2">
+          {services.map((service) => {
+            const Icon = service.icon;
+            return (
+              <button
+                key={service.title}
+                onClick={() => navigate(service.route)}
+                className="w-full flex items-center gap-3 p-3.5 bg-card border border-border/50 rounded-xl hover:bg-secondary/30 hover:border-purple/20 transition-all active:scale-[0.98] group"
+              >
+                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-purple/10 flex items-center justify-center">
+                  <Icon className="h-[18px] w-[18px] text-purple" strokeWidth={1.5} />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-[14px] font-medium text-foreground">{service.title}</p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-0.5">{service.subtitle}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-purple/60 transition-colors" strokeWidth={1.5} />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Curated Experiences Preview */}
+        <div className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2 tracking-tight">
+              <Sparkles className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              Curated Experiences
+            </h2>
+            <p className="text-[11px] text-muted-foreground/50 mt-1">Handpicked collections for any mood</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            {curatedExperiences.map((experience) => {
+              const Icon = experience.icon;
+              return (
+                <button
+                  key={experience.label}
+                  onClick={() => navigate(experience.route)}
+                  className="flex items-center gap-2.5 p-3 bg-card border border-border/50 rounded-xl hover:bg-secondary/30 hover:border-purple/20 transition-all active:scale-[0.98] group"
+                >
+                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center">
+                    <Icon className="h-4 w-4 text-purple" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-[12px] font-medium text-foreground text-left leading-tight">
+                    {experience.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
-
-      {/* Experiences */}
-      <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
-        <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-          <Sparkles className="h-5 w-5 text-purple" strokeWidth={1.5} />
-          <span className="text-gradient-neon">Curated Experiences</span>
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          {experienceCategories.map((category) => (
-            <IconTile
-              key={category.id}
-              icon={category.icon}
-              label={category.title}
-              onClick={() => handleCategoryClick(category)}
-              className={category.id === 'celebrations' ? 'ring-2 ring-purple animate-pulse-glow' : ''}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Experience Detail Modal */}
-      <ExperienceDetailModal
-        category={selectedCategory}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedCategory(null);
-        }}
-        onItemClick={handleExperienceItemClick}
-      />
-
-      {/* Event Planner Modal */}
-      <EventPlannerModal
-        isOpen={isEventPlannerOpen}
-        onClose={() => {
-          setIsEventPlannerOpen(false);
-          setSelectedOccasion(undefined);
-        }}
-        occasionType={selectedOccasion}
-      />
-
-      <Card className="animate-fade-in border border-purple/30 shadow-hover bg-card">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-purple/20">
-              <Bell className="h-5 w-5 text-purple" strokeWidth={1.5} />
-            </div>
-            <CardTitle className="text-gradient-neon">Dining Reminders</CardTitle>
-          </div>
-          <CardDescription>Set reminders for your next outing</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-center">
-            <CalendarComponent
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border border-border bg-card"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">What's the vibe?</label>
-            <textarea
-              value={reminderNote}
-              onChange={(e) => setReminderNote(e.target.value)}
-              placeholder="e.g., Thai food with friends, Anniversary dinner..."
-              className="w-full min-h-[80px] px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple"
-            />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
