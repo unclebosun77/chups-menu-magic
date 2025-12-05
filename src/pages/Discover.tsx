@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, MapPin, Star, Clock, Filter, User } from "lucide-react";
+import { Search, Filter, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import SkeletonCard from "@/components/SkeletonCard";
+import RestaurantCard from "@/components/restaurant/RestaurantCard";
 
 type Restaurant = {
   id: string;
@@ -144,6 +144,17 @@ const Discover = () => {
 
   const cuisineTypes = Array.from(new Set(restaurants.map((r) => r.cuisine_type)));
 
+  // Transform to RestaurantCard format
+  const transformRestaurant = (r: Restaurant) => ({
+    id: r.id,
+    name: r.name,
+    rating: r.average_rating || 0,
+    cuisine: r.cuisine_type,
+    price_level: "££",
+    description: r.description,
+    images: r.logo_url ? [r.logo_url] : [],
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
@@ -232,72 +243,12 @@ const Discover = () => {
             <p className="text-muted-foreground">No restaurants found matching your criteria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-wrap gap-4 justify-center">
             {filteredRestaurants.map((restaurant) => (
-              <Card
-                key={restaurant.id}
-                className="overflow-hidden hover:shadow-hover transition-all duration-300 cursor-pointer group"
-                onClick={() => navigate(`/restaurant/${restaurant.id}`)}
-              >
-                {restaurant.logo_url && (
-                  <div className="h-48 overflow-hidden bg-muted">
-                    <img
-                      src={restaurant.logo_url}
-                      alt={restaurant.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                        {restaurant.name}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
-                        <Badge variant="secondary">{restaurant.cuisine_type}</Badge>
-                        {restaurant.is_open ? (
-                          <Badge className="bg-green-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Open
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Closed</Badge>
-                        )}
-                        {restaurant.matchScore && restaurant.matchScore >= 3 && (
-                          <Badge variant="default" className="bg-purple text-purple-foreground">
-                            Matches your taste
-                          </Badge>
-                        )}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {restaurant.description || "Delicious food awaits!"}
-                  </p>
-                  {restaurant.address && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="line-clamp-1">
-                        {restaurant.address}, {restaurant.city}
-                      </span>
-                    </div>
-                  )}
-                  {restaurant.review_count! > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">
-                        {restaurant.average_rating?.toFixed(1)}
-                      </span>
-                      <span className="text-muted-foreground">
-                        ({restaurant.review_count} reviews)
-                      </span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <RestaurantCard 
+                key={restaurant.id} 
+                restaurant={transformRestaurant(restaurant)} 
+              />
             ))}
           </div>
         )}

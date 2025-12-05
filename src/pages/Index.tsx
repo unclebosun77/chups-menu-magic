@@ -7,7 +7,7 @@ import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
 import HeroSection from "@/components/home/HeroSection";
 import SmartActionPills from "@/components/home/SmartActionPills";
-import UniversalRestaurantCard from "@/components/home/UniversalRestaurantCard";
+import RestaurantCard from "@/components/restaurant/RestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 import YourNextSpotSection from "@/components/home/YourNextSpotSection";
 
@@ -99,7 +99,16 @@ const Index = () => {
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {restaurants.map((restaurant) => (
-                <UniversalRestaurantCard key={restaurant.id} restaurant={restaurant} />
+                <RestaurantCard 
+                  key={restaurant.id} 
+                  restaurant={{
+                    id: restaurant.id,
+                    name: restaurant.name,
+                    cuisine: restaurant.cuisine_type,
+                    description: restaurant.description,
+                    images: restaurant.logo_url ? [restaurant.logo_url] : [],
+                  }} 
+                />
               ))}
             </div>
           )}
