@@ -10,7 +10,7 @@ interface SignatureDishCardProps {
 const SignatureDishCard = ({ item, onAddToOrder }: SignatureDishCardProps) => {
   return (
     <div 
-      className="flex-shrink-0 w-52 rounded-2xl overflow-hidden bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+      className="flex-shrink-0 w-52 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
       onClick={() => onAddToOrder(item)}
     >
       {/* Image */}
@@ -22,8 +22,8 @@ const SignatureDishCard = ({ item, onAddToOrder }: SignatureDishCardProps) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-secondary flex items-center justify-center">
-            <Star className="h-8 w-8 text-muted-foreground/30" />
+          <div className="w-full h-full bg-white/5 flex items-center justify-center">
+            <Star className="h-8 w-8 text-white/30" />
           </div>
         )}
         
@@ -51,15 +51,15 @@ const SignatureDishCard = ({ item, onAddToOrder }: SignatureDishCardProps) => {
       
       {/* Content */}
       <div className="p-3.5">
-        <h3 className="font-semibold text-[14px] text-foreground mb-0.5 line-clamp-1">
+        <h3 className="font-semibold text-[14px] text-white mb-0.5 line-clamp-1">
           {item.name}
         </h3>
-        <p className="text-[11px] text-muted-foreground/60 line-clamp-1 mb-2">
+        <p className="text-[11px] text-white/50 line-clamp-1 mb-2">
           {item.description}
         </p>
         <div className="flex items-center justify-between">
           <span className="font-bold text-purple text-[15px]">£{item.price}</span>
-          <span className="text-[10px] text-muted-foreground/50">Tap to add</span>
+          <span className="text-[10px] text-white/40">Tap to add</span>
         </div>
       </div>
     </div>

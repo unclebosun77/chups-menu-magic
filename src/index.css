@@ -68,6 +68,11 @@ html {
     --shadow-neon: 0 0 10px hsl(270 100% 60% / 0.18);
     --shadow-card: 0 2px 12px -2px hsl(270 30% 50% / 0.06);
     --shadow-pill: 0 1px 4px hsl(270 30% 50% / 0.08);
+    
+    /* Premium Dark Gradient */
+    --gradient-dark-premium: linear-gradient(180deg, hsl(260 30% 8%) 0%, hsl(270 40% 12%) 50%, hsl(260 25% 6%) 100%);
+    --gradient-dark-purple: linear-gradient(135deg, hsl(260 30% 10%) 0%, hsl(270 50% 15%) 100%);
+    --gradient-hero-dark: linear-gradient(180deg, hsl(270 50% 20% / 0.4) 0%, hsl(260 30% 8%) 100%);
   }
 
   .dark {
@@ -153,6 +158,14 @@ html {
   
   .shadow-pill {
     box-shadow: var(--shadow-pill);
+  }
+  
+  .bg-gradient-dark-premium {
+    background: linear-gradient(180deg, hsl(260 30% 8%) 0%, hsl(270 40% 12%) 50%, hsl(260 25% 6%) 100%);
+  }
+  
+  .bg-gradient-dark-purple {
+    background: linear-gradient(135deg, hsl(260 30% 10%) 0%, hsl(270 50% 15%) 100%);
   }
   
   .text-gradient-neon {

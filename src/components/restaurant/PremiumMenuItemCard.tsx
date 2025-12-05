@@ -9,14 +9,14 @@ interface PremiumMenuItemCardProps {
 
 const PremiumMenuItemCard = ({ item, onAddToOrder }: PremiumMenuItemCardProps) => {
   return (
-    <div className="bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group">
+    <div className="bg-white/5 rounded-2xl border border-white/10 shadow-sm hover:shadow-md hover:bg-white/8 transition-all duration-200 overflow-hidden group">
       <div className="flex p-4 gap-4">
         {/* Left: Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
             {/* Name & Price Row */}
             <div className="flex items-start justify-between gap-2 mb-1.5">
-              <h3 className="font-semibold text-[15px] text-foreground leading-tight">
+              <h3 className="font-semibold text-[15px] text-white leading-tight">
                 {item.name}
               </h3>
               <span className="font-bold text-purple text-[15px] shrink-0">
@@ -25,7 +25,7 @@ const PremiumMenuItemCard = ({ item, onAddToOrder }: PremiumMenuItemCardProps) =
             </div>
             
             {/* Description */}
-            <p className="text-[13px] text-muted-foreground/70 leading-relaxed line-clamp-2 mb-3">
+            <p className="text-[13px] text-white/50 leading-relaxed line-clamp-2 mb-3">
               {item.description}
             </p>
           </div>
@@ -36,7 +36,7 @@ const PremiumMenuItemCard = ({ item, onAddToOrder }: PremiumMenuItemCardProps) =
               {item.tags.slice(0, 4).map((tag) => (
                 <span 
                   key={tag} 
-                  className="text-[11px] bg-secondary/60 text-muted-foreground px-2 py-0.5 rounded-full flex items-center gap-0.5"
+                  className="text-[11px] bg-white/10 text-white/70 px-2 py-0.5 rounded-full flex items-center gap-0.5"
                   title={getTagLabel(tag)}
                 >
                   <span>{getTagEmoji(tag)}</span>
