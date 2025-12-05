@@ -157,41 +157,41 @@ const RestaurantProfile = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30"
+            className="h-9 w-9 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30"
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
           </Button>
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
               size="icon"
-              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
+              className={`h-9 w-9 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
                 isSaved ? 'bg-purple/20 text-purple' : 'bg-background/80 hover:bg-background'
               }`}
               onClick={handleToggleSaved}
             >
-              <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+              <Bookmark className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} strokeWidth={1.5} />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
+              className={`h-9 w-9 rounded-full backdrop-blur-md shadow-lg border border-border/30 ${
                 isFavorite ? 'bg-red-50 text-red-500' : 'bg-background/80 hover:bg-background'
               }`}
               onClick={handleToggleFavorite}
             >
-              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} strokeWidth={1.5} />
             </Button>
             {totalItems > 0 && (
               <Button 
                 variant="ghost" 
                 size="icon"
-                className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30 relative"
+                className="h-9 w-9 rounded-full bg-background/80 backdrop-blur-md hover:bg-background shadow-lg border border-border/30 relative"
                 onClick={handleViewOrder}
               >
-                <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
+                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold">
                   {totalItems}
                 </span>
               </Button>
@@ -241,9 +241,9 @@ const RestaurantProfile = () => {
                 <h1 className="text-2xl font-bold text-foreground tracking-tight">{restaurant.name}</h1>
                 <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
               </div>
-              <div className="flex items-center gap-1 bg-purple/15 px-3 py-1.5 rounded-full">
-                <Star className="h-4 w-4 text-purple fill-purple" />
-                <span className="text-sm font-bold text-purple">{restaurant.rating}</span>
+              <div className="flex items-center gap-1 bg-purple/15 px-2.5 py-1 rounded-full">
+                <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
+                <span className="text-[13px] font-bold text-purple">{restaurant.rating}</span>
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ const RestaurantProfile = () => {
         {/* Powered by Outa tag */}
         <div className="absolute bottom-2 right-4">
           <span className="text-[10px] text-muted-foreground/50 flex items-center gap-1">
-            <Sparkles className="h-3 w-3" /> Powered by Outa Intelligence
+            <Sparkles className="h-3 w-3" strokeWidth={1.5} /> Powered by Outa Intelligence
           </span>
         </div>
       </div>
@@ -262,25 +262,25 @@ const RestaurantProfile = () => {
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="flex-1 h-12 rounded-xl border-border/50 hover:bg-secondary/50"
+            className="flex-1 h-11 rounded-xl border-border/50 hover:bg-secondary/50 text-[13px]"
             onClick={() => window.open(`tel:+441234567890`)}
           >
-            <Phone className="h-4 w-4 mr-2 text-purple" />
+            <Phone className="h-4 w-4 mr-1.5 text-purple" strokeWidth={1.5} />
             Call
           </Button>
           <Button
             variant="outline"
-            className="flex-1 h-12 rounded-xl border-border/50 hover:bg-secondary/50"
+            className="flex-1 h-11 rounded-xl border-border/50 hover:bg-secondary/50 text-[13px]"
             onClick={() => window.open(`https://maps.google.com?q=${restaurant.address}`)}
           >
-            <Navigation className="h-4 w-4 mr-2 text-purple" />
+            <Navigation className="h-4 w-4 mr-1.5 text-purple" strokeWidth={1.5} />
             Directions
           </Button>
           <Button
-            className="flex-1 h-12 rounded-xl bg-purple hover:bg-purple/90 text-white"
+            className="flex-1 h-11 rounded-xl bg-purple hover:bg-purple/90 text-white text-[13px]"
             onClick={() => setShowAskOuta(true)}
           >
-            <Sparkles className="h-4 w-4 mr-2" />
+            <Sparkles className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
             Ask Outa
           </Button>
         </div>
@@ -335,7 +335,7 @@ const RestaurantProfile = () => {
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-full bg-purple/15">
-                <Sparkles className="h-5 w-5 text-purple" />
+                <Sparkles className="h-5 w-5 text-purple" strokeWidth={1.5} />
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-sm text-foreground mb-1">Outa's Pick for You</p>
@@ -369,7 +369,7 @@ const RestaurantProfile = () => {
           <Card className="border-border/40 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-purple" />
+                <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
                 <span className="font-semibold text-[13px]">Hours</span>
               </div>
               <div className="space-y-1">
@@ -390,7 +390,7 @@ const RestaurantProfile = () => {
           <Card className="border-border/40 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <MapPin className="h-4 w-4 text-purple" />
+                <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
                 <span className="font-semibold text-[13px]">Location</span>
               </div>
               <p className="text-[11px] text-muted-foreground/60 mb-2 leading-relaxed">
@@ -402,7 +402,7 @@ const RestaurantProfile = () => {
                 className="w-full text-[10px] h-7 rounded-full border-border/50"
               >
                 Get Directions
-                <ChevronRight className="h-3 w-3 ml-1" />
+                <ChevronRight className="h-4 w-4 ml-1" strokeWidth={1.5} />
               </Button>
             </CardContent>
           </Card>
@@ -430,10 +430,10 @@ const RestaurantProfile = () => {
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border/50 p-4 z-50">
           <Button 
-            className="w-full bg-purple hover:bg-purple/90 text-white h-14 rounded-2xl shadow-lg text-[15px] font-semibold"
+            className="w-full bg-purple hover:bg-purple/90 text-white h-12 rounded-2xl shadow-lg text-[14px] font-semibold"
             onClick={handleViewOrder}
           >
-            <ShoppingCart className="h-5 w-5 mr-2" />
+            <ShoppingCart className="h-5 w-5 mr-2" strokeWidth={1.5} />
             View Order ({totalItems} items) · £{totalAmount.toFixed(2)}
           </Button>
         </div>

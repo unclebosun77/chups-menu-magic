@@ -6,10 +6,9 @@ interface IconTileProps {
   label: string;
   onClick?: () => void;
   className?: string;
-  emoji?: string;
 }
 
-export const IconTile = ({ icon: Icon, label, onClick, className, emoji }: IconTileProps) => {
+export const IconTile = ({ icon: Icon, label, onClick, className }: IconTileProps) => {
   return (
     <button
       onClick={onClick}
@@ -28,13 +27,9 @@ export const IconTile = ({ icon: Icon, label, onClick, className, emoji }: IconT
       {/* Subtle gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple/0 via-purple/0 to-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
-      {/* Icon container with animation */}
+      {/* Icon container - 20px medium size */}
       <div className="relative flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-        {emoji ? (
-          <span className="text-2xl filter drop-shadow-sm">{emoji}</span>
-        ) : (
-          <Icon className="h-5 w-5 text-purple group-hover:text-purple-hover transition-colors duration-300" strokeWidth={2.5} />
-        )}
+        <Icon className="h-5 w-5 text-purple group-hover:text-purple-hover transition-colors duration-300" strokeWidth={1.5} />
       </div>
       
       {/* Label */}

@@ -81,7 +81,7 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
             />
           ) : (
             <div className="w-full h-full bg-secondary flex items-center justify-center">
-              <ChefHat className="h-5 w-5 text-muted-foreground/30" />
+              <ChefHat className="h-6 w-6 text-muted-foreground/30" strokeWidth={1.5} />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -98,18 +98,18 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
         <CardContent className="p-2">
           <h3 className="font-semibold text-[13px] mb-1 line-clamp-1 text-foreground tracking-tight">{restaurant.name}</h3>
           
-          <div className="flex items-center justify-between text-[9px] text-muted-foreground/70 mb-1.5">
-            <div className="flex items-center gap-0.5">
-              <MapPin className="h-2.5 w-2.5 text-purple/70" />
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground/70 mb-1.5">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3 text-purple/70" strokeWidth={1.5} />
               <span>2.4 km</span>
             </div>
-            <div className="flex items-center gap-0.5">
-              <Star className="h-2.5 w-2.5 fill-purple/80 text-purple/80" />
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-purple/80 text-purple/80" strokeWidth={1.5} />
               <span className="font-medium text-foreground">4.8</span>
             </div>
           </div>
           
-          <Badge className="text-[8px] bg-secondary/40 text-muted-foreground/70 border-0 rounded-full px-1.5 py-0">
+          <Badge className="text-[9px] bg-secondary/40 text-muted-foreground/70 border-0 rounded-full px-2 py-0.5">
             {getCuisineTag(restaurant.cuisine_type)}
           </Badge>
         </CardContent>

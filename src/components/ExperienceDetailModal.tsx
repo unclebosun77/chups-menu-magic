@@ -17,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 interface ExperienceItem {
   name: string;
   icon: any;
-  emoji?: string;
   description: string;
   price?: string;
   duration?: string;
@@ -26,8 +25,8 @@ interface ExperienceItem {
 interface ExperienceCategory {
   id: string;
   title: string;
-  emoji: string;
   color: string;
+  icon: any;
   items: ExperienceItem[];
 }
 
@@ -186,7 +185,9 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{category.emoji}</span>
+            <div className="p-3 rounded-xl bg-purple/10">
+              <category.icon className="h-6 w-6 text-purple" strokeWidth={1.5} />
+            </div>
             <div>
               <DialogTitle className="text-2xl">{category.title}</DialogTitle>
               <DialogDescription>
@@ -227,14 +228,10 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
                       <div className="flex flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <div className="p-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                            {item.emoji ? (
-                              <span className="text-2xl">{item.emoji}</span>
-                            ) : (
-                              <Icon className="h-5 w-5 text-primary" />
-                            )}
+                            <Icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
                           </div>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <DollarSign className="h-3 w-3" />
+                            <DollarSign className="h-4 w-4" strokeWidth={1.5} />
                             <span className="text-[10px]">{pricing.split(' ')[0]}</span>
                           </div>
                         </div>
@@ -270,7 +267,7 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
                           !date && "text-muted-foreground"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 h-4 w-4" strokeWidth={1.5} />
                         {date ? format(date, "PPP") : "Pick a date"}
                       </Button>
                     </PopoverTrigger>
@@ -292,7 +289,7 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
                   <Label>Time *</Label>
                   <Select value={timeSlot} onValueChange={setTimeSlot}>
                     <SelectTrigger>
-                      <Clock className="mr-2 h-4 w-4" />
+                      <Clock className="mr-2 h-4 w-4" strokeWidth={1.5} />
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
@@ -310,7 +307,7 @@ export const ExperienceDetailModal = ({ category, isOpen, onClose, onItemClick }
                   <Label>Party Size *</Label>
                   <Select value={partySize} onValueChange={setPartySize}>
                     <SelectTrigger>
-                      <Users className="mr-2 h-4 w-4" />
+                      <Users className="mr-2 h-4 w-4" strokeWidth={1.5} />
                       <SelectValue placeholder="Number of guests" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
