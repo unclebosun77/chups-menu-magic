@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { demoRestaurants, DemoMenuItem, DemoRestaurant } from "@/data/demoRestau
 import { supabase } from "@/integrations/supabase/client";
 import AskOutaModal from "@/components/AskOutaModal";
 import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
+import { MenuSection } from "@/components/restaurant/menu";
 import { vibrate } from "@/utils/haptics";
 
 // Restaurant profile component types
@@ -19,15 +20,12 @@ const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const menuSectionRef = useRef<HTMLDivElement>(null);
   
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showAskOuta, setShowAskOuta] = useState(false);
   const [showFullGallery, setShowFullGallery] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [isTabsSticky, setIsTabsSticky] = useState(false);
   const [restaurant, setRestaurant] = useState<DemoRestaurant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -82,18 +80,6 @@ const RestaurantProfile = () => {
 
     loadRestaurant();
   }, [restaurantId]);
-
-  // Handle sticky tabs
-  useEffect(() => {
-    const handleScroll = () => {
-      if (menuSectionRef.current) {
-        const rect = menuSectionRef.current.getBoundingClientRect();
-        setIsTabsSticky(rect.top <= 80);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   if (isLoading) {
     return (
@@ -157,27 +143,10 @@ const RestaurantProfile = () => {
   const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const categories = ["all", "starters", "mains", "sides", "desserts", "drinks", "specials"];
-  const categoryLabels: Record<string, string> = {
-    all: "All", starters: "Starters", mains: "Mains", sides: "Sides",
-    desserts: "Desserts", drinks: "Drinks", specials: "Specials"
-  };
-
-  const filteredMenu = selectedCategory === "all" 
-    ? restaurant.menu 
-    : restaurant.menu.filter(item => item.category === selectedCategory);
-
+  // Get signature items for recommendation
   const signatureItems = restaurant.menu.filter(item => 
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
-
-  const getTagEmoji = (tag: string) => {
-    const emojis: Record<string, string> = {
-      spicy: "🌶️", veg: "🥬", vegan: "🌱", "gluten-free": "🌾",
-      popular: "⭐", "chef-pick": "👨‍🍳", sharing: "🍽️"
-    };
-    return emojis[tag] || "";
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28">
@@ -440,116 +409,12 @@ const RestaurantProfile = () => {
         </div>
       </div>
 
-      {/* Signature Dishes */}
-      {signatureItems.length > 0 && (
-        <div className="px-5 pb-6">
-          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 tracking-tight">
-            <Star className="h-5 w-5 text-purple fill-purple/30" />
-            Signature Picks
-          </h2>
-          <ScrollArea className="w-full -mx-5 px-5">
-            <div className="flex gap-3 pb-2">
-              {signatureItems.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className="flex-shrink-0 w-44 overflow-hidden hover:shadow-lg transition-all cursor-pointer border-border/40"
-                  onClick={() => handleAddToOrder(item)}
-                >
-                  <div className="relative aspect-[4/3]">
-                    {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-secondary flex items-center justify-center">
-                        <span className="text-3xl">🍽️</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <p className="text-white font-semibold text-sm line-clamp-1">{item.name}</p>
-                      <p className="text-white/80 font-bold text-sm">£{item.price}</p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-      )}
-
-      {/* Menu Section */}
-      <div ref={menuSectionRef} className="px-5 pb-6">
-        <h2 className="text-lg font-bold mb-4 tracking-tight">🍽️ Full Menu</h2>
-
-        {/* Category Tabs */}
-        <div className={`${isTabsSticky ? 'fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50 px-5 py-3' : ''}`}>
-          <ScrollArea className="w-full">
-            <div className="flex gap-2 pb-1">
-              {categories.map((cat) => (
-                <Button
-                  key={cat}
-                  variant={selectedCategory === cat ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`rounded-full text-xs whitespace-nowrap ${
-                    selectedCategory === cat 
-                      ? "bg-purple hover:bg-purple/90 text-white" 
-                      : "border-border/50 hover:bg-secondary/50"
-                  }`}
-                >
-                  {categoryLabels[cat]}
-                </Button>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-
-        {isTabsSticky && <div className="h-14" />}
-
-        {/* Menu Items */}
-        <div className="space-y-3 mt-4">
-          {filteredMenu.map((item) => (
-            <Card 
-              key={item.id} 
-              className="border-border/40 hover:shadow-md transition-all cursor-pointer overflow-hidden"
-              onClick={() => handleAddToOrder(item)}
-            >
-              <CardContent className="p-0">
-                <div className="flex gap-3 p-3">
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-semibold text-[14px] text-foreground">{item.name}</h3>
-                      <span className="font-bold text-[14px] text-purple">£{item.price}</span>
-                    </div>
-                    <p className="text-[12px] text-muted-foreground/70 line-clamp-2 mb-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {item.tags.map((tag) => (
-                        <span key={tag} className="text-[10px] text-muted-foreground/60">
-                          {getTagEmoji(tag)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  {item.image && (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredMenu.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground/60 text-sm">No items in this category</p>
-          </div>
-        )}
-      </div>
+      {/* Unified Menu Section */}
+      <MenuSection
+        menu={restaurant.menu}
+        signatureDishes={restaurant.signatureDishes}
+        onAddToOrder={handleAddToOrder}
+      />
 
       {/* Reviews Placeholder */}
       <div className="px-5 pb-6">
