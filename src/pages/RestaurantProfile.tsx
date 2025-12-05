@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap } from "lucide-react";
+import { useTasteProfile } from "@/context/TasteProfileContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -207,59 +208,115 @@ const RestaurantProfile = () => {
           </div>
         </div>
 
-        {/* Cinematic Banner Image */}
-        <div 
-          className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]"
-          style={{ opacity: 0 }}
-          onClick={() => setShowFullGallery(true)}
-        >
-          <img
-            src={restaurant.galleryImages[galleryIndex] || restaurant.heroImage}
-            alt={restaurant.name}
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        {/* Smart Banner - Detects Logo vs Photo */}
+        {(() => {
+          // Smart detection: if heroImage contains 'logo' in the URL or is same as logoUrl, treat as logo mode
+          const currentImage = restaurant.galleryImages[galleryIndex] || restaurant.heroImage;
+          const isLogoMode = currentImage === restaurant.logoUrl || 
+            currentImage.toLowerCase().includes('logo') ||
+            restaurant.galleryImages.length === 0;
           
-          {/* Gallery dots with animation */}
-          {restaurant.galleryImages.length > 1 && (
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
-              {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
+          if (isLogoMode) {
+            // Logo Mode - Centered, contained, premium presentation
+            return (
+              <div 
+                className="relative min-h-[280px] overflow-hidden animate-[bannerReveal_0.6s_ease-out_forwards] bg-gradient-to-b from-secondary/50 via-secondary/30 to-background"
+                style={{ opacity: 0 }}
+              >
+                {/* Decorative background pattern */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(139,92,246,0.08),transparent_60%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(236,72,153,0.05),transparent_50%)]" />
+                
+                {/* Centered Logo Container */}
+                <div className="flex flex-col items-center justify-center pt-16 pb-24 px-8">
+                  <div 
+                    className="w-[65%] max-w-[200px] aspect-square rounded-3xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(139,92,246,0.08)] p-4 border border-border/40 transition-transform duration-500 hover:scale-105 animate-[logoFloat_0.6s_ease-out_forwards]"
+                    style={{ opacity: 0, animationDelay: '150ms' }}
+                  >
+                    <img 
+                      src={restaurant.logoUrl} 
+                      alt={restaurant.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
+                
+                {/* Restaurant Name Overlay */}
+                <div 
+                  className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-background via-background/80 to-transparent animate-[titleReveal_0.5s_ease-out_forwards]"
+                  style={{ opacity: 0, animationDelay: '250ms' }}
+                >
+                  <div className="flex items-end justify-between">
+                    <div className="flex-1">
+                      <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
+                      <p className="text-[14px] text-muted-foreground/70 mt-1">{restaurant.cuisine}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
+                      <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
+                      <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          
+          // Photo Mode - Cinematic hero banner
+          return (
+            <div 
+              className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]"
+              style={{ opacity: 0 }}
+              onClick={() => setShowFullGallery(true)}
+            >
+              <img
+                src={currentImage}
+                alt={restaurant.name}
+                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+              
+              {/* Gallery dots with animation */}
+              {restaurant.galleryImages.length > 1 && (
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+                  {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
 
-          {/* Restaurant Name Overlay - Animated */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '200ms' }}
-          >
-            <div className="flex items-end gap-4">
-              {/* Logo with glow */}
-              <div className="w-18 h-18 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0 transition-transform duration-300 hover:scale-105">
-                <img 
-                  src={restaurant.logoUrl} 
-                  alt={restaurant.name}
-                  className="w-full h-full object-contain rounded-xl"
-                />
-              </div>
-              <div className="flex-1 pb-1">
-                <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                <p className="text-[14px] text-muted-foreground/80 mt-0.5">{restaurant.cuisine}</p>
-              </div>
-              <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
-                <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
-                <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
+              {/* Restaurant Name Overlay - Animated */}
+              <div 
+                className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]"
+                style={{ opacity: 0, animationDelay: '200ms' }}
+              >
+                <div className="flex items-end gap-4">
+                  {/* Logo with glow */}
+                  <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+                    <img 
+                      src={restaurant.logoUrl} 
+                      alt={restaurant.name}
+                      className="w-full h-full object-contain rounded-xl"
+                    />
+                  </div>
+                  <div className="flex-1 pb-1">
+                    <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
+                    <p className="text-[14px] text-muted-foreground/80 mt-0.5">{restaurant.cuisine}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
+                    <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
+                    <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* Powered by Outa tag */}
         <div 
@@ -364,46 +421,110 @@ const RestaurantProfile = () => {
         </p>
       </div>
 
-      {/* Outa Intelligence Recommendation - Premium Card */}
-      <div 
-        className="px-5 pb-5 animate-[recommendationReveal_0.5s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '650ms' }}
-      >
-        <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.06] via-purple/[0.03] to-neon-pink/[0.02] shadow-[0_4px_20px_-8px_rgba(139,92,246,0.15)] overflow-hidden">
-          <CardContent className="p-5 relative">
-            {/* Subtle glow effect */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-radial from-purple/10 to-transparent rounded-full blur-2xl" />
+      {/* Outa Intelligence Recommendation - Dynamic Premium Card */}
+      {(() => {
+        // Dynamic recommendation logic
+        const cuisineMatch = restaurant.cuisine;
+        const priceMatch = restaurant.priceLevel === "£" || restaurant.priceLevel === "££";
+        const hasSignature = signatureItems.length > 0;
+        
+        // Dynamic mood chips based on restaurant vibe
+        const moodChips = [
+          ...(restaurant.vibe.includes("Romantic") || restaurant.vibe.includes("Elegant") ? [{ label: "Date Night", icon: Heart }] : []),
+          ...(restaurant.vibe.includes("Cozy") || restaurant.vibe.includes("Warm") ? [{ label: "Cozy Vibes", icon: Flame }] : []),
+          ...(priceMatch ? [{ label: "Great Value", icon: Zap }] : []),
+          ...(restaurant.rating >= 4.5 ? [{ label: "Top Rated", icon: Award }] : []),
+          ...(!restaurant.vibe.includes("Romantic") && !restaurant.vibe.includes("Cozy") ? [{ label: "Perfect Tonight", icon: Star }] : []),
+        ].slice(0, 3);
+        
+        // Dynamic microcopy based on context
+        const getMicrocopy = () => {
+          if (hasSignature) {
+            return {
+              headline: "We think you'll love this",
+              body: (
+                <>
+                  The <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> is their signature — perfectly crafted and matches your taste.
+                </>
+              )
+            };
+          }
+          if (cuisineMatch.toLowerCase().includes("italian")) {
+            return {
+              headline: "Perfect for your Italian cravings",
+              body: "This spot delivers authentic flavors you've been searching for."
+            };
+          }
+          if (cuisineMatch.toLowerCase().includes("afro") || cuisineMatch.toLowerCase().includes("nigerian")) {
+            return {
+              headline: "A match for your bold taste",
+              body: "Rich, bold flavors that match your preference for authentic cuisine."
+            };
+          }
+          return {
+            headline: "This spot matches your vibe",
+            body: (
+              <>
+                Based on your taste, you'll love their <span className="font-semibold text-purple">{cuisineMatch}</span> dishes.
+              </>
+            )
+          };
+        };
+        
+        const copy = getMicrocopy();
+        
+        return (
+          <div 
+            className="px-5 pb-6 mt-1 animate-[recommendationReveal_0.5s_ease-out_forwards]"
+            style={{ opacity: 0, animationDelay: '650ms' }}
+          >
+            {/* Section divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mb-6" />
             
-            <div className="flex items-start gap-4 relative">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple/15 to-purple/25 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]">
-                <Sparkles className="h-5 w-5 text-purple animate-[sparkleFloat_3s_ease-in-out_infinite]" strokeWidth={1.5} />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-[15px] text-foreground mb-1.5">Outa's Pick for You</p>
-                {signatureItems.length > 0 ? (
-                  <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
-                    Try the <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> — it's one of their best dishes and matches your taste profile.
-                  </p>
-                ) : (
-                  <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
-                    This restaurant matches your preference for <span className="font-semibold text-purple">{restaurant.cuisine}</span> cuisine.
-                  </p>
-                )}
-                <div className="flex gap-2 mt-3">
-                  {["Date Night", "Cozy Vibes", "Great Service"].map((vibe, idx) => (
-                    <span 
-                      key={idx} 
-                      className="text-[10px] text-purple/80 bg-purple/10 px-2.5 py-1 rounded-full font-medium"
-                    >
-                      {vibe}
-                    </span>
-                  ))}
+            <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.07] via-purple/[0.04] to-neon-pink/[0.03] shadow-[0_6px_24px_-8px_rgba(139,92,246,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_36px_-10px_rgba(139,92,246,0.25)] hover:scale-[1.01] active:scale-[0.99]">
+              <CardContent className="p-5 relative">
+                {/* Animated glow effects */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-purple/12 to-transparent rounded-full blur-2xl animate-[glowPulse_4s_ease-in-out_infinite]" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-radial from-neon-pink/8 to-transparent rounded-full blur-xl animate-[glowPulse_4s_ease-in-out_infinite_1s]" />
+                
+                <div className="flex items-start gap-4 relative">
+                  {/* Animated icon with glow */}
+                  <div className="relative">
+                    <div className="absolute inset-0 rounded-xl bg-purple/20 blur-md animate-[iconGlow_2s_ease-in-out_infinite]" />
+                    <div className="relative p-3 rounded-xl bg-gradient-to-br from-purple/20 to-purple/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_-4px_rgba(139,92,246,0.3)]">
+                      <Sparkles className="h-5 w-5 text-purple animate-[sparkleFloat_2.5s_ease-in-out_infinite]" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <p className="font-bold text-[15px] text-foreground mb-1 tracking-tight">{copy.headline}</p>
+                    <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
+                      {copy.body}
+                    </p>
+                    
+                    {/* Dynamic mood chips with animations */}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {moodChips.map((chip, idx) => {
+                        const ChipIcon = chip.icon;
+                        return (
+                          <button 
+                            key={idx} 
+                            className="flex items-center gap-1.5 text-[10px] text-purple/90 bg-gradient-to-r from-purple/12 to-purple/8 px-3 py-1.5 rounded-full font-semibold border border-purple/15 shadow-sm transition-all duration-200 hover:scale-105 hover:bg-purple/15 hover:border-purple/25 active:scale-95 animate-[chipReveal_0.35s_ease-out_forwards]"
+                            style={{ opacity: 0, animationDelay: `${750 + idx * 80}ms` }}
+                          >
+                            <ChipIcon className="h-3 w-3" strokeWidth={2} />
+                            {chip.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
 
       {/* About Section - Animated Cards */}
       <div 
@@ -641,6 +762,50 @@ const RestaurantProfile = () => {
           }
           50% {
             transform: translateY(-2px);
+          }
+        }
+        
+        @keyframes logoFloat {
+          from {
+            opacity: 0;
+            transform: scale(0.9) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        @keyframes glowPulse {
+          0%, 100% {
+            opacity: 0.6;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+        }
+        
+        @keyframes iconGlow {
+          0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.7;
+            transform: scale(1.15);
+          }
+        }
+        
+        @keyframes chipReveal {
+          from {
+            opacity: 0;
+            transform: translateY(6px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
           }
         }
       `}</style>
