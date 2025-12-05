@@ -42,12 +42,7 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
       name: restaurant.name, 
       cuisine: restaurant.cuisine_type 
     });
-    // Route to unified RestaurantProfile
-    if (restaurant.id.includes("-demo")) {
-      navigate(`/restaurant/demo/${restaurant.id}`);
-    } else {
-      navigate(`/restaurant/${restaurant.id}`);
-    }
+    navigate(`/restaurant/${restaurant.id}`);
   }, [navigate, restaurant, addRestaurantVisit]);
 
   const handleLongPressStart = useCallback(() => {

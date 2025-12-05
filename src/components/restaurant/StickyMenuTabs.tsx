@@ -18,7 +18,7 @@ const StickyMenuTabs = ({
   return (
     <div className={`transition-all duration-200 ${
       isSticky 
-        ? "fixed top-0 left-0 right-0 z-40 bg-[hsl(260,30%,8%,0.95)] backdrop-blur-md border-b border-white/10 shadow-sm py-3 px-4" 
+        ? "fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm py-3 px-4" 
         : "py-2"
     }`}>
       <ScrollArea className="w-full">
@@ -30,7 +30,7 @@ const StickyMenuTabs = ({
               className={`shrink-0 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
                 selectedCategory === cat 
                   ? "bg-purple text-white shadow-sm" 
-                  : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                  : "bg-secondary/50 text-foreground hover:bg-secondary border border-border/40"
               }`}
             >
               {categoryLabels[cat]}
