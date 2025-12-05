@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Rocket, X } from "lucide-react";
+import { Search, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/context/SearchContext";
@@ -8,7 +8,7 @@ import LiveSearchOverlay from "@/components/search/LiveSearchOverlay";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { query, setQuery, isSearching, clearSearch } = useSearch();
+  const { query, setQuery, clearSearch } = useSearch();
   const { behavior } = useUserBehavior();
   const expandedSearch = behavior.searchFrequency > 5;
 
@@ -25,27 +25,27 @@ const HeroSection = () => {
         </div>
         
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" strokeWidth={1.5} />
           <Input
             placeholder="Find your next spot..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setQuery(query)}
-            className={`pl-9 pr-8 bg-card border border-border/60 focus:border-purple/30 text-foreground placeholder:text-muted-foreground/40 rounded-xl text-[13px] transition-all ${expandedSearch ? "h-10" : "h-8"}`}
+            className={`pl-10 pr-9 bg-card border border-border/60 focus:border-purple/30 text-foreground placeholder:text-muted-foreground/40 rounded-xl text-[13px] transition-all ${expandedSearch ? "h-10" : "h-9"}`}
           />
           {query && (
             <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <X className="h-4 w-4 text-muted-foreground/60" strokeWidth={1.5} />
             </button>
           )}
         </div>
         
         <Button 
-          className="w-full bg-purple text-primary-foreground hover:bg-purple-hover rounded-xl h-8 text-[13px] font-medium flex items-center justify-center gap-1.5 transition-all mt-3 shadow-sm"
+          className="w-full bg-purple text-primary-foreground hover:bg-purple-hover rounded-xl h-9 text-[13px] font-medium flex items-center justify-center gap-1.5 transition-all mt-3 shadow-sm"
           onClick={() => navigate("/discover")}
         >
           <span>Let's goo</span>
-          <Rocket className="h-3 w-3" />
+          <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
         </Button>
       </div>
       <LiveSearchOverlay />

@@ -27,25 +27,21 @@ const Services = () => {
   const quickServices = [
     {
       icon: UtensilsCrossed,
-      emoji: "🍽️",
       label: "Dine-In",
       onClick: () => navigate("/discover"),
     },
     {
       icon: Gift,
-      emoji: "🎁",
       label: "Rewards",
       onClick: () => navigate("/rewards"),
     },
     {
       icon: MapPin,
-      emoji: "📍",
       label: "Locations",
       onClick: () => navigate("/discover"),
     },
     {
       icon: Phone,
-      emoji: "📞",
       label: "Book Table",
       onClick: () => navigate("/bookings"),
     },
@@ -56,71 +52,66 @@ const Services = () => {
       id: "dining",
       title: "Exclusive",
       icon: UtensilsCrossed,
-      emoji: "🍽️",
       color: "bg-gradient-to-br from-orange-500/10 to-red-500/10",
       items: [
-        { name: "Private Dining", icon: Users, emoji: "👥", description: "Intimate setups or hidden chef's tables" },
-        { name: "Chef's Table Nights", icon: ChefHat, emoji: "👨‍🍳", description: "Behind-the-scenes tasting menus" },
-        { name: "Pop-Up Events", icon: Sparkles, emoji: "⚡", description: "Limited-time culinary adventures" },
+        { name: "Private Dining", icon: Users, description: "Intimate setups or hidden chef's tables" },
+        { name: "Chef's Table Nights", icon: ChefHat, description: "Behind-the-scenes tasting menus" },
+        { name: "Pop-Up Events", icon: Sparkles, description: "Limited-time culinary adventures" },
       ],
     },
     {
       id: "pairings",
       title: "Pairings",
       icon: Wine,
-      emoji: "🍷",
       color: "bg-gradient-to-br from-purple-500/10 to-pink-500/10",
       items: [
-        { name: "Wine Pairing Nights", icon: Wine, emoji: "🍷", description: "Perfect wine & food combinations" },
-        { name: "Cocktail Mixology", icon: GlassWater, emoji: "🍸", description: "Learn to craft signature cocktails" },
-        { name: "Dessert Pairings", icon: Cake, emoji: "🍰", description: "Sweet endings with perfect drinks" },
-        { name: "Craft Beer Tastings", icon: Coffee, emoji: "🍺", description: "Explore local & international brews" },
-        { name: "Food & Music Pairing", icon: Music, emoji: "🎵", description: "Harmonize flavors with melodies" },
+        { name: "Wine Pairing Nights", icon: Wine, description: "Perfect wine & food combinations" },
+        { name: "Cocktail Mixology", icon: GlassWater, description: "Learn to craft signature cocktails" },
+        { name: "Dessert Pairings", icon: Cake, description: "Sweet endings with perfect drinks" },
+        { name: "Craft Beer Tastings", icon: Coffee, description: "Explore local & international brews" },
+        { name: "Food & Music Pairing", icon: Music, description: "Harmonize flavors with melodies" },
       ],
     },
     {
       id: "wellness",
-      title: "Health and Wellness",
+      title: "Health",
       icon: Leaf,
-      emoji: "🌿",
       color: "bg-gradient-to-br from-green-500/10 to-blue-500/10",
       items: [
-        { name: "Meal Prep Plans", icon: Calendar, emoji: "📅", description: "Weekly healthy meal subscriptions" },
-        { name: "Cooking Classes", icon: ChefHat, emoji: "👩‍🍳", description: "Master new cuisines & techniques" },
-        { name: "Chef Masterclasses", icon: Award, emoji: "🏆", description: "Learn from culinary legends" },
-        { name: "Ingredient Workshops", icon: Wheat, emoji: "🌾", description: "Deep dive into quality ingredients" },
-        { name: "Dietary Menus", icon: BookOpen, emoji: "📋", description: "Keto, vegan, paleo & more" },
-        { name: "Nutritionist-Approved", icon: Heart, emoji: "💚", description: "Healthy & delicious balanced meals" },
-        { name: "Calorie Tracking", icon: Award, emoji: "📊", description: "Know exactly what you're eating" },
-        { name: "Allergen-Free Options", icon: Shield, emoji: "🛡️", description: "Safe meals for all dietary needs" },
-        { name: "Organic & Local", icon: Leaf, emoji: "🌱", description: "Farm-fresh sustainable ingredients" },
+        { name: "Meal Prep Plans", icon: Calendar, description: "Weekly healthy meal subscriptions" },
+        { name: "Cooking Classes", icon: ChefHat, description: "Master new cuisines & techniques" },
+        { name: "Chef Masterclasses", icon: Award, description: "Learn from culinary legends" },
+        { name: "Ingredient Workshops", icon: Wheat, description: "Deep dive into quality ingredients" },
+        { name: "Dietary Menus", icon: BookOpen, description: "Keto, vegan, paleo & more" },
+        { name: "Nutritionist-Approved", icon: Heart, description: "Healthy & delicious balanced meals" },
+        { name: "Calorie Tracking", icon: Award, description: "Know exactly what you're eating" },
+        { name: "Allergen-Free Options", icon: Shield, description: "Safe meals for all dietary needs" },
+        { name: "Organic & Local", icon: Leaf, description: "Farm-fresh sustainable ingredients" },
       ],
     },
     {
       id: "celebrations",
       title: "Events",
       icon: PartyPopper,
-      emoji: "🎉",
       color: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
       items: [
-        { name: "Outa Concierge", icon: Rocket, emoji: "🚀", description: "AI-powered event planning assistant" },
-        { name: "Special Occasions", icon: PartyPopper, emoji: "🎊", description: "Celebrate life's big moments" },
-        { name: "Proposal Packages", icon: Heart, emoji: "💍", description: "Make your moment unforgettable" },
-        { name: "Seasonal Events", icon: Calendar, emoji: "🎄", description: "Festive seasonal celebrations" },
-        { name: "Themed Nights", icon: Sparkles, emoji: "🎭", description: "Immersive culinary themes" },
-        { name: "Group Dining", icon: Users, emoji: "🎉", description: "Perfect for parties & gatherings" },
+        { name: "Outa Concierge", icon: Rocket, description: "AI-powered event planning assistant" },
+        { name: "Special Occasions", icon: PartyPopper, description: "Celebrate life's big moments" },
+        { name: "Proposal Packages", icon: Heart, description: "Make your moment unforgettable" },
+        { name: "Seasonal Events", icon: Calendar, description: "Festive seasonal celebrations" },
+        { name: "Themed Nights", icon: Sparkles, description: "Immersive culinary themes" },
+        { name: "Group Dining", icon: Users, description: "Perfect for parties & gatherings" },
       ],
     },
     {
       id: "addons",
       title: "Add-Ons",
       icon: Gift,
-      emoji: "✨",
       color: "bg-gradient-to-br from-indigo-500/10 to-violet-500/10",
       items: [
-        { name: "Experience Gifting", icon: Gift, emoji: "🎁", description: "Give memorable dining experiences" },
-        { name: "Dine & Stay Packages", icon: Home, emoji: "🏨", description: "Complete getaway experiences" },
-        { name: "Restaurant Tours", icon: Map, emoji: "🗺️", description: "Behind-the-scenes kitchen tours" },
+        { name: "Experience Gifting", icon: Gift, description: "Give memorable dining experiences" },
+        { name: "Dine & Stay Packages", icon: Home, description: "Complete getaway experiences" },
+        { name: "Restaurant Tours", icon: Map, description: "Behind-the-scenes kitchen tours" },
       ],
     },
   ];
@@ -157,7 +148,7 @@ const Services = () => {
       {/* Quick Services */}
       <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
         <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-          <span className="text-2xl">⚡</span> 
+          <Rocket className="h-5 w-5 text-purple" strokeWidth={1.5} />
           <span className="text-gradient-neon">Quick Services</span>
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -165,7 +156,6 @@ const Services = () => {
             <IconTile
               key={service.label}
               icon={service.icon}
-              emoji={service.emoji}
               label={service.label}
               onClick={service.onClick}
             />
@@ -176,7 +166,7 @@ const Services = () => {
       {/* Experiences */}
       <div className="space-y-4 p-5 rounded-3xl bg-secondary/50 border border-border shadow-soft">
         <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-          <span className="text-2xl">✨</span> 
+          <Sparkles className="h-5 w-5 text-purple" strokeWidth={1.5} />
           <span className="text-gradient-neon">Curated Experiences</span>
         </h2>
         <div className="grid grid-cols-3 gap-3">
@@ -184,7 +174,6 @@ const Services = () => {
             <IconTile
               key={category.id}
               icon={category.icon}
-              emoji={category.emoji}
               label={category.title}
               onClick={() => handleCategoryClick(category)}
               className={category.id === 'celebrations' ? 'ring-2 ring-purple animate-pulse-glow' : ''}
@@ -218,7 +207,7 @@ const Services = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-purple/20">
-              <Bell className="h-5 w-5 text-purple" />
+              <Bell className="h-5 w-5 text-purple" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-gradient-neon">Dining Reminders</CardTitle>
           </div>
