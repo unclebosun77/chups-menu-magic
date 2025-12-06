@@ -3,14 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, MapPin, Star, Clock, Filter, User } from "lucide-react";
+import { Search, MapPin, Star, Clock, Filter, User, Sparkles, X, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
-import SkeletonCard from "@/components/SkeletonCard";
+import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
 
 type Restaurant = {
   id: string;
@@ -27,6 +25,14 @@ type Restaurant = {
   matchScore?: number;
 };
 
+const filterChips = [
+  { id: "all", label: "All", icon: null },
+  { id: "open", label: "Open Now", icon: Clock },
+  { id: "nearby", label: "Near Me", icon: MapPin },
+  { id: "top-rated", label: "Top Rated", icon: Star },
+  { id: "trending", label: "Trending", icon: TrendingUp },
+];
+
 const Discover = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,10 +40,9 @@ const Discover = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cuisineFilter, setCuisineFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
   const [showTasteDialog, setShowTasteDialog] = useState(false);
 
   useEffect(() => {
@@ -46,7 +51,7 @@ const Discover = () => {
 
   useEffect(() => {
     filterRestaurants();
-  }, [searchQuery, cuisineFilter, statusFilter, restaurants]);
+  }, [searchQuery, activeFilter, cuisineFilter, restaurants]);
 
   const loadRestaurants = async () => {
     try {
@@ -57,7 +62,6 @@ const Discover = () => {
 
       if (error) throw error;
 
-      // Fetch reviews for each restaurant
       const restaurantsWithRatings = await Promise.all(
         (restaurantsData || []).map(async (restaurant) => {
           const { data: reviews } = await supabase
@@ -95,26 +99,16 @@ const Discover = () => {
     // Calculate match scores if profile exists
     if (profile) {
       filtered = filtered.map((r) => {
-        let score = 0;
-        
-        // Cuisine match
-        if (profile.cuisines.includes(r.cuisine_type)) {
-          score += 3;
-        }
-        
-        // Boost for open restaurants
-        if (r.is_open) {
-          score += 1;
-        }
-        
-        return { ...r, matchScore: score };
+        let score = 50; // Base score
+        if (profile.cuisines.includes(r.cuisine_type)) score += 30;
+        if (r.is_open) score += 10;
+        if (r.average_rating && r.average_rating >= 4) score += 10;
+        return { ...r, matchScore: Math.min(score, 100) };
       });
-      
-      // Sort by match score descending
       filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
     }
 
-    // Search filter - search across multiple fields
+    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
@@ -122,21 +116,21 @@ const Discover = () => {
           r.name.toLowerCase().includes(query) ||
           r.cuisine_type.toLowerCase().includes(query) ||
           r.description?.toLowerCase().includes(query) ||
-          r.city?.toLowerCase().includes(query) ||
-          r.address?.toLowerCase().includes(query)
+          r.city?.toLowerCase().includes(query)
       );
     }
 
-    // Cuisine filter
-    if (cuisineFilter !== "all") {
-      filtered = filtered.filter((r) => r.cuisine_type === cuisineFilter);
+    // Active filter
+    if (activeFilter === "open") {
+      filtered = filtered.filter((r) => r.is_open);
+    } else if (activeFilter === "top-rated") {
+      filtered = filtered.filter((r) => (r.average_rating || 0) >= 4);
+      filtered.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
     }
 
-    // Status filter
-    if (statusFilter === "open") {
-      filtered = filtered.filter((r) => r.is_open);
-    } else if (statusFilter === "closed") {
-      filtered = filtered.filter((r) => !r.is_open);
+    // Cuisine filter
+    if (cuisineFilter) {
+      filtered = filtered.filter((r) => r.cuisine_type === cuisineFilter);
     }
 
     setFilteredRestaurants(filtered);
@@ -145,159 +139,135 @@ const Discover = () => {
   const cuisineTypes = Array.from(new Set(restaurants.map((r) => r.cuisine_type)));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-24">
+      {/* Premium Header */}
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+        <div className="px-4 py-4">
+          {/* Title Row */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Discover Restaurants</h1>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant={isComplete ? "outline" : "default"} 
-                size="sm"
-                onClick={() => setShowTasteDialog(true)}
-                className="gap-2"
-              >
-                <User className="h-4 w-4" />
-                {isComplete ? "Taste profile active" : "Set your taste"}
-              </Button>
-              <Button variant="ghost" onClick={() => navigate("/")}>
-                Home
-              </Button>
+            <div className="animate-slide-up">
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Discover</h1>
+              <p className="text-xs text-muted-foreground/70 mt-0.5">Find your perfect spot</p>
             </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, cuisine, or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setShowFilters(!showFilters)}
+            <Button 
+              variant={isComplete ? "outline" : "default"} 
+              size="sm"
+              onClick={() => setShowTasteDialog(true)}
+              className={`gap-2 rounded-full ${isComplete ? 'border-purple/30 text-purple hover:bg-purple/5' : 'bg-gradient-neon shadow-glow'}`}
             >
-              <Filter className="h-4 w-4" />
+              {isComplete ? <Sparkles className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+              <span className="text-xs">{isComplete ? "Profile active" : "Set taste"}</span>
             </Button>
           </div>
 
-          {/* Filters */}
-          {showFilters && (
-            <div className="flex gap-3 mt-4 flex-wrap">
-              <Select value={cuisineFilter} onValueChange={setCuisineFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Cuisines" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Cuisines</SelectItem>
-                  {cuisineTypes.map((cuisine) => (
-                    <SelectItem key={cuisine} value={cuisine}>
-                      {cuisine}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Search Bar */}
+          <div className="relative animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <Input
+              placeholder="Search restaurants, cuisines..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 pr-10 h-12 rounded-2xl border-border/50 bg-secondary/30 focus:bg-card focus:border-purple/30 transition-all"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="open">Open Now</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Filter Chips */}
+          <div className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            {filterChips.map((chip, index) => {
+              const Icon = chip.icon;
+              const isActive = activeFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => setActiveFilter(chip.id)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all chip-animate ${
+                    isActive 
+                      ? 'bg-purple text-primary-foreground shadow-neon' 
+                      : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
+                  }`}
+                  style={{ animationDelay: `${200 + index * 50}ms` }}
+                >
+                  {Icon && <Icon className="h-3.5 w-3.5" />}
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Cuisine Chips */}
+          {cuisineTypes.length > 0 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
+              {cuisineTypes.map((cuisine, index) => (
+                <button
+                  key={cuisine}
+                  onClick={() => setCuisineFilter(cuisineFilter === cuisine ? null : cuisine)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all chip-animate ${
+                    cuisineFilter === cuisine 
+                      ? 'bg-purple/20 text-purple border border-purple/30' 
+                      : 'bg-secondary/30 text-muted-foreground/70 hover:bg-secondary/50'
+                  }`}
+                >
+                  {cuisine}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </div>
 
       {/* Restaurant Grid */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="px-4 py-6">
+        {/* AI Recommendation Banner */}
+        {isComplete && filteredRestaurants.length > 0 && (
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple/10 to-neon-pink/5 border border-purple/20 animate-slide-up">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-neon flex items-center justify-center shadow-glow">
+                <Sparkles className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Outa's picks for you</p>
+                <p className="text-xs text-muted-foreground/70">Based on your taste profile</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <SkeletonCard key={i} type="grid" />
+              <div key={i} className="h-[220px] rounded-2xl bg-secondary/50 shimmer-loading" />
             ))}
           </div>
         ) : filteredRestaurants.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No restaurants found matching your criteria.</p>
+          <div className="text-center py-16 animate-slide-up">
+            <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-4">
+              <MapPin className="h-8 w-8 text-muted-foreground/30" />
+            </div>
+            <p className="text-foreground font-medium mb-1">No restaurants found</p>
+            <p className="text-sm text-muted-foreground/60">Try adjusting your filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <Card
+          <div className="grid grid-cols-2 gap-4">
+            {filteredRestaurants.map((restaurant, index) => (
+              <div 
                 key={restaurant.id}
-                className="overflow-hidden hover:shadow-hover transition-all duration-300 cursor-pointer group"
-                onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+                className="animate-scale-in"
+                style={{ animationDelay: `${100 + index * 50}ms` }}
               >
-                {restaurant.logo_url && (
-                  <div className="h-48 overflow-hidden bg-muted">
-                    <img
-                      src={restaurant.logo_url}
-                      alt={restaurant.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                        {restaurant.name}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
-                        <Badge variant="secondary">{restaurant.cuisine_type}</Badge>
-                        {restaurant.is_open ? (
-                          <Badge className="bg-green-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Open
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Closed</Badge>
-                        )}
-                        {restaurant.matchScore && restaurant.matchScore >= 3 && (
-                          <Badge variant="default" className="bg-purple text-purple-foreground">
-                            Matches your taste
-                          </Badge>
-                        )}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {restaurant.description || "Delicious food awaits!"}
-                  </p>
-                  {restaurant.address && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="line-clamp-1">
-                        {restaurant.address}, {restaurant.city}
-                      </span>
-                    </div>
-                  )}
-                  {restaurant.review_count! > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">
-                        {restaurant.average_rating?.toFixed(1)}
-                      </span>
-                      <span className="text-muted-foreground">
-                        ({restaurant.review_count} reviews)
-                      </span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                <PremiumRestaurantCard 
+                  restaurant={restaurant} 
+                  variant="grid" 
+                  index={index}
+                />
+              </div>
             ))}
           </div>
         )}
