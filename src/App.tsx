@@ -28,6 +28,14 @@ import OrderSummary from "./pages/OrderSummary";
 import AIOrderChat from "./pages/AIOrderChat";
 import OutaIntelligence from "./pages/OutaIntelligence";
 import CuratedExperiences from "./pages/CuratedExperiences";
+import OnboardingHome from "./pages/onboarding/OnboardingHome";
+import BrandingStep from "./pages/onboarding/BrandingStep";
+import RestaurantDetailsForm from "./pages/onboarding/RestaurantDetailsForm";
+import MenuCategoryList from "./pages/onboarding/MenuCategoryList";
+import MenuItemEditor from "./pages/onboarding/MenuItemEditor";
+import GalleryUploader from "./pages/onboarding/GalleryUploader";
+import OpeningHoursEditor from "./pages/onboarding/OpeningHoursEditor";
+import ReviewAndSubmit from "./pages/onboarding/ReviewAndSubmit";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +69,17 @@ const App = () => (
                   <Route path="/ai-chat" element={<AIOrderChat />} />
                   <Route path="/outa-intelligence" element={<OutaIntelligence />} />
                   <Route path="/curated-experiences" element={<CuratedExperiences />} />
-                  <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
+                  
+                  {/* Restaurant Onboarding Pro Suite */}
+                  <Route path="/restaurant/onboarding" element={<OnboardingHome />} />
+                  <Route path="/restaurant/onboarding/branding" element={<BrandingStep />} />
+                  <Route path="/restaurant/onboarding/details" element={<RestaurantDetailsForm />} />
+                  <Route path="/restaurant/onboarding/menu" element={<MenuCategoryList />} />
+                  <Route path="/restaurant/onboarding/menu/:categoryId" element={<MenuItemEditor />} />
+                  <Route path="/restaurant/onboarding/gallery" element={<GalleryUploader />} />
+                  <Route path="/restaurant/onboarding/hours" element={<OpeningHoursEditor />} />
+                  <Route path="/restaurant/onboarding/review" element={<ReviewAndSubmit />} />
+                  
                   <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
                   <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
                   
