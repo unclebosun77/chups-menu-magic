@@ -63,7 +63,7 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
   return (
     <>
       <Card
-        className="flex-shrink-0 w-[140px] overflow-hidden hover:shadow-md transition-all cursor-pointer group bg-card rounded-2xl border border-border/50 shadow-sm active:scale-95"
+        className="flex-shrink-0 w-[150px] overflow-hidden cursor-pointer group bg-card rounded-2xl border border-border/40 shadow-card hover:shadow-hover hover:border-purple/20 transition-all duration-300 active:scale-[0.97]"
         onClick={handleClick}
         onMouseDown={handleLongPressStart}
         onMouseUp={handleLongPressEnd}
@@ -76,40 +76,44 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
             <img
               src={restaurant.logo_url}
               alt={restaurant.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full bg-secondary flex items-center justify-center">
-              <ChefHat className="h-6 w-6 text-muted-foreground/30" strokeWidth={1.5} />
+            <div className="w-full h-full bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center">
+              <ChefHat className="h-8 w-8 text-muted-foreground/20" strokeWidth={1.5} />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
           
-          {/* Open indicator */}
+          {/* Open indicator - Premium style */}
           {restaurant.is_open && (
-            <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 bg-card/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full text-[8px]">
-              <span className="w-1 h-1 bg-green-500 rounded-full" />
+            <div className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 backdrop-blur-md px-2 py-1 rounded-full text-[9px] shadow-sm border border-border/30">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
               <span className="text-foreground font-medium">Open</span>
             </div>
           )}
+          
+          {/* Rating overlay */}
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 backdrop-blur-md px-2 py-1 rounded-full shadow-sm border border-border/30">
+            <Star className="h-3 w-3 fill-purple text-purple" strokeWidth={1.5} />
+            <span className="text-[10px] font-bold text-foreground">4.8</span>
+          </div>
         </div>
         
-        <CardContent className="p-2">
-          <h3 className="font-semibold text-[13px] mb-1 line-clamp-1 text-foreground tracking-tight">{restaurant.name}</h3>
+        <CardContent className="p-3">
+          <h3 className="font-bold text-[14px] mb-1 line-clamp-1 text-foreground tracking-tight group-hover:text-purple transition-colors">{restaurant.name}</h3>
           
-          <div className="flex items-center justify-between text-[10px] text-muted-foreground/70 mb-1.5">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3 text-purple/70" strokeWidth={1.5} />
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-2">
+            <div className="flex items-center gap-0.5">
+              <MapPin className="h-3 w-3 text-purple/60" strokeWidth={1.5} />
               <span>2.4 km</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-purple/80 text-purple/80" strokeWidth={1.5} />
-              <span className="font-medium text-foreground">4.8</span>
-            </div>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="text-purple/70 font-medium">££</span>
           </div>
           
-          <Badge className="text-[9px] bg-secondary/40 text-muted-foreground/70 border-0 rounded-full px-2 py-0.5">
+          <Badge className="text-[9px] bg-purple/10 text-purple border-purple/20 rounded-full px-2 py-0.5 font-medium">
             {getCuisineTag(restaurant.cuisine_type)}
           </Badge>
         </CardContent>
