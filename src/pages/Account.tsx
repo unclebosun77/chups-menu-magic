@@ -8,6 +8,7 @@ import { Settings, Bell, Heart, HelpCircle, LogOut, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import TasteProfileCard from "@/components/TasteProfileCard";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
+import LocationPreferencesCard from "@/components/LocationPreferencesCard";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -90,6 +91,9 @@ const Account = () => {
           </div>
         </CardHeader>
       </Card>
+
+      {/* Location Preferences Section */}
+      <LocationPreferencesCard className="animate-slide-up" />
 
       {/* Taste Profile Section */}
       <TasteProfileCard 

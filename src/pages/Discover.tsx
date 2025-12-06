@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Star, Clock, Filter, User, Sparkles, X, TrendingUp } from "lucide-react";
+import { Search, MapPin, Star, Clock, User, Sparkles, X, TrendingUp, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTasteProfile } from "@/context/TasteProfileContext";
+import { useLocation } from "@/context/LocationContext";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
+import RegionFilter from "@/components/RegionFilter";
+import { enrichWithLocation } from "@/utils/mockLocations";
+import { rankNearbyOptions } from "@/utils/nearbyEngine";
 
 type Restaurant = {
   id: string;
@@ -23,12 +26,16 @@ type Restaurant = {
   average_rating?: number;
   review_count?: number;
   matchScore?: number;
+  latitude?: number;
+  longitude?: number;
+  region?: string;
+  distanceText?: string;
 };
 
 const filterChips = [
   { id: "all", label: "All", icon: null },
   { id: "open", label: "Open Now", icon: Clock },
-  { id: "nearby", label: "Near Me", icon: MapPin },
+  { id: "nearby", label: "Near Me", icon: Navigation },
   { id: "top-rated", label: "Top Rated", icon: Star },
   { id: "trending", label: "Trending", icon: TrendingUp },
 ];
@@ -37,21 +44,19 @@ const Discover = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { profile, isComplete } = useTasteProfile();
+  const { userLocation, sortByDistance, filterByRegion, getDistanceText, currentRegion } = useLocation();
+  
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTasteDialog, setShowTasteDialog] = useState(false);
 
   useEffect(() => {
     loadRestaurants();
   }, []);
-
-  useEffect(() => {
-    filterRestaurants();
-  }, [searchQuery, activeFilter, cuisineFilter, restaurants]);
 
   const loadRestaurants = async () => {
     try {
@@ -73,8 +78,11 @@ const Discover = () => {
             ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
             : 0;
 
+          // Enrich with location data
+          const enriched = enrichWithLocation(restaurant);
+
           return {
-            ...restaurant,
+            ...enriched,
             average_rating: avgRating,
             review_count: reviews?.length || 0,
           };
@@ -93,19 +101,30 @@ const Discover = () => {
     }
   };
 
-  const filterRestaurants = () => {
+  // Filter and sort restaurants
+  const filteredRestaurants = useMemo(() => {
     let filtered = [...restaurants];
 
-    // Calculate match scores if profile exists
-    if (profile) {
-      filtered = filtered.map((r) => {
-        let score = 50; // Base score
-        if (profile.cuisines.includes(r.cuisine_type)) score += 30;
-        if (r.is_open) score += 10;
-        if (r.average_rating && r.average_rating >= 4) score += 10;
-        return { ...r, matchScore: Math.min(score, 100) };
+    // Apply region filter
+    if (selectedRegion) {
+      filtered = filterByRegion(filtered, selectedRegion);
+    }
+
+    // Calculate match scores using nearby engine for better ranking
+    if (profile || activeFilter === "nearby") {
+      const ranked = rankNearbyOptions(filtered, userLocation, profile, {
+        tasteWeight: activeFilter === "nearby" ? 0.3 : 0.7,
+        distanceWeight: activeFilter === "nearby" ? 0.7 : 0.3,
       });
-      filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+      
+      filtered = ranked.map(r => {
+        const original = filtered.find(o => o.id === r.id);
+        return {
+          ...original!,
+          matchScore: r.combinedScore,
+          distanceText: r.distanceText,
+        };
+      });
     }
 
     // Search filter
@@ -116,7 +135,8 @@ const Discover = () => {
           r.name.toLowerCase().includes(query) ||
           r.cuisine_type.toLowerCase().includes(query) ||
           r.description?.toLowerCase().includes(query) ||
-          r.city?.toLowerCase().includes(query)
+          r.city?.toLowerCase().includes(query) ||
+          r.region?.toLowerCase().includes(query)
       );
     }
 
@@ -126,6 +146,8 @@ const Discover = () => {
     } else if (activeFilter === "top-rated") {
       filtered = filtered.filter((r) => (r.average_rating || 0) >= 4);
       filtered.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
+    } else if (activeFilter === "nearby") {
+      filtered = sortByDistance(filtered);
     }
 
     // Cuisine filter
@@ -133,10 +155,22 @@ const Discover = () => {
       filtered = filtered.filter((r) => r.cuisine_type === cuisineFilter);
     }
 
-    setFilteredRestaurants(filtered);
-  };
+    return filtered;
+  }, [restaurants, searchQuery, activeFilter, cuisineFilter, selectedRegion, profile, userLocation, sortByDistance, filterByRegion]);
 
   const cuisineTypes = Array.from(new Set(restaurants.map((r) => r.cuisine_type)));
+
+  // Count restaurants per region
+  const regionCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: restaurants.length };
+    restaurants.forEach(r => {
+      const enriched = enrichWithLocation(r);
+      if (enriched.region) {
+        counts[enriched.region] = (counts[enriched.region] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [restaurants]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-24">
@@ -147,7 +181,10 @@ const Discover = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="animate-slide-up">
               <h1 className="text-2xl font-bold text-foreground tracking-tight">Discover</h1>
-              <p className="text-xs text-muted-foreground/70 mt-0.5">Find your perfect spot</p>
+              <p className="text-xs text-muted-foreground/70 mt-0.5 flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {currentRegion}
+              </p>
             </div>
             <Button 
               variant={isComplete ? "outline" : "default"} 
@@ -164,7 +201,7 @@ const Discover = () => {
           <div className="relative animate-slide-up" style={{ animationDelay: '100ms' }}>
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <Input
-              placeholder="Search restaurants, cuisines..."
+              placeholder="Search restaurants, cuisines, areas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-11 pr-10 h-12 rounded-2xl border-border/50 bg-secondary/30 focus:bg-card focus:border-purple/30 transition-all"
@@ -179,8 +216,18 @@ const Discover = () => {
             )}
           </div>
 
+          {/* Region Filter - NEW */}
+          <div className="mt-4 animate-slide-up" style={{ animationDelay: '150ms' }}>
+            <RegionFilter
+              selectedRegion={selectedRegion || "All"}
+              onRegionChange={setSelectedRegion}
+              showCounts
+              counts={regionCounts}
+            />
+          </div>
+
           {/* Filter Chips */}
-          <div className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
             {filterChips.map((chip, index) => {
               const Icon = chip.icon;
               const isActive = activeFilter === chip.id;
@@ -205,7 +252,7 @@ const Discover = () => {
           {/* Cuisine Chips */}
           {cuisineTypes.length > 0 && (
             <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
-              {cuisineTypes.map((cuisine, index) => (
+              {cuisineTypes.map((cuisine) => (
                 <button
                   key={cuisine}
                   onClick={() => setCuisineFilter(cuisineFilter === cuisine ? null : cuisine)}
@@ -234,7 +281,9 @@ const Discover = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Outa's picks for you</p>
-                <p className="text-xs text-muted-foreground/70">Based on your taste profile</p>
+                <p className="text-xs text-muted-foreground/70">
+                  {filteredRestaurants.length} spots {selectedRegion ? `in ${selectedRegion}` : `near ${currentRegion}`}
+                </p>
               </div>
             </div>
           </div>
@@ -252,7 +301,9 @@ const Discover = () => {
               <MapPin className="h-8 w-8 text-muted-foreground/30" />
             </div>
             <p className="text-foreground font-medium mb-1">No restaurants found</p>
-            <p className="text-sm text-muted-foreground/60">Try adjusting your filters</p>
+            <p className="text-sm text-muted-foreground/60">
+              {selectedRegion ? `No spots in ${selectedRegion} yet` : 'Try adjusting your filters'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">

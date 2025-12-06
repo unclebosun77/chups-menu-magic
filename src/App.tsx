@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TasteProfileProvider } from "@/context/TasteProfileContext";
 import { UserBehaviorProvider } from "@/context/UserBehaviorContext";
 import { SearchProvider } from "@/context/SearchContext";
+import { LocationProvider } from "@/context/LocationContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -36,37 +37,39 @@ const App = () => (
       <TasteProfileProvider>
         <UserBehaviorProvider>
           <SearchProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-        <Routes>
-          {/* Main app routes with bottom nav */}
-          <Route path="/" element={<Layout><Index /></Layout>} />
-          <Route path="/services" element={<Layout><Services /></Layout>} />
-          <Route path="/bookings" element={<MyBookings />} />
-          <Route path="/activity" element={<Layout><Activity /></Layout>} />
-          <Route path="/account" element={<Layout><Account /></Layout>} />
-          
-          {/* Full screen routes without bottom nav */}
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/catering" element={<Catering />} />
-          <Route path="/rewards" element={<Rewards />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/ai-assistant" element={<AIAssistant />} />
-          <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/order-summary" element={<OrderSummary />} />
-          <Route path="/ai-chat" element={<AIOrderChat />} />
-          <Route path="/outa-intelligence" element={<OutaIntelligence />} />
-          <Route path="/curated-experiences" element={<CuratedExperiences />} />
-          <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
-          <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-          <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-          </BrowserRouter>
+            <LocationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Main app routes with bottom nav */}
+                  <Route path="/" element={<Layout><Index /></Layout>} />
+                  <Route path="/services" element={<Layout><Services /></Layout>} />
+                  <Route path="/bookings" element={<MyBookings />} />
+                  <Route path="/activity" element={<Layout><Activity /></Layout>} />
+                  <Route path="/account" element={<Layout><Account /></Layout>} />
+                  
+                  {/* Full screen routes without bottom nav */}
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/catering" element={<Catering />} />
+                  <Route path="/rewards" element={<Rewards />} />
+                  <Route path="/discover" element={<Discover />} />
+                  <Route path="/ai-assistant" element={<AIAssistant />} />
+                  <Route path="/my-orders" element={<MyOrders />} />
+                  <Route path="/order-success" element={<OrderSuccess />} />
+                  <Route path="/order-summary" element={<OrderSummary />} />
+                  <Route path="/ai-chat" element={<AIOrderChat />} />
+                  <Route path="/outa-intelligence" element={<OutaIntelligence />} />
+                  <Route path="/curated-experiences" element={<CuratedExperiences />} />
+                  <Route path="/restaurant/onboarding" element={<RestaurantOnboarding />} />
+                  <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
+                  <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
+                  
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </LocationProvider>
           </SearchProvider>
         </UserBehaviorProvider>
       </TasteProfileProvider>
