@@ -70,6 +70,11 @@ const TasteProfileDialog = ({ open, onOpenChange }: TasteProfileDialogProps) => 
       cuisines: selectedCuisines,
       pricePreference,
       proteins: selectedProteins,
+      // Preserve existing data or initialize new
+      savedRestaurants: profile?.savedRestaurants || [],
+      visitedRestaurants: profile?.visitedRestaurants || [],
+      preferredVibes: profile?.preferredVibes || [],
+      lastInteraction: new Date().toISOString(),
     };
 
     setProfile(newProfile);

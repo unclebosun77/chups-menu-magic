@@ -1,11 +1,15 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChefHat, MapPin, Star, Sparkles } from "lucide-react";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
+import { useTasteProfile } from "@/context/TasteProfileContext";
 import { vibrate } from "@/utils/haptics";
 import QuickActionsSheet from "@/components/restaurant/QuickActionsSheet";
+import { generateRestaurantTags, getHeroTag } from "@/utils/aiTagging";
+import { calculateTasteMatchScore } from "@/utils/outaSuggestEngine";
+import TasteMatchBadge from "@/components/TasteMatchBadge";
 
 type Restaurant = {
   id: string;
@@ -18,12 +22,16 @@ type Restaurant = {
   longitude?: number | null;
   matchScore?: number;
   aiReason?: string;
+  priceLevel?: string;
+  ambience?: string[];
+  signatureDishes?: string[];
 };
 
 interface PremiumRestaurantCardProps {
   restaurant: Restaurant;
   variant?: "compact" | "featured" | "grid";
   index?: number;
+  showAiTags?: boolean;
 }
 
 const getCuisineTag = (cuisineType: string) => {
@@ -33,12 +41,46 @@ const getCuisineTag = (cuisineType: string) => {
   return cuisineType;
 };
 
-const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0 }: PremiumRestaurantCardProps) => {
+const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0, showAiTags = true }: PremiumRestaurantCardProps) => {
   const navigate = useNavigate();
   const { addRestaurantVisit } = useUserBehavior();
+  const { profile, updateTasteFromInteraction } = useTasteProfile();
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // AI-driven tags and match score
+  const aiTags = useMemo(() => {
+    if (!showAiTags) return [];
+    return generateRestaurantTags({
+      name: restaurant.name,
+      cuisine: restaurant.cuisine_type,
+      description: restaurant.description || undefined,
+      priceLevel: restaurant.priceLevel,
+      ambience: restaurant.ambience,
+      signatureDishes: restaurant.signatureDishes,
+      isOpen: restaurant.is_open,
+    });
+  }, [restaurant, showAiTags]);
+
+  const heroTag = useMemo(() => getHeroTag({
+    name: restaurant.name,
+    cuisine: restaurant.cuisine_type,
+    description: restaurant.description || undefined,
+    priceLevel: restaurant.priceLevel,
+    ambience: restaurant.ambience,
+  }), [restaurant]);
+
+  const dynamicMatchScore = useMemo(() => {
+    if (restaurant.matchScore) return restaurant.matchScore;
+    return calculateTasteMatchScore({
+      id: restaurant.id,
+      name: restaurant.name,
+      cuisine: restaurant.cuisine_type,
+      priceLevel: restaurant.priceLevel,
+      ambience: restaurant.ambience,
+    }, profile);
+  }, [restaurant, profile]);
 
   const handleClick = useCallback(() => {
     addRestaurantVisit({ 
@@ -46,8 +88,16 @@ const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0 }: P
       name: restaurant.name, 
       cuisine: restaurant.cuisine_type 
     });
+    // Update taste profile from interaction
+    updateTasteFromInteraction({
+      id: restaurant.id,
+      name: restaurant.name,
+      cuisine: restaurant.cuisine_type,
+      priceLevel: restaurant.priceLevel,
+      ambience: restaurant.ambience,
+    }, 'view');
     navigate(`/restaurant/${restaurant.id}`);
-  }, [navigate, restaurant, addRestaurantVisit]);
+  }, [navigate, restaurant, addRestaurantVisit, updateTasteFromInteraction]);
 
   const handleLongPressStart = useCallback(() => {
     const timer = setTimeout(() => {
@@ -111,12 +161,13 @@ const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0 }: P
           {/* Premium gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           
-          {/* Match score badge (if available) */}
-          {restaurant.matchScore && restaurant.matchScore > 70 && (
-            <div className="absolute top-2 right-2 bg-purple/90 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 shadow-neon">
-              <Sparkles className="h-3 w-3" />
-              <span>{restaurant.matchScore}%</span>
-            </div>
+          {/* Match score badge - using dynamic score */}
+          {dynamicMatchScore > 70 && (
+            <TasteMatchBadge 
+              score={dynamicMatchScore} 
+              variant="compact" 
+              className="absolute top-2 right-2 shadow-lg"
+            />
           )}
           
           {/* Open indicator */}
@@ -156,10 +207,16 @@ const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0 }: P
             </div>
           </div>
           
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Badge className="text-[10px] bg-secondary/60 text-muted-foreground border-0 rounded-full px-2.5 py-0.5 chip-animate">
               {getCuisineTag(restaurant.cuisine_type)}
             </Badge>
+            {/* AI Hero Tag */}
+            {showAiTags && heroTag && (
+              <Badge className="text-[9px] bg-purple/15 text-purple border-purple/20 rounded-full px-2 py-0.5 chip-animate animate-fade-in">
+                {heroTag.label}
+              </Badge>
+            )}
             {variant === "grid" && restaurant.description && (
               <p className="text-xs text-muted-foreground/60 line-clamp-1 flex-1">
                 {restaurant.description}
