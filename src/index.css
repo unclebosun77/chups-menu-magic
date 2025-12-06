@@ -62,12 +62,16 @@ html {
     --gradient-hero: linear-gradient(180deg, hsl(270 100% 60% / 0.08) 0%, hsl(270 20% 98%) 100%);
     --gradient-purple-glow: linear-gradient(135deg, hsl(270 100% 60% / 0.1), hsl(270 100% 60% / 0.03));
     --gradient-neon: linear-gradient(135deg, hsl(270 100% 60%), hsl(330 100% 60%));
+    --gradient-premium: linear-gradient(180deg, hsl(260 20% 8%) 0%, hsl(270 40% 12%) 50%, hsl(260 20% 8%) 100%);
+    --gradient-premium-card: linear-gradient(145deg, hsl(260 30% 15%) 0%, hsl(270 25% 10%) 100%);
+    --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(270 100% 60% / 0.1) 50%, transparent 100%);
     --shadow-soft: 0 2px 8px -2px hsl(270 30% 50% / 0.06);
     --shadow-hover: 0 6px 20px -4px hsl(270 100% 60% / 0.12);
     --shadow-glow: 0 0 12px hsl(270 100% 60% / 0.15), 0 0 24px hsl(330 100% 60% / 0.06);
     --shadow-neon: 0 0 10px hsl(270 100% 60% / 0.18);
     --shadow-card: 0 2px 12px -2px hsl(270 30% 50% / 0.06);
     --shadow-pill: 0 1px 4px hsl(270 30% 50% / 0.08);
+    --shadow-premium: 0 8px 32px -8px hsl(270 100% 20% / 0.3), 0 4px 16px -4px hsl(270 100% 60% / 0.1);
   }
 
   .dark {
@@ -139,6 +143,14 @@ html {
     background: var(--gradient-neon);
   }
   
+  .bg-gradient-premium {
+    background: var(--gradient-premium);
+  }
+  
+  .bg-gradient-premium-card {
+    background: var(--gradient-premium-card);
+  }
+  
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
@@ -153,6 +165,10 @@ html {
   
   .shadow-pill {
     box-shadow: var(--shadow-pill);
+  }
+  
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
   }
   
   .text-gradient-neon {
@@ -289,5 +305,112 @@ html {
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Premium Animations */
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  .animate-stagger-fade {
+    animation: staggerFade 0.5s ease-out forwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes staggerFade {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes shimmerSlide {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .shimmer-loading {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, hsl(270 100% 60% / 0.08) 50%, transparent 100%);
+    animation: shimmerSlide 1.5s infinite;
+  }
+
+  /* Image fade-in on load */
+  .img-fade-in {
+    animation: imgFadeIn 0.4s ease-out forwards;
+  }
+
+  @keyframes imgFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(1.02);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Card hover lift */
+  .card-hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Chip animation */
+  .chip-animate {
+    transition: all 0.2s ease-out;
+  }
+
+  .chip-animate:hover {
+    transform: scale(1.05);
+  }
+
+  .chip-animate:active {
+    transform: scale(0.95);
   }
 }
