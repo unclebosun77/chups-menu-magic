@@ -11,6 +11,7 @@ import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 import YourNextSpotSection from "@/components/home/YourNextSpotSection";
 import NearbyRestaurantsRow from "@/components/NearbyRestaurantsRow";
+import FloatingAIButton from "@/components/FloatingAIButton";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
 import { useLocation } from "@/context/LocationContext";
@@ -176,6 +177,8 @@ const Index = () => {
         </section>
       </div>
 
+      {/* Floating AI Chat Button */}
+      <FloatingAIButton />
     </div>
   );
 };
