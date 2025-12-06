@@ -10,8 +10,10 @@ import SmartActionPills from "@/components/home/SmartActionPills";
 import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
 import ExploreDishesSection from "@/components/home/ExploreDishesSection";
 import YourNextSpotSection from "@/components/home/YourNextSpotSection";
+import NearbyRestaurantsRow from "@/components/NearbyRestaurantsRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
+import { useLocation } from "@/context/LocationContext";
 
 type Restaurant = {
   id: string;
@@ -26,6 +28,7 @@ type Restaurant = {
 
 const Index = () => {
   const navigate = useNavigate();
+  const { currentRegion } = useLocation();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -105,6 +108,11 @@ const Index = () => {
           <SmartActionPills />
         </section>
 
+        {/* Nearby Restaurants Section - NEW */}
+        <section className="mt-10 animate-slide-up" style={{ animationDelay: '250ms' }}>
+          <NearbyRestaurantsRow restaurants={restaurants} />
+        </section>
+
         {/* Discover Section - Premium Cards */}
         <section className="mt-10 animate-slide-up" style={{ animationDelay: '300ms' }}>
           <div className="flex items-center justify-between mb-5">
@@ -114,7 +122,7 @@ const Index = () => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-foreground tracking-tight">Discover</h2>
-                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Trending around you</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Trending in {currentRegion}</p>
               </div>
             </div>
             <Button 
