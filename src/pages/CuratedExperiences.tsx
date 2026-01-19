@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, Heart } from "lucide-react";
+import { useTasteProfile } from "@/context/TasteProfileContext";
+import { useUserBehavior } from "@/context/UserBehaviorContext";
+import { getRestaurantRouteForTheme, getCanonicalRestaurant, CANONICAL_IDS } from "@/data/canonicalRestaurants";
 
 import cosbyPasta from "@/assets/menu/cosby-truffle-tagliatelle.jpg";
 import cosbyBurrata from "@/assets/menu/cosby-burrata-tomato.jpg";
@@ -12,6 +15,7 @@ import proxCurry from "@/assets/menu/prox-green-curry.jpg";
 
 const categories = ['All', 'Romantic', 'Nightlife', 'Fine Dining', 'Groups', 'Budget'];
 
+// Collections reference canonical restaurant IDs
 const collections = [
   {
     id: 1,
@@ -20,6 +24,7 @@ const collections = [
     image: cosbyBurrata,
     category: 'Romantic',
     featured: true,
+    restaurantId: CANONICAL_IDS.COSBY,
   },
   {
     id: 2,
@@ -28,6 +33,7 @@ const collections = [
     image: yakoyoJollof,
     category: 'All',
     featured: true,
+    restaurantId: CANONICAL_IDS.YAKOYO,
   },
   {
     id: 3,
@@ -35,6 +41,7 @@ const collections = [
     subtitle: 'Elevated experiences',
     image: cosbyPasta,
     category: 'Fine Dining',
+    restaurantId: CANONICAL_IDS.COSBY,
   },
   {
     id: 4,
@@ -42,6 +49,7 @@ const collections = [
     subtitle: 'Perfect for crowds',
     image: yakoyoSuya,
     category: 'Groups',
+    restaurantId: CANONICAL_IDS.YAKOYO,
   },
   {
     id: 5,
@@ -49,6 +57,7 @@ const collections = [
     subtitle: 'Local secrets',
     image: proxPadThai,
     category: 'All',
+    restaurantId: CANONICAL_IDS.PROX,
   },
   {
     id: 6,
@@ -56,11 +65,14 @@ const collections = [
     subtitle: 'Great value spots',
     image: proxCurry,
     category: 'Budget',
+    restaurantId: CANONICAL_IDS.PROX,
   },
 ];
 
 const CuratedExperiences = () => {
   const navigate = useNavigate();
+  const { profile } = useTasteProfile();
+  const { addRestaurantVisit } = useUserBehavior();
   const [activeFilter, setActiveFilter] = useState('All');
 
   const filteredCollections = activeFilter === 'All' 
@@ -69,6 +81,28 @@ const CuratedExperiences = () => {
 
   const featuredCollections = filteredCollections.filter(c => c.featured);
   const regularCollections = filteredCollections.filter(c => !c.featured);
+
+  // Handle navigation to canonical restaurant profile
+  const handleCollectionClick = (collection: typeof collections[0]) => {
+    const restaurant = getCanonicalRestaurant(collection.restaurantId);
+    if (restaurant) {
+      // Log activity for user behavior tracking
+      addRestaurantVisit({
+        id: restaurant.id,
+        name: restaurant.name,
+        cuisine: restaurant.cuisine,
+      });
+    }
+    navigate(`/restaurant/${collection.restaurantId}`);
+  };
+
+  // Personalized subtitle based on taste profile
+  const getPersonalizedSubtitle = () => {
+    if (profile?.cuisines && profile.cuisines.length > 0) {
+      return `Handpicked for your love of ${profile.cuisines[0]}`;
+    }
+    return "Handpicked experiences for every mood";
+  };
 
   return (
     <Layout>
@@ -93,7 +127,7 @@ const CuratedExperiences = () => {
             Collections
           </h1>
           <p className="text-muted-foreground text-sm">
-            Handpicked experiences for every mood
+            {getPersonalizedSubtitle()}
           </p>
         </div>
 
@@ -124,7 +158,11 @@ const CuratedExperiences = () => {
             </h3>
             <div className="space-y-4">
               {featuredCollections.map((collection) => (
-                <FeaturedCard key={collection.id} collection={collection} />
+                <FeaturedCard 
+                  key={collection.id} 
+                  collection={collection}
+                  onClick={() => handleCollectionClick(collection)}
+                />
               ))}
             </div>
           </div>
@@ -138,7 +176,11 @@ const CuratedExperiences = () => {
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {regularCollections.map((collection) => (
-                <CollectionCard key={collection.id} collection={collection} />
+                <CollectionCard 
+                  key={collection.id} 
+                  collection={collection}
+                  onClick={() => handleCollectionClick(collection)}
+                />
               ))}
             </div>
           </div>
@@ -148,25 +190,17 @@ const CuratedExperiences = () => {
   );
 };
 
-const FeaturedCard = ({ collection }: { collection: typeof collections[0] }) => {
-  const navigate = useNavigate();
-  
-  // Map collection titles to specific restaurant IDs for direct navigation
-  const getRestaurantRoute = (title: string): string => {
-    const restaurantMap: Record<string, string> = {
-      'Date Night': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
-      'Fine Dining': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
-      'Trending Now': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
-      'Group Friendly': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
-      'Hidden Gems': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
-      'Budget Bites': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
-    };
-    return restaurantMap[title] || '/discover';
-  };
+interface CardProps {
+  collection: typeof collections[0];
+  onClick: () => void;
+}
+
+const FeaturedCard = ({ collection, onClick }: CardProps) => {
+  const restaurant = getCanonicalRestaurant(collection.restaurantId);
   
   return (
     <button 
-      onClick={() => navigate(getRestaurantRoute(collection.title))}
+      onClick={onClick}
       className="w-full relative h-48 rounded-3xl overflow-hidden group transition-transform hover:scale-[1.01] active:scale-[0.99]"
     >
       <img 
@@ -178,6 +212,11 @@ const FeaturedCard = ({ collection }: { collection: typeof collections[0] }) => 
       <div className="absolute bottom-0 left-0 right-0 p-5">
         <h3 className="text-xl font-bold text-white mb-1">{collection.title}</h3>
         <p className="text-white/70 text-sm">{collection.subtitle}</p>
+        {restaurant && (
+          <p className="text-white/50 text-xs mt-1">
+            featuring {restaurant.name}
+          </p>
+        )}
       </div>
       <div className="absolute top-4 left-4">
         <span className="px-3 py-1 rounded-full bg-purple/90 backdrop-blur-sm text-white text-xs font-medium">
@@ -188,25 +227,12 @@ const FeaturedCard = ({ collection }: { collection: typeof collections[0] }) => 
   );
 };
 
-const CollectionCard = ({ collection }: { collection: typeof collections[0] }) => {
-  const navigate = useNavigate();
-  
-  // Map collection titles to specific restaurant IDs for direct navigation
-  const getRestaurantRoute = (title: string): string => {
-    const restaurantMap: Record<string, string> = {
-      'Date Night': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
-      'Fine Dining': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
-      'Trending Now': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
-      'Group Friendly': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
-      'Hidden Gems': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
-      'Budget Bites': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
-    };
-    return restaurantMap[title] || '/discover';
-  };
+const CollectionCard = ({ collection, onClick }: CardProps) => {
+  const restaurant = getCanonicalRestaurant(collection.restaurantId);
   
   return (
     <button 
-      onClick={() => navigate(getRestaurantRoute(collection.title))}
+      onClick={onClick}
       className="relative aspect-[4/5] rounded-2xl overflow-hidden group transition-transform hover:scale-[1.02] active:scale-[0.98]"
     >
       <img 
@@ -218,6 +244,9 @@ const CollectionCard = ({ collection }: { collection: typeof collections[0] }) =
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <h4 className="font-semibold text-white text-sm mb-0.5">{collection.title}</h4>
         <p className="text-white/60 text-xs">{collection.subtitle}</p>
+        {restaurant && (
+          <p className="text-white/40 text-[10px] mt-1">{restaurant.name}</p>
+        )}
       </div>
     </button>
   );

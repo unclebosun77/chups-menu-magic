@@ -9,7 +9,8 @@ import ChatInput from '@/components/chat/ChatInput';
 import { ChatMessage, getInitialMessage, generateMessageId } from '@/utils/chatEngine';
 import { useTasteProfile } from '@/context/TasteProfileContext';
 import { useLocation } from '@/context/LocationContext';
-import { personalizedRestaurants } from '@/data/personalizedRestaurants';
+import { useUserBehavior } from '@/context/UserBehaviorContext';
+import { getAllCanonicalRestaurants, getCanonicalRestaurant } from '@/data/canonicalRestaurants';
 import { enrichWithLocation } from '@/utils/mockLocations';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
@@ -18,12 +19,13 @@ const OutaChat = () => {
   const navigate = useNavigate();
   const { profile } = useTasteProfile();
   const { userLocation } = useLocation();
+  const { behavior, addRestaurantVisit, addSearch } = useUserBehavior();
   const scrollRef = useRef<HTMLDivElement>(null);
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Initialize with greeting
+  // Initialize with personalized greeting based on user profile and behavior
   useEffect(() => {
     const initialMessage = getInitialMessage(profile);
     setMessages([initialMessage]);
@@ -36,11 +38,28 @@ const OutaChat = () => {
     }
   }, [messages, isTyping]);
 
-  // Get enriched restaurants for context
-  const restaurants = personalizedRestaurants.map(r => enrichWithLocation({
+  // Get canonical restaurants enriched with location data
+  const restaurants = getAllCanonicalRestaurants().map(r => enrichWithLocation({
     ...r,
-    cuisine: r.cuisine || (r as any).cuisine_type,
+    cuisine: r.cuisine,
   }));
+
+  // Build context from user profile and behavior
+  const buildUserContext = () => {
+    const preferredCuisines = profile?.cuisines?.join(', ') || behavior.preferredCuisines.join(', ') || 'no preferences set';
+    const recentRestaurants = behavior.visitedRestaurants.slice(0, 3).map(r => r.name).join(', ');
+    const recentSearches = behavior.recentSearches.slice(0, 3).join(', ');
+    
+    return {
+      location: userLocation ? 'Birmingham city centre' : 'Birmingham city centre',
+      cuisines: preferredCuisines,
+      spiceLevel: profile?.spiceLevel || 'medium',
+      pricePreference: profile?.pricePreference || 'mid',
+      recentRestaurants: recentRestaurants || 'none yet',
+      recentSearches: recentSearches || 'none yet',
+      likesSpicy: behavior.likesSpicy,
+    };
+  };
 
   const streamAIResponse = async (userMessageContent: string, allMessages: ChatMessage[]) => {
     // Build conversation history for the AI
@@ -51,12 +70,19 @@ const OutaChat = () => {
         content: m.content,
       }));
 
+    // Build rich context from user profile and behavior
+    const userContext = buildUserContext();
+
     // Add context about user preferences and nearby restaurants
     const contextMessage = `
 User context:
-- Location: ${userLocation ? 'Birmingham city centre' : 'Birmingham city centre'}
-- Taste preferences: ${profile?.cuisines?.join(', ') || 'no preferences set'}
-- Spice level: ${profile?.spiceLevel || 'medium'}
+- Location: ${userContext.location}
+- Taste preferences: ${userContext.cuisines}
+- Spice level: ${userContext.spiceLevel}
+- Price preference: ${userContext.pricePreference}
+- Recently visited: ${userContext.recentRestaurants}
+- Recent searches: ${userContext.recentSearches}
+${userContext.likesSpicy ? '- User enjoys spicy food' : ''}
 
 Available nearby restaurants: ${restaurants.slice(0, 5).map(r => 
   `${r.name} (${r.cuisine || 'varied'}, ${r.priceLevel || '££'}, ${r.distance || 'nearby'})`
@@ -179,7 +205,7 @@ User's message: ${userMessageContent}
     return actions.slice(0, 3);
   };
 
-  // Find mentioned restaurants
+  // Find mentioned restaurants from canonical data only
   const findMentionedRestaurants = (content: string, allRestaurants: any[]): any[] => {
     const lower = content.toLowerCase();
     return allRestaurants.filter(r => 
@@ -188,6 +214,9 @@ User's message: ${userMessageContent}
   };
 
   const handleSendMessage = useCallback(async (content: string) => {
+    // Log search for user behavior tracking
+    addSearch(content);
+
     // Add user message
     const userMessage: ChatMessage = {
       id: generateMessageId(),
@@ -230,15 +259,22 @@ User's message: ${userMessageContent}
           : m
       )
     );
-  }, [messages, profile, userLocation, restaurants]);
+  }, [messages, profile, userLocation, restaurants, addSearch]);
 
   const handleQuickAction = useCallback((action: string) => {
     handleSendMessage(action);
   }, [handleSendMessage]);
 
   const handleRestaurantClick = useCallback((restaurant: any) => {
+    // Log restaurant visit for activity tracking
+    addRestaurantVisit({
+      id: restaurant.id,
+      name: restaurant.name,
+      cuisine: restaurant.cuisine || 'varied',
+    });
+    // Navigate to canonical restaurant profile
     navigate(`/restaurant/${restaurant.id}`);
-  }, [navigate]);
+  }, [navigate, addRestaurantVisit]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 flex flex-col">
