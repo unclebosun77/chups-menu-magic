@@ -28,7 +28,7 @@ const Account = () => {
   const menuItems = [
     { icon: Settings, label: "Settings", subtitle: "App preferences", action: () => {} },
     { icon: Bell, label: "Notifications", subtitle: "Alerts & updates", action: () => {} },
-    { icon: Heart, label: "Favorites", subtitle: "Saved restaurants", action: () => navigate("/activity") },
+    { icon: Heart, label: "Favorites", subtitle: "Saved restaurants", action: () => navigate("/saved") },
     { icon: HelpCircle, label: "Help & Support", subtitle: "Get assistance", action: () => {} },
   ];
 

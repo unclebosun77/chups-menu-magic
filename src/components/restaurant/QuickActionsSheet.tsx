@@ -3,6 +3,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { vibrate } from "@/utils/haptics";
 import { toast } from "@/hooks/use-toast";
+import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
+import { useAuth } from "@/context/AuthContext";
 
 interface QuickActionsSheetProps {
   restaurant: {
@@ -16,19 +18,40 @@ interface QuickActionsSheetProps {
 
 const QuickActionsSheet = ({ restaurant, open, onOpenChange }: QuickActionsSheetProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isSaved, toggleSave } = useSavedRestaurants();
 
   if (!restaurant) return null;
+
+  const isRestaurantSaved = isSaved(restaurant.id);
+
+  const handleSave = async () => {
+    vibrate(20);
+    
+    if (!user) {
+      toast({ title: "Sign in to save", description: "Create an account to save restaurants" });
+      onOpenChange(false);
+      navigate("/auth");
+      return;
+    }
+
+    const result = await toggleSave(restaurant.id);
+    if (!result.error) {
+      toast({ 
+        title: isRestaurantSaved ? "Removed from favorites" : "Saved!", 
+        description: isRestaurantSaved ? `${restaurant.name} removed` : `${restaurant.name} added to your favorites` 
+      });
+    }
+    onOpenChange(false);
+  };
 
   const actions = [
     {
       icon: Heart,
-      label: "Save",
-      color: "text-red-500",
-      action: () => {
-        vibrate(20);
-        toast({ title: "Saved!", description: `${restaurant.name} added to your favorites` });
-        onOpenChange(false);
-      }
+      label: isRestaurantSaved ? "Unsave" : "Save",
+      color: isRestaurantSaved ? "text-red-500" : "text-muted-foreground",
+      filled: isRestaurantSaved,
+      action: handleSave
     },
     {
       icon: Share2,
@@ -92,7 +115,7 @@ const QuickActionsSheet = ({ restaurant, open, onOpenChange }: QuickActionsSheet
               className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-secondary/50 transition-colors"
             >
               <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
-                <action.icon className={`h-5 w-5 ${action.color}`} />
+                <action.icon className={`h-5 w-5 ${action.color} ${action.filled ? 'fill-current' : ''}`} />
               </div>
               <span className="text-xs font-medium text-muted-foreground">{action.label}</span>
             </button>

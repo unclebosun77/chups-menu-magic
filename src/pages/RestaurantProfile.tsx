@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
 import { MenuSection } from "@/components/restaurant/menu";
 import { vibrate } from "@/utils/haptics";
 import { getSupabaseId } from "@/utils/restaurantMapping";
+import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
@@ -22,15 +24,22 @@ const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isSaved: checkIsSaved, toggleSave } = useSavedRestaurants();
   
   const [order, setOrder] = useState<OrderItem[]>([]);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [showAskOuta, setShowAskOuta] = useState(false);
   const [showFullGallery, setShowFullGallery] = useState(false);
   const [restaurant, setRestaurant] = useState<DemoRestaurant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Get the normalized Supabase ID
+  const supabaseId = restaurantId ? getSupabaseId(restaurantId) : "";
+  
+  // Check if this restaurant is saved
+  const isFavorite = checkIsSaved(supabaseId);
 
   // Load restaurant data
   useEffect(() => {
@@ -156,16 +165,23 @@ const RestaurantProfile = () => {
     });
   };
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      toast({ title: "Sign in to save restaurants", description: "Create an account to save your favorites" });
+      navigate("/auth");
+      return;
+    }
+    
     vibrate(20);
-    setIsFavorite(!isFavorite);
-    toast({ title: isFavorite ? "Removed from favorites" : "Added to favorites ❤️" });
-  };
-
-  const handleToggleSaved = () => {
-    vibrate(20);
-    setIsSaved(!isSaved);
-    toast({ title: isSaved ? "Removed from saved" : "Saved for later 📌" });
+    setIsSaving(true);
+    const result = await toggleSave(supabaseId);
+    setIsSaving(false);
+    
+    if (result.error) {
+      toast({ title: "Error", description: result.error, variant: "destructive" });
+    } else {
+      toast({ title: isFavorite ? "Removed from favorites" : "Added to favorites ❤️" });
+    }
   };
 
   const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
@@ -197,16 +213,7 @@ const RestaurantProfile = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${
-                isSaved ? 'bg-purple/20 text-purple border-purple/30' : 'bg-background/85 hover:bg-background'
-              }`}
-              onClick={handleToggleSaved}
-            >
-              <Bookmark className={`h-5 w-5 transition-all ${isSaved ? 'fill-current scale-110' : ''}`} strokeWidth={1.5} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
+              disabled={isSaving}
               className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${
                 isFavorite ? 'bg-red-50 text-red-500 border-red-200' : 'bg-background/85 hover:bg-background'
               }`}
