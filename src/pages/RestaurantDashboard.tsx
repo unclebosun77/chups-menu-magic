@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import MenuItemForm from "@/components/MenuItemForm";
 import MenuItemCard from "@/components/MenuItemCard";
 import RestaurantProfileEdit from "@/components/RestaurantProfileEdit";
+import OrderManagement from "@/components/dashboard/OrderManagement";
 
 type Restaurant = {
   id: string;
@@ -245,6 +246,12 @@ const RestaurantDashboard = () => {
       />
 
       <main className="container mx-auto px-4 py-8">
+        {/* Order Management Section */}
+        <OrderManagement 
+          orders={orders} 
+          onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)} 
+        />
+
         {/* Insights Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">Insights</h2>
