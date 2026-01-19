@@ -5,13 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  Settings, Bell, Heart, HelpCircle, LogOut, User, 
-  ChevronRight, Sparkles, Crown, ArrowLeft 
+  LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import TasteProfileCard from "@/components/TasteProfileCard";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import LocationPreferencesCard from "@/components/LocationPreferencesCard";
+import SavedRestaurantsPreview from "@/components/profile/SavedRestaurantsPreview";
+import ActivitySummaryCard from "@/components/profile/ActivitySummaryCard";
+import SettingsStubCard from "@/components/profile/SettingsStubCard";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -25,13 +27,6 @@ const Account = () => {
     navigate("/");
   };
 
-  const menuItems = [
-    { icon: Settings, label: "Settings", subtitle: "App preferences", action: () => {} },
-    { icon: Bell, label: "Notifications", subtitle: "Alerts & updates", action: () => {} },
-    { icon: Heart, label: "Favorites", subtitle: "Saved restaurants", action: () => navigate("/saved") },
-    { icon: HelpCircle, label: "Help & Support", subtitle: "Get assistance", action: () => {} },
-  ];
-
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
@@ -43,7 +38,7 @@ const Account = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Profile</h1>
-              <p className="text-xs text-muted-foreground">Manage your account</p>
+              <p className="text-xs text-muted-foreground">Your dining preferences</p>
             </div>
           </div>
         </div>
@@ -57,7 +52,7 @@ const Account = () => {
               </div>
               <h2 className="text-xl font-bold text-foreground mb-2">Welcome to Outa</h2>
               <p className="text-sm text-muted-foreground mb-6">
-                Sign in to access your profile and personalized features
+                Sign in to access your profile, saved restaurants, and personalized features
               </p>
               <Button 
                 onClick={() => navigate("/auth")} 
@@ -73,6 +68,9 @@ const Account = () => {
             onEditProfile={() => setShowTasteDialog(true)}
             className="animate-slide-up"
           />
+
+          {/* Saved Restaurants Preview */}
+          <SavedRestaurantsPreview className="animate-slide-up" />
         </div>
 
         <TasteProfileDialog 
@@ -97,7 +95,8 @@ const Account = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">Profile</h1>
+              <h1 className="text-xl font-bold text-foreground">Your Profile</h1>
+              <p className="text-xs text-muted-foreground">Your dining preferences</p>
             </div>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/15 to-neon-pink/10 flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-purple" />
@@ -139,48 +138,50 @@ const Account = () => {
           className="animate-slide-up"
         />
 
-        {/* Menu Items */}
-        <div className="space-y-2">
-          {menuItems.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <Card
-                key={item.label}
-                className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all animate-slide-up active:scale-[0.98]"
-                onClick={item.action}
-                style={{ animationDelay: `${(index + 2) * 50}ms` }}
-              >
-                <CardContent className="flex items-center gap-4 p-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-purple" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-foreground">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.subtitle}</p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Saved Restaurants Preview */}
+        <SavedRestaurantsPreview className="animate-slide-up" />
 
-          {/* Sign Out */}
-          <Card
-            className="glass-card cursor-pointer hover:shadow-lg border-destructive/10 hover:border-destructive/20 transition-all animate-slide-up active:scale-[0.98]"
-            onClick={handleSignOut}
-            style={{ animationDelay: '350ms' }}
-          >
-            <CardContent className="flex items-center gap-4 p-4">
-              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-                <LogOut className="h-5 w-5 text-destructive" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-destructive">Sign Out</p>
-                <p className="text-xs text-muted-foreground">Log out of your account</p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Activity Summary */}
+        <ActivitySummaryCard className="animate-slide-up" />
+
+        {/* Settings Stub */}
+        <div className="pt-2">
+          <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Settings</h3>
+          <SettingsStubCard />
         </div>
+
+        {/* Help & Support */}
+        <Card
+          className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all animate-slide-up active:scale-[0.98]"
+          onClick={() => {}}
+        >
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
+              <HelpCircle className="h-5 w-5 text-purple" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">Help & Support</p>
+              <p className="text-xs text-muted-foreground">Get assistance</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+          </CardContent>
+        </Card>
+
+        {/* Sign Out */}
+        <Card
+          className="glass-card cursor-pointer hover:shadow-lg border-destructive/10 hover:border-destructive/20 transition-all animate-slide-up active:scale-[0.98]"
+          onClick={handleSignOut}
+        >
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <LogOut className="h-5 w-5 text-destructive" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-destructive">Sign Out</p>
+              <p className="text-xs text-muted-foreground">Log out of your account</p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Version Info */}
         <div className="text-center py-4">
