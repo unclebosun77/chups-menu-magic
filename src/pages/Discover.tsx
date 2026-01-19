@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,17 +42,29 @@ const filterChips = [
 
 const Discover = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { profile, isComplete } = useTasteProfile();
   const { userLocation, sortByDistance, filterByRegion, getDistanceText, currentRegion } = useLocation();
   
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [activeFilter, setActiveFilter] = useState(searchParams.get("open") === "true" ? "open" : "all");
+  const [cuisineFilter, setCuisineFilter] = useState<string | null>(searchParams.get("cuisine"));
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTasteDialog, setShowTasteDialog] = useState(false);
+
+  // Sync URL params with state
+  useEffect(() => {
+    const q = searchParams.get("q");
+    const cuisine = searchParams.get("cuisine");
+    const open = searchParams.get("open");
+    
+    if (q) setSearchQuery(q);
+    if (cuisine) setCuisineFilter(cuisine);
+    if (open === "true") setActiveFilter("open");
+  }, [searchParams]);
 
   useEffect(() => {
     loadRestaurants();
