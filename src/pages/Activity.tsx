@@ -74,7 +74,7 @@ const Activity = () => {
     try {
       const allActivities: ActivityItem[] = [];
 
-      const { data: orders } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+      const { data: orders } = await supabase.from("orders").select("*").eq("user_id", userId).order("created_at", { ascending: false });
       orders?.forEach((order) => {
         allActivities.push({
           id: order.id,
