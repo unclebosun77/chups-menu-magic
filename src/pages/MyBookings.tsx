@@ -55,11 +55,15 @@ const MyBookings = () => {
   };
 
   const fetchBookings = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
+        .eq('user_id', user.id)
         .order('booking_date', { ascending: false });
 
       if (error) throw error;
