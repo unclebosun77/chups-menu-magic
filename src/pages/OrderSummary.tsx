@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Minus, Plus, Trash2, Rocket } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
@@ -21,14 +23,17 @@ const OrderSummary = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const { restaurantName, restaurantId, items: initialItems } = location.state || {};
   
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialItems || []);
-  const [customerName, setCustomerName] = useState("");
+  const [customerName, setCustomerName] = useState(user?.email?.split('@')[0] || "");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState(user?.email || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!restaurantName) {
+  if (!restaurantName || !restaurantId) {
     navigate("/");
     return null;
   }
@@ -51,7 +56,7 @@ const OrderSummary = () => {
   const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!customerName || !customerPhone) {
       toast({
         title: "Missing Information",
@@ -70,14 +75,52 @@ const OrderSummary = () => {
       return;
     }
 
-    // Navigate to success page
-    navigate("/order-success", {
-      state: {
-        restaurantName,
-        totalAmount,
-        itemCount: totalItems,
-      },
-    });
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.from("orders").insert({
+        restaurant_id: restaurantId,
+        user_id: user?.id || null,
+        customer_name: customerName,
+        customer_email: customerEmail || null,
+        customer_phone: customerPhone || null,
+        items: orderItems.map(item => ({ 
+          id: item.id, 
+          name: item.name, 
+          price: item.price, 
+          quantity: item.quantity 
+        })),
+        total: totalAmount,
+      }).select('id').single();
+
+      if (error) {
+        toast({ 
+          title: "Error placing order", 
+          description: error.message, 
+          variant: "destructive" 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Navigate to success page with order ID
+      navigate("/order-success", {
+        state: {
+          orderId: data?.id,
+          restaurantName,
+          totalAmount,
+          itemCount: totalItems,
+        },
+      });
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to place order. Please try again.", 
+        variant: "destructive" 
+      });
+      setIsSubmitting(false);
+    }
   };
 
   return (
