@@ -18,6 +18,8 @@ export interface NearbyRestaurant {
   tasteScore: number;
   combinedScore: number;
   nearbyReason: string;
+  logo_url?: string | null;
+  is_open?: boolean;
 }
 
 interface RestaurantData {
@@ -32,6 +34,8 @@ interface RestaurantData {
   ambience?: string[];
   rating?: number;
   isOpen?: boolean;
+  is_open?: boolean;
+  logo_url?: string | null;
 }
 
 // Haversine distance calculation
@@ -167,6 +171,8 @@ export function rankNearbyOptions(
         tasteScore,
         combinedScore,
         nearbyReason: "",
+        logo_url: r.logo_url,
+        is_open: r.is_open ?? r.isOpen ?? true,
       };
 
       nearbyRestaurant.nearbyReason = generateNearbyReason(nearbyRestaurant, tasteProfile);

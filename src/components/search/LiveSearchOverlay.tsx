@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Clock, ChefHat, UtensilsCrossed, Sparkles, X } from "lucide-react";
+import { Search, Clock, ChefHat, UtensilsCrossed, Sparkles, X, Loader2 } from "lucide-react";
 import { useSearch, SearchResult } from "@/context/SearchContext";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 
 const LiveSearchOverlay = () => {
   const navigate = useNavigate();
-  const { query, results, isSearching, clearSearch } = useSearch();
+  const { query, results, isSearching, isLoading, clearSearch } = useSearch();
   const { behavior, addSearch } = useUserBehavior();
 
   if (!isSearching) return null;
@@ -84,7 +84,12 @@ const LiveSearchOverlay = () => {
         {/* Search results */}
         {query && (
           <div className="space-y-4">
-            {results.length === 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-purple" />
+                <span className="ml-2 text-sm text-muted-foreground">Searching...</span>
+              </div>
+            ) : results.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground text-sm">No results found for "{query}"</p>
                 <p className="text-muted-foreground/60 text-xs mt-1">Try searching for a restaurant, dish, or cuisine</p>
