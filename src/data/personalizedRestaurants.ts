@@ -2,9 +2,10 @@
 import cosbyBurrataTomato from "@/assets/menu/cosby-burrata-tomato.jpg";
 import proxGreenCurry from "@/assets/menu/prox-green-curry.jpg";
 
+// Using Supabase UUIDs as canonical IDs for consistency across the app
 export const personalizedRestaurants = [
   {
-    id: "yakoyo-demo",
+    id: "8179401a-d2c5-4561-98ae-2010b561d477", // Yakoyo Supabase UUID
     name: "Yakoyo",
     cuisine: "Afro Fusion",
     address: "12 Bennetts Hill, Birmingham City Centre, B2 5RS",
@@ -26,7 +27,7 @@ export const personalizedRestaurants = [
     signatureDishes: ["Smoked Jollof Risotto", "Fire-Grilled Suya Steak", "Yam Croquettes"]
   },
   {
-    id: "cosby-demo",
+    id: "3a798457-b065-44c9-b7d4-9c05910e8593", // Cosby Supabase UUID
     name: "Cosby",
     cuisine: "Modern Italian",
     address: "38 Temple Street, Birmingham City Centre, B2 5DP",
@@ -49,7 +50,7 @@ export const personalizedRestaurants = [
     signatureDishes: ["Truffle Tagliatelle", "Burrata & Tomato", "Lemon Parmigiano Risotto"]
   },
   {
-    id: "prox-demo",
+    id: "4b1ee37b-9053-4523-b610-eabb8a059712", // The Prox Supabase UUID
     name: "The Prox",
     cuisine: "Premium Thai",
     address: "24 Colmore Row, Birmingham City Centre, B3 2QE",

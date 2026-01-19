@@ -23,24 +23,24 @@ export const BIRMINGHAM_REGIONS = [
 
 export type BirminghamRegion = typeof BIRMINGHAM_REGIONS[number];
 
-// Mock restaurant locations
+// Mock restaurant locations using Supabase UUIDs
 export const restaurantLocations: Record<string, RestaurantLocation> = {
-  "yakoyo-demo": {
-    id: "yakoyo-demo",
+  "8179401a-d2c5-4561-98ae-2010b561d477": {
+    id: "8179401a-d2c5-4561-98ae-2010b561d477",
     latitude: 52.4810,
     longitude: -1.8950,
     region: "City Centre",
     address: "12 Bennetts Hill, Birmingham City Centre, B2 5RS",
   },
-  "cosby-demo": {
-    id: "cosby-demo",
+  "3a798457-b065-44c9-b7d4-9c05910e8593": {
+    id: "3a798457-b065-44c9-b7d4-9c05910e8593",
     latitude: 52.4778,
     longitude: -1.9005,
     region: "Mailbox",
     address: "38 Temple Street, Birmingham City Centre, B2 5DP",
   },
-  "prox-demo": {
-    id: "prox-demo",
+  "4b1ee37b-9053-4523-b610-eabb8a059712": {
+    id: "4b1ee37b-9053-4523-b610-eabb8a059712",
     latitude: 52.4820,
     longitude: -1.9120,
     region: "Broad Street",

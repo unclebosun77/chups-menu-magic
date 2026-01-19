@@ -23,12 +23,11 @@ export const dishCategories: DishCategory[] = [
   "Grill"
 ];
 
-// Restaurant mapping - these IDs should match your actual restaurant IDs
-// For demo purposes, using placeholder IDs
+// Restaurant mapping using Supabase UUIDs for consistency
 const restaurants = {
-  yakoyo: { id: "yakoyo-demo", name: "Yakoyo" },
-  cosby: { id: "cosby-demo", name: "Cosby" },
-  theProx: { id: "the-prox-demo", name: "The Prox" },
+  yakoyo: { id: "8179401a-d2c5-4561-98ae-2010b561d477", name: "Yakoyo" },
+  cosby: { id: "3a798457-b065-44c9-b7d4-9c05910e8593", name: "Cosby" },
+  theProx: { id: "4b1ee37b-9053-4523-b610-eabb8a059712", name: "The Prox" },
 };
 
 export const seedDishes = [

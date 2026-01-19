@@ -55,9 +55,12 @@ export interface DemoRestaurant {
   menu: DemoMenuItem[];
 }
 
+// Using Supabase UUIDs as keys for direct lookup
+// Legacy demo IDs are mapped in src/utils/restaurantMapping.ts
 export const demoRestaurants: Record<string, DemoRestaurant> = {
-  "yakoyo-demo": {
-    id: "yakoyo-demo",
+  // Yakoyo - Supabase UUID
+  "8179401a-d2c5-4561-98ae-2010b561d477": {
+    id: "8179401a-d2c5-4561-98ae-2010b561d477",
     name: "Yakoyo",
     cuisine: "Afro Fusion / Nigerian",
     address: "12 Bennetts Hill",
@@ -117,8 +120,9 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
       { id: "y-sp1", name: "Yakoyo Sharing Platter", description: "Selection of starters perfect for the table", price: 28, category: "specials", tags: ["sharing", "popular"] },
     ]
   },
-  "cosby-demo": {
-    id: "cosby-demo",
+  // Cosby - Supabase UUID
+  "3a798457-b065-44c9-b7d4-9c05910e8593": {
+    id: "3a798457-b065-44c9-b7d4-9c05910e8593",
     name: "Cosby",
     cuisine: "Modern Italian",
     address: "38 Temple Street",
@@ -179,8 +183,9 @@ export const demoRestaurants: Record<string, DemoRestaurant> = {
       { id: "c-sp1", name: "Chef's Tasting Menu", description: "5-course journey through Italian flavors", price: 55, category: "specials", tags: ["chef-pick", "sharing"] },
     ]
   },
-  "prox-demo": {
-    id: "prox-demo",
+  // The Prox - Supabase UUID  
+  "4b1ee37b-9053-4523-b610-eabb8a059712": {
+    id: "4b1ee37b-9053-4523-b610-eabb8a059712",
     name: "The Prox",
     cuisine: "Premium Thai",
     address: "24 Colmore Row",

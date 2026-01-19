@@ -13,6 +13,7 @@ import AskOutaModal from "@/components/AskOutaModal";
 import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
 import { MenuSection } from "@/components/restaurant/menu";
 import { vibrate } from "@/utils/haptics";
+import { getSupabaseId } from "@/utils/restaurantMapping";
 
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
@@ -36,23 +37,41 @@ const RestaurantProfile = () => {
     const loadRestaurant = async () => {
       setIsLoading(true);
       
-      // Check if it's a demo restaurant
-      if (restaurantId && demoRestaurants[restaurantId]) {
-        setRestaurant(demoRestaurants[restaurantId]);
+      if (!restaurantId) {
         setIsLoading(false);
         return;
       }
 
-      // Try loading from Supabase
-      if (restaurantId) {
-        const { data, error } = await supabase
-          .from("restaurants")
-          .select("*")
-          .eq("id", restaurantId)
-          .single();
+      // Normalize the ID - convert legacy demo IDs to Supabase UUIDs
+      const supabaseId = getSupabaseId(restaurantId);
+      
+      // Check if we have rich demo data for this restaurant (now keyed by Supabase UUID)
+      const demoData = demoRestaurants[supabaseId];
+      
+      // Try loading from Supabase first
+      const { data, error } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("id", supabaseId)
+        .maybeSingle();
 
-        if (data && !error) {
-          // Convert Supabase restaurant to DemoRestaurant format
+      if (data && !error) {
+        // Merge Supabase data with rich demo data if available
+        if (demoData) {
+          setRestaurant({
+            ...demoData,
+            id: data.id, // Use Supabase UUID as canonical ID
+            name: data.name || demoData.name,
+            cuisine: data.cuisine_type || demoData.cuisine,
+            description: data.description || demoData.description,
+            logoUrl: data.logo_url || demoData.logoUrl,
+            isOpen: data.is_open,
+            address: data.address || demoData.address,
+            city: data.city || demoData.city,
+            openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
+          });
+        } else {
+          // No demo data - create from Supabase only
           setRestaurant({
             id: data.id,
             name: data.name,
@@ -62,7 +81,7 @@ const RestaurantProfile = () => {
             priceLevel: "££",
             description: data.description || "",
             vibe: ["Modern", "Cozy"],
-            openingHours: data.hours as Record<string, string> || {},
+            openingHours: (data.hours as Record<string, string>) || {},
             signatureDishes: [],
             logoUrl: data.logo_url || "",
             heroImage: data.logo_url || "",
@@ -74,6 +93,9 @@ const RestaurantProfile = () => {
             menu: []
           });
         }
+      } else if (demoData) {
+        // Fallback to demo data only if Supabase fails
+        setRestaurant(demoData);
       }
       
       setIsLoading(false);
