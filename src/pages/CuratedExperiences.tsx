@@ -151,9 +151,22 @@ const CuratedExperiences = () => {
 const FeaturedCard = ({ collection }: { collection: typeof collections[0] }) => {
   const navigate = useNavigate();
   
+  // Map collection titles to specific restaurant IDs for direct navigation
+  const getRestaurantRoute = (title: string): string => {
+    const restaurantMap: Record<string, string> = {
+      'Date Night': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
+      'Fine Dining': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
+      'Trending Now': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
+      'Group Friendly': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
+      'Hidden Gems': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
+      'Budget Bites': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
+    };
+    return restaurantMap[title] || '/discover';
+  };
+  
   return (
     <button 
-      onClick={() => navigate('/discover')}
+      onClick={() => navigate(getRestaurantRoute(collection.title))}
       className="w-full relative h-48 rounded-3xl overflow-hidden group transition-transform hover:scale-[1.01] active:scale-[0.99]"
     >
       <img 
@@ -178,9 +191,22 @@ const FeaturedCard = ({ collection }: { collection: typeof collections[0] }) => 
 const CollectionCard = ({ collection }: { collection: typeof collections[0] }) => {
   const navigate = useNavigate();
   
+  // Map collection titles to specific restaurant IDs for direct navigation
+  const getRestaurantRoute = (title: string): string => {
+    const restaurantMap: Record<string, string> = {
+      'Date Night': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
+      'Fine Dining': '/restaurant/3a798457-b065-44c9-b7d4-9c05910e8593', // Cosby
+      'Trending Now': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
+      'Group Friendly': '/restaurant/8179401a-d2c5-4561-98ae-2010b561d477', // Yakoyo
+      'Hidden Gems': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
+      'Budget Bites': '/restaurant/4b1ee37b-9053-4523-b610-eabb8a059712', // The Prox
+    };
+    return restaurantMap[title] || '/discover';
+  };
+  
   return (
     <button 
-      onClick={() => navigate('/discover')}
+      onClick={() => navigate(getRestaurantRoute(collection.title))}
       className="relative aspect-[4/5] rounded-2xl overflow-hidden group transition-transform hover:scale-[1.02] active:scale-[0.98]"
     >
       <img 
