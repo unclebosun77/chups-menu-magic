@@ -7,6 +7,8 @@ import { TasteProfileProvider } from "@/context/TasteProfileContext";
 import { UserBehaviorProvider } from "@/context/UserBehaviorContext";
 import { SearchProvider } from "@/context/SearchContext";
 import { LocationProvider } from "@/context/LocationContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -43,56 +45,61 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TasteProfileProvider>
-        <UserBehaviorProvider>
-          <SearchProvider>
-            <LocationProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  {/* Main app routes with bottom nav */}
-                  <Route path="/" element={<Layout><Index /></Layout>} />
-                  <Route path="/services" element={<Layout><Services /></Layout>} />
-                  <Route path="/bookings" element={<MyBookings />} />
-                  <Route path="/activity" element={<Layout><Activity /></Layout>} />
-                  <Route path="/account" element={<Layout><Account /></Layout>} />
-                  
-                  {/* Full screen routes without bottom nav */}
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/catering" element={<Catering />} />
-                  <Route path="/rewards" element={<Rewards />} />
-                  <Route path="/discover" element={<Discover />} />
-                  <Route path="/ai-assistant" element={<AIAssistant />} />
-                  <Route path="/my-orders" element={<MyOrders />} />
-                  <Route path="/order-success" element={<OrderSuccess />} />
-                  <Route path="/order-summary" element={<OrderSummary />} />
-                  <Route path="/ai-chat" element={<AIOrderChat />} />
-                  <Route path="/outa-intelligence" element={<OutaIntelligence />} />
-                  <Route path="/curated-experiences" element={<CuratedExperiences />} />
-                  <Route path="/chat" element={<OutaChat />} />
-                  
-                  {/* Restaurant Onboarding Pro Suite */}
-                  <Route path="/restaurant/onboarding" element={<OnboardingHome />} />
-                  <Route path="/restaurant/onboarding/branding" element={<BrandingStep />} />
-                  <Route path="/restaurant/onboarding/details" element={<RestaurantDetailsForm />} />
-                  <Route path="/restaurant/onboarding/menu" element={<MenuCategoryList />} />
-                  <Route path="/restaurant/onboarding/menu/:categoryId" element={<MenuItemEditor />} />
-                  <Route path="/restaurant/onboarding/gallery" element={<GalleryUploader />} />
-                  <Route path="/restaurant/onboarding/hours" element={<OpeningHoursEditor />} />
-                  <Route path="/restaurant/onboarding/review" element={<ReviewAndSubmit />} />
-                  
-                  <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-                  <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
-                  
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </LocationProvider>
-          </SearchProvider>
-        </UserBehaviorProvider>
-      </TasteProfileProvider>
+      <AuthProvider>
+        <TasteProfileProvider>
+          <UserBehaviorProvider>
+            <SearchProvider>
+              <LocationProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Layout><Index /></Layout>} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/discover" element={<Discover />} />
+                    <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
+                    
+                    {/* Main app routes with bottom nav */}
+                    <Route path="/services" element={<Layout><Services /></Layout>} />
+                    <Route path="/activity" element={<Layout><Activity /></Layout>} />
+                    <Route path="/account" element={<Layout><Account /></Layout>} />
+                    
+                    {/* Protected routes - require authentication */}
+                    <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+                    <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                    <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+                    <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                    <Route path="/order-summary" element={<ProtectedRoute><OrderSummary /></ProtectedRoute>} />
+                    
+                    {/* Full screen routes without bottom nav */}
+                    <Route path="/catering" element={<Catering />} />
+                    <Route path="/ai-assistant" element={<AIAssistant />} />
+                    <Route path="/ai-chat" element={<AIOrderChat />} />
+                    <Route path="/outa-intelligence" element={<OutaIntelligence />} />
+                    <Route path="/curated-experiences" element={<CuratedExperiences />} />
+                    <Route path="/chat" element={<OutaChat />} />
+                    
+                    {/* Restaurant Onboarding Pro Suite - Protected */}
+                    <Route path="/restaurant/onboarding" element={<ProtectedRoute><OnboardingHome /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/branding" element={<ProtectedRoute><BrandingStep /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/details" element={<ProtectedRoute><RestaurantDetailsForm /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/menu" element={<ProtectedRoute><MenuCategoryList /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/menu/:categoryId" element={<ProtectedRoute><MenuItemEditor /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/gallery" element={<ProtectedRoute><GalleryUploader /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/hours" element={<ProtectedRoute><OpeningHoursEditor /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><ReviewAndSubmit /></ProtectedRoute>} />
+                    <Route path="/restaurant/dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
+                    
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </LocationProvider>
+            </SearchProvider>
+          </UserBehaviorProvider>
+        </TasteProfileProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

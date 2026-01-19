@@ -1,60 +1,59 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import logoIcon from "@/assets/logo-icon.png";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft, Loader2, Mail, Lock, User, ChefHat } from "lucide-react";
 import { z } from "zod";
-import { LogIn, UserPlus, Sparkles, KeyRound } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const signInSchema = z.object({
-  email: z.string()
-    .trim()
-    .email({ message: "Invalid email address" })
-    .max(255, { message: "Email must be less than 255 characters" }),
-  password: z.string()
-    .min(1, { message: "Password is required" }),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 const signUpSchema = z.object({
-  email: z.string()
-    .trim()
-    .email({ message: "Invalid email address" })
-    .max(255, { message: "Email must be less than 255 characters" }),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string()
-    .min(6, { message: "Password must be at least 6 characters" })
-    .max(72, { message: "Password must be less than 72 characters" })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
 const resetPasswordSchema = z.object({
-  email: z.string()
-    .trim()
-    .email({ message: "Invalid email address" })
-    .max(255, { message: "Email must be less than 255 characters" }),
+  email: z.string().email("Please enter a valid email address"),
 });
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const { user, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<"customer" | "restaurant">("customer");
-  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      const from = (location.state as { from?: Location })?.from?.pathname || "/";
+      navigate(from, { replace: true });
+    }
+  }, [user, authLoading, navigate, location]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
 
-    // Validate input data
     const validationResult = signInSchema.safeParse({
       email: formData.get("signin-email"),
       password: formData.get("signin-password"),
@@ -76,10 +75,13 @@ const Auth = () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      toast({ title: "Error signing in", description: error.message, variant: "destructive" });
+      let message = error.message;
+      if (error.message.includes("Invalid login credentials")) {
+        message = "Invalid email or password. Please try again.";
+      }
+      toast({ title: "Error signing in", description: message, variant: "destructive" });
     } else {
       toast({ title: "Welcome back!" });
-      navigate("/");
     }
     setIsLoading(false);
   };
@@ -89,7 +91,6 @@ const Auth = () => {
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
 
-    // Validate input data
     const validationResult = signUpSchema.safeParse({
       email: formData.get("signup-email"),
       password: formData.get("signup-password"),
@@ -118,223 +119,208 @@ const Auth = () => {
     });
 
     if (error) {
-      toast({ title: "Error signing up", description: error.message, variant: "destructive" });
+      let message = error.message;
+      if (error.message.includes("already registered")) {
+        message = "This email is already registered. Please sign in instead.";
+      }
+      toast({ title: "Error signing up", description: message, variant: "destructive" });
     } else {
-      toast({ title: "Account created!", description: "Welcome to CHUPS" });
-      navigate(role === "restaurant" ? "/restaurant/onboarding" : "/");
+      toast({ title: "Account created!", description: "Welcome to Outa" });
+      if (role === "restaurant") {
+        navigate("/restaurant/onboarding");
+      }
     }
     setIsLoading(false);
   };
 
-  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    const formData = new FormData(e.currentTarget);
-
-    // Validate input data
-    const validationResult = resetPasswordSchema.safeParse({
-      email: formData.get("reset-email"),
-    });
+  const handleResetPassword = async () => {
+    const validationResult = resetPasswordSchema.safeParse({ email: resetEmail });
 
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
-      toast({ 
-        title: "Validation error", 
-        description: errorMessage, 
-        variant: "destructive" 
+      toast({
+        title: "Validation error",
+        description: validationResult.error.errors[0].message,
+        variant: "destructive",
       });
-      setIsLoading(false);
       return;
     }
 
-    const { email } = validationResult.data;
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/auth`,
     });
 
     if (error) {
-      toast({ 
-        title: "Error", 
-        description: error.message, 
-        variant: "destructive" 
-      });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ 
-        title: "Reset email sent!", 
-        description: "Check your email for the password reset link." 
-      });
-      setShowResetDialog(false);
+      toast({ title: "Check your email", description: "Password reset link sent!" });
+      setResetDialogOpen(false);
+      setResetEmail("");
     }
     setIsLoading(false);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md shadow-2xl border-primary/10 backdrop-blur-sm">
-        <CardHeader className="text-center space-y-4 pb-6">
-          <div className="flex justify-center mb-2">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
-              <img src={logoIcon} alt="CHUPS" className="h-20 w-20 relative z-10 drop-shadow-lg" />
-            </div>
-          </div>
-          <div>
-            <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              CHUPS
-            </CardTitle>
-            <CardDescription className="text-base mt-2 flex items-center justify-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              Your personalized menu experience
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-              <TabsTrigger value="signin" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Sign In
-              </TabsTrigger>
-              <TabsTrigger value="signup" className="data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Sign Up
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="signin" className="space-y-6 mt-6">
-              <form onSubmit={handleSignIn} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-sm font-medium">Email</Label>
-                  <Input 
-                    id="signin-email" 
-                    name="signin-email" 
-                    type="email" 
-                    required 
-                    className="h-11 border-primary/20 focus:border-primary"
-                    placeholder="your@email.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-sm font-medium">Password</Label>
-                  <Input 
-                    id="signin-password" 
-                    name="signin-password" 
-                    type="password" 
-                    required 
-                    className="h-11 border-primary/20 focus:border-primary"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowResetDialog(true)}
-                    className="text-sm text-primary hover:underline font-medium"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Signing in..." : (
-                    <>
-                      <LogIn className="mr-2 h-5 w-5" />
-                      Sign In
-                    </>
-                  )}
-                </Button>
-              </form>
-            </TabsContent>
-            <TabsContent value="signup" className="space-y-6 mt-6">
-              <form onSubmit={handleSignUp} className="space-y-5">
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">I am a</Label>
-                  <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "restaurant")} className="gap-3">
-                    <div className="flex items-center space-x-3 rounded-lg border border-primary/20 p-3 cursor-pointer hover:bg-accent transition-colors">
-                      <RadioGroupItem value="customer" id="customer" />
-                      <Label htmlFor="customer" className="font-normal cursor-pointer flex-1">Customer</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 rounded-lg border border-primary/20 p-3 cursor-pointer hover:bg-accent transition-colors">
-                      <RadioGroupItem value="restaurant" id="restaurant" />
-                      <Label htmlFor="restaurant" className="font-normal cursor-pointer flex-1">Restaurant Owner</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-sm font-medium">Email</Label>
-                  <Input 
-                    id="signup-email" 
-                    name="signup-email" 
-                    type="email" 
-                    required 
-                    className="h-11 border-primary/20 focus:border-primary"
-                    placeholder="your@email.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-sm font-medium">Password</Label>
-                  <Input 
-                    id="signup-password" 
-                    name="signup-password" 
-                    type="password" 
-                    required 
-                    minLength={6} 
-                    className="h-11 border-primary/20 focus:border-primary"
-                    placeholder="••••••••"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Creating account..." : (
-                    <>
-                      <UserPlus className="mr-2 h-5 w-5" />
-                      Sign Up
-                    </>
-                  )}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-                <KeyRound className="h-5 w-5 text-primary" />
-              </div>
-              <DialogTitle>Reset Your Password</DialogTitle>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
+      <div className="p-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-4 pb-8">
+        <Card className="w-full max-w-md border-0 shadow-lg">
+          <CardHeader className="text-center space-y-2">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-neon-pink rounded-2xl flex items-center justify-center mb-2">
+              <span className="text-2xl font-bold text-white">O</span>
             </div>
-            <DialogDescription>
-              Enter your email address and we'll send you a link to reset your password.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleResetPassword} className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="reset-email" className="text-sm font-medium">Email</Label>
-              <Input 
-                id="reset-email" 
-                name="reset-email" 
-                type="email" 
-                required 
-                className="h-11"
-                placeholder="your@email.com"
-              />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full h-11 font-semibold" 
-              disabled={isLoading}
-            >
-              {isLoading ? "Sending..." : "Send Reset Link"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+            <CardTitle className="text-2xl font-bold">Welcome to Outa</CardTitle>
+            <CardDescription>Sign in to discover amazing dining experiences</CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signin-email"
+                        name="signin-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signin-password"
+                        name="signin-password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
+                  </Button>
+
+                  <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="w-full text-sm">
+                        Forgot password?
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription>
+                          Enter your email and we'll send you a reset link.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                        />
+                        <Button onClick={handleResetPassword} className="w-full" disabled={isLoading}>
+                          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Reset Link"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-email"
+                        name="signup-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-password"
+                        name="signup-password"
+                        type="password"
+                        placeholder="Min 8 chars, 1 upper, 1 lower, 1 number"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>I am a...</Label>
+                    <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "restaurant")}>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value="customer" id="customer" />
+                        <User className="h-4 w-4 text-primary" />
+                        <Label htmlFor="customer" className="flex-1 cursor-pointer">
+                          <span className="font-medium">Food Lover</span>
+                          <p className="text-xs text-muted-foreground">Discover restaurants and order food</p>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value="restaurant" id="restaurant" />
+                        <ChefHat className="h-4 w-4 text-primary" />
+                        <Label htmlFor="restaurant" className="flex-1 cursor-pointer">
+                          <span className="font-medium">Restaurant Owner</span>
+                          <p className="text-xs text-muted-foreground">Manage your restaurant on Outa</p>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
