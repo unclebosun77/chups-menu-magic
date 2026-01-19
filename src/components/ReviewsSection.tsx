@@ -28,38 +28,60 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCheckingUserReview, setIsCheckingUserReview] = useState(false);
 
   useEffect(() => {
     loadReviews();
     if (user) {
       loadUserReview(user.id);
+    } else {
+      setIsCheckingUserReview(false);
     }
   }, [restaurantId, user]);
 
   const loadReviews = async () => {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("restaurant_id", restaurantId)
-      .order("created_at", { ascending: false });
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("restaurant_id", restaurantId)
+        .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      setReviews(data);
+      if (!error && data) {
+        setReviews(data);
+      }
+    } catch (error) {
+      console.error("Error loading reviews:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const loadUserReview = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("restaurant_id", restaurantId)
-      .eq("user_id", userId)
-      .single();
+    setIsCheckingUserReview(true);
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("restaurant_id", restaurantId)
+        .eq("user_id", userId)
+        .maybeSingle();
 
-    if (!error && data) {
-      setUserReview(data);
-      setRating(data.rating);
-      setComment(data.comment || "");
+      if (!error && data) {
+        setUserReview(data);
+        setRating(data.rating);
+        setComment(data.comment || "");
+      } else {
+        setUserReview(null);
+        setRating(0);
+        setComment("");
+      }
+    } catch (error) {
+      console.error("Error loading user review:", error);
+    } finally {
+      setIsCheckingUserReview(false);
     }
   };
 
@@ -138,6 +160,26 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : 0;
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Reviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center py-8">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-sm text-muted-foreground">Loading reviews...</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Overall Rating */}
@@ -162,7 +204,9 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Based on {reviews.length} reviews
+                {reviews.length === 0 
+                  ? "No reviews yet" 
+                  : `Based on ${reviews.length} review${reviews.length !== 1 ? 's' : ''}`}
               </p>
             </div>
           </div>
@@ -221,30 +265,42 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {reviews.map((review) => (
-          <Card key={review.id}>
-            <CardContent className="pt-6">
-              <div className="flex gap-1 mb-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-4 w-4 ${
-                      star <= review.rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground"
-                    }`}
-                  />
-                ))}
-              </div>
-              {review.comment && (
-                <p className="text-sm text-muted-foreground">{review.comment}</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">
-                {new Date(review.created_at).toLocaleDateString()}
+        {reviews.length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Star className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-foreground font-medium mb-1">No reviews yet</p>
+              <p className="text-sm text-muted-foreground">
+                {user ? "Be the first to leave a review!" : "Sign in to leave a review"}
               </p>
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          reviews.map((review) => (
+            <Card key={review.id}>
+              <CardContent className="pt-6">
+                <div className="flex gap-1 mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= review.rating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  ))}
+                </div>
+                {review.comment && (
+                  <p className="text-sm text-muted-foreground">{review.comment}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-2">
+                  {new Date(review.created_at).toLocaleDateString()}
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

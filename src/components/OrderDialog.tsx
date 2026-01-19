@@ -92,7 +92,7 @@ const OrderDialog = ({
 
     const { name, email, phone } = validationResult.data;
 
-    const { error } = await supabase.from("orders").insert({
+    const { data, error } = await supabase.from("orders").insert({
       restaurant_id: restaurantId,
       user_id: user?.id || null,
       customer_name: name,
@@ -100,7 +100,7 @@ const OrderDialog = ({
       customer_phone: phone || null,
       items: order.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
       total: totalAmount,
-    });
+    }).select('id').single();
 
     if (error) {
       toast({ title: "Error placing order", description: error.message, variant: "destructive" });
@@ -109,6 +109,7 @@ const OrderDialog = ({
       onOpenChange(false);
       navigate("/order-success", { 
         state: { 
+          orderId: data?.id,
           restaurantName, 
           totalAmount, 
           itemCount: order.reduce((sum, item) => sum + item.quantity, 0) 

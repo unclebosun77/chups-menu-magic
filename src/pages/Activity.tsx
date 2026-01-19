@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,15 +25,25 @@ interface ActivityItem {
 
 const Activity = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'order' | 'booking' | 'reward'>('all');
 
+  // Redirect to auth if not authenticated
   useEffect(() => {
-    checkUser();
-  }, []);
+    if (!authLoading && !user) {
+      navigate("/auth", { state: { from: location }, replace: true });
+    }
+  }, [user, authLoading, navigate, location]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAllActivities(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -42,33 +53,26 @@ const Activity = () => {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' },
         (payload) => {
           const newOrder = payload.new as any;
-          const newActivity: ActivityItem = {
-            id: newOrder.id,
-            type: 'order',
-            title: 'Order Placed',
-            description: `Order for ${newOrder.customer_name || 'customer'}`,
-            amount: Number(newOrder.total),
-            status: newOrder.status,
-            date: new Date(newOrder.created_at),
-            metadata: newOrder,
-          };
-          setActivities(prev => [newActivity, ...prev]);
+          // Only add if it's the current user's order
+          if (newOrder.user_id === user.id) {
+            const newActivity: ActivityItem = {
+              id: newOrder.id,
+              type: 'order',
+              title: 'Order Placed',
+              description: `Order for ${newOrder.customer_name || 'customer'}`,
+              amount: Number(newOrder.total),
+              status: newOrder.status,
+              date: new Date(newOrder.created_at),
+              metadata: newOrder,
+            };
+            setActivities(prev => [newActivity, ...prev]);
+          }
         }
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   }, [user]);
-
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      setUser(session.user);
-      await fetchAllActivities(session.user.id);
-    } else {
-      setLoading(false);
-    }
-  };
 
   const fetchAllActivities = async (userId: string) => {
     try {
@@ -152,6 +156,21 @@ const Activity = () => {
 
   const filteredActivities = filterActivities(activeTab);
 
+  // Show loading while auth is being determined
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/15 to-purple/25 flex items-center justify-center animate-pulse">
+            <Sparkles className="h-5 w-5 text-purple" />
+          </div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect happens in useEffect, but show sign-in prompt as fallback
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
@@ -174,7 +193,7 @@ const Activity = () => {
             </div>
             <p className="text-foreground font-semibold mb-2">Sign in to view activity</p>
             <p className="text-sm text-muted-foreground mb-6">Track your orders, bookings, and rewards</p>
-            <Button onClick={() => navigate("/auth")} className="bg-purple hover:bg-purple/90">
+            <Button onClick={() => navigate("/auth", { state: { from: location } })} className="bg-purple hover:bg-purple/90">
               Sign In
             </Button>
           </Card>
