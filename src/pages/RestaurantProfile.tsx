@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap } from "lucide-react";
+import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { MenuSection } from "@/components/restaurant/menu";
 import { vibrate } from "@/utils/haptics";
 import { getSupabaseId } from "@/utils/restaurantMapping";
 import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
+import ReviewsSection from "@/components/ReviewsSection";
 
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
@@ -628,17 +629,55 @@ const RestaurantProfile = () => {
         />
       </div>
 
-      {/* Reviews Placeholder */}
+      {/* Services Section */}
       <div 
         className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '980ms' }}
+        style={{ opacity: 0, animationDelay: '960ms' }}
+      >
+        <h2 className="text-lg font-bold mb-4 tracking-tight">Services</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { icon: UtensilsCrossed, label: "Order Food", available: true, onClick: () => {} },
+            { icon: Calendar, label: "Reserve Table", available: false },
+            { icon: MessageCircle, label: "Ask Outa", available: true, onClick: () => setShowAskOuta(true) },
+            { icon: Info, label: "Event Booking", available: false },
+          ].map((service, idx) => (
+            <button
+              key={service.label}
+              onClick={service.available ? service.onClick : undefined}
+              disabled={!service.available}
+              className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 ${
+                service.available 
+                  ? "bg-card border-border/40 hover:border-purple/30 hover:shadow-sm active:scale-[0.98] cursor-pointer"
+                  : "bg-secondary/30 border-border/20 cursor-not-allowed opacity-60"
+              }`}
+              style={{ animationDelay: `${1000 + idx * 60}ms` }}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                service.available ? "bg-purple/10 text-purple" : "bg-muted/50 text-muted-foreground"
+              }`}>
+                <service.icon className="h-4 w-4" strokeWidth={1.5} />
+              </div>
+              <div className="text-left flex-1">
+                <span className={`text-[13px] font-medium ${service.available ? "text-foreground" : "text-muted-foreground"}`}>
+                  {service.label}
+                </span>
+                {!service.available && (
+                  <p className="text-[9px] text-muted-foreground/60">Coming soon</p>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div 
+        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '1020ms' }}
       >
         <h2 className="text-lg font-bold mb-4 tracking-tight">Reviews</h2>
-        <Card className="border-border/30 shadow-sm">
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground/50 text-sm">Reviews coming soon</p>
-          </CardContent>
-        </Card>
+        <ReviewsSection restaurantId={supabaseId} />
       </div>
 
       {/* Order Bar - Premium Floating */}
