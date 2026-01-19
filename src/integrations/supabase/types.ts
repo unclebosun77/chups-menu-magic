@@ -281,6 +281,7 @@ export type Database = {
           status: string
           total: number
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -294,6 +295,7 @@ export type Database = {
           status?: string
           total: number
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -307,6 +309,7 @@ export type Database = {
           status?: string
           total?: number
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -507,6 +510,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      saved_restaurants: {
+        Row: {
+          created_at: string
+          id: string
+          restaurant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          restaurant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          restaurant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_restaurants_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

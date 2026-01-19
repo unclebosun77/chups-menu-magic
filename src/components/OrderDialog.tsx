@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +64,7 @@ const OrderDialog = ({
 }: OrderDialogProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -92,6 +94,7 @@ const OrderDialog = ({
 
     const { error } = await supabase.from("orders").insert({
       restaurant_id: restaurantId,
+      user_id: user?.id || null,
       customer_name: name,
       customer_email: email,
       customer_phone: phone || null,

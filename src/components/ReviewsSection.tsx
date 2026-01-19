@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Star, Trash2, Edit2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 type Review = {
   id: string;
@@ -20,25 +21,20 @@ type ReviewsSectionProps = {
 
 const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [userReview, setUserReview] = useState<Review | null>(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    checkUser();
     loadReviews();
-  }, [restaurantId]);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
     if (user) {
       loadUserReview(user.id);
     }
-  };
+  }, [restaurantId, user]);
 
   const loadReviews = async () => {
     const { data, error } = await supabase
@@ -117,6 +113,27 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
     setIsSubmitting(false);
   };
 
+  const handleDelete = async () => {
+    if (!user || !userReview) return;
+    
+    setIsDeleting(true);
+    const { error } = await supabase
+      .from("reviews")
+      .delete()
+      .eq("id", userReview.id);
+
+    if (error) {
+      toast({ title: "Error deleting review", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Review deleted" });
+      setUserReview(null);
+      setRating(0);
+      setComment("");
+      loadReviews();
+    }
+    setIsDeleting(false);
+  };
+
   const avgRating = reviews.length > 0
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : 0;
@@ -188,9 +205,16 @@ const ReviewsSection = ({ restaurantId }: ReviewsSectionProps) => {
                 rows={4}
               />
             </div>
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : userReview ? "Update Review" : "Submit Review"}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
+                {isSubmitting ? "Submitting..." : userReview ? "Update Review" : "Submit Review"}
+              </Button>
+              {userReview && (
+                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

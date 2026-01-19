@@ -24,6 +24,7 @@ import Discover from "./pages/Discover";
 import AIAssistant from "./pages/AIAssistant";
 import MyOrders from "./pages/MyOrders";
 import MyBookings from "./pages/MyBookings";
+import SavedRestaurants from "./pages/SavedRestaurants";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import OrderSummary from "./pages/OrderSummary";
@@ -68,6 +69,7 @@ const App = () => (
                     {/* Protected routes - require authentication */}
                     <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
                     <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                    <Route path="/saved" element={<ProtectedRoute><SavedRestaurants /></ProtectedRoute>} />
                     <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
                     <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
                     <Route path="/order-summary" element={<ProtectedRoute><OrderSummary /></ProtectedRoute>} />
