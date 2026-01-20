@@ -32,11 +32,14 @@ import AIOrderChat from "./pages/AIOrderChat";
 import OutaIntelligence from "./pages/OutaIntelligence";
 import CuratedExperiences from "./pages/CuratedExperiences";
 import OutaChat from "./pages/OutaChat";
-// Restaurant Onboarding (Simplified Flow)
-import OnboardingBasicInfo from "./pages/onboarding/OnboardingBasicInfo";
-import OnboardingImageUpload from "./pages/onboarding/OnboardingImageUpload";
-import OnboardingTags from "./pages/onboarding/OnboardingTags";
-import OnboardingReview from "./pages/onboarding/OnboardingReview";
+import OnboardingHome from "./pages/onboarding/OnboardingHome";
+import BrandingStep from "./pages/onboarding/BrandingStep";
+import RestaurantDetailsForm from "./pages/onboarding/RestaurantDetailsForm";
+import MenuCategoryList from "./pages/onboarding/MenuCategoryList";
+import MenuItemEditor from "./pages/onboarding/MenuItemEditor";
+import GalleryUploader from "./pages/onboarding/GalleryUploader";
+import OpeningHoursEditor from "./pages/onboarding/OpeningHoursEditor";
+import ReviewAndSubmit from "./pages/onboarding/ReviewAndSubmit";
 
 const queryClient = new QueryClient();
 
@@ -79,11 +82,15 @@ const App = () => (
                     <Route path="/curated-experiences" element={<CuratedExperiences />} />
                     <Route path="/chat" element={<OutaChat />} />
                     
-                    {/* Restaurant Onboarding - 4-Step Flow */}
-                    <Route path="/restaurant/onboarding" element={<ProtectedRoute><OnboardingBasicInfo /></ProtectedRoute>} />
-                    <Route path="/restaurant/onboarding/images" element={<ProtectedRoute><OnboardingImageUpload /></ProtectedRoute>} />
-                    <Route path="/restaurant/onboarding/tags" element={<ProtectedRoute><OnboardingTags /></ProtectedRoute>} />
-                    <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><OnboardingReview /></ProtectedRoute>} />
+                    {/* Restaurant Onboarding Pro Suite - Protected */}
+                    <Route path="/restaurant/onboarding" element={<ProtectedRoute><OnboardingHome /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/branding" element={<ProtectedRoute><BrandingStep /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/details" element={<ProtectedRoute><RestaurantDetailsForm /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/menu" element={<ProtectedRoute><MenuCategoryList /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/menu/:categoryId" element={<ProtectedRoute><MenuItemEditor /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/gallery" element={<ProtectedRoute><GalleryUploader /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/hours" element={<ProtectedRoute><OpeningHoursEditor /></ProtectedRoute>} />
+                    <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><ReviewAndSubmit /></ProtectedRoute>} />
                     <Route path="/restaurant/dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
                     
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
