@@ -3,15 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Star, Clock, User, Sparkles, X, TrendingUp, Navigation } from "lucide-react";
+import { Search, MapPin, Star, Clock, X, TrendingUp, Navigation, Utensils, Coffee, Flame, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useLocation } from "@/context/LocationContext";
-import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
 import RegionFilter from "@/components/RegionFilter";
 import { enrichWithLocation } from "@/utils/mockLocations";
-import { rankNearbyOptions } from "@/utils/nearbyEngine";
 
 type Restaurant = {
   id: string;
@@ -25,7 +22,6 @@ type Restaurant = {
   primary_color: string;
   average_rating?: number;
   review_count?: number;
-  matchScore?: number;
   latitude?: number;
   longitude?: number;
   region?: string;
@@ -33,18 +29,25 @@ type Restaurant = {
 };
 
 const filterChips = [
-  { id: "all", label: "All", icon: null },
+  { id: "all", label: "All", icon: Utensils },
   { id: "open", label: "Open Now", icon: Clock },
   { id: "nearby", label: "Near Me", icon: Navigation },
   { id: "top-rated", label: "Top Rated", icon: Star },
   { id: "trending", label: "Trending", icon: TrendingUp },
 ];
 
+const vibeChips = [
+  { id: "casual", label: "Casual Dining" },
+  { id: "fine", label: "Fine Dining" },
+  { id: "quick", label: "Quick Bites" },
+  { id: "date", label: "Date Night" },
+  { id: "groups", label: "Groups" },
+];
+
 const Discover = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
-  const { profile, isComplete } = useTasteProfile();
   const { userLocation, sortByDistance, filterByRegion, getDistanceText, currentRegion } = useLocation();
   
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -53,7 +56,6 @@ const Discover = () => {
   const [cuisineFilter, setCuisineFilter] = useState<string | null>(searchParams.get("cuisine"));
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showTasteDialog, setShowTasteDialog] = useState(false);
 
   // Sync URL params with state
   useEffect(() => {
@@ -113,30 +115,13 @@ const Discover = () => {
     }
   };
 
-  // Filter and sort restaurants
+  // Filter and sort restaurants - NEUTRAL logic, no personalization
   const filteredRestaurants = useMemo(() => {
     let filtered = [...restaurants];
 
     // Apply region filter
     if (selectedRegion) {
       filtered = filterByRegion(filtered, selectedRegion);
-    }
-
-    // Calculate match scores using nearby engine for better ranking
-    if (profile || activeFilter === "nearby") {
-      const ranked = rankNearbyOptions(filtered, userLocation, profile, {
-        tasteWeight: activeFilter === "nearby" ? 0.3 : 0.7,
-        distanceWeight: activeFilter === "nearby" ? 0.7 : 0.3,
-      });
-      
-      filtered = ranked.map(r => {
-        const original = filtered.find(o => o.id === r.id);
-        return {
-          ...original!,
-          matchScore: r.combinedScore,
-          distanceText: r.distanceText,
-        };
-      });
     }
 
     // Search filter
@@ -168,7 +153,7 @@ const Discover = () => {
     }
 
     return filtered;
-  }, [restaurants, searchQuery, activeFilter, cuisineFilter, selectedRegion, profile, userLocation, sortByDistance, filterByRegion]);
+  }, [restaurants, searchQuery, activeFilter, cuisineFilter, selectedRegion, userLocation, sortByDistance, filterByRegion]);
 
   const cuisineTypes = Array.from(new Set(restaurants.map((r) => r.cuisine_type)));
 
@@ -186,34 +171,28 @@ const Discover = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-24">
-      {/* Premium Header */}
+      {/* Neutral Exploratory Header */}
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="px-4 py-4">
-          {/* Title Row */}
+          {/* Title Row - Neutral, exploratory tone */}
           <div className="flex items-center justify-between mb-4">
             <div className="animate-slide-up">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Discover</h1>
-              <p className="text-xs text-muted-foreground/70 mt-0.5 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {currentRegion}
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Explore</h1>
+              <p className="text-xs text-muted-foreground/70 mt-0.5">
+                Browse restaurants by cuisine, vibe, or location
               </p>
             </div>
-            <Button 
-              variant={isComplete ? "outline" : "default"} 
-              size="sm"
-              onClick={() => setShowTasteDialog(true)}
-              className={`gap-2 rounded-full ${isComplete ? 'border-purple/30 text-purple hover:bg-purple/5' : 'bg-gradient-neon shadow-glow'}`}
-            >
-              {isComplete ? <Sparkles className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
-              <span className="text-xs">{isComplete ? "Profile active" : "Set taste"}</span>
-            </Button>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              <span className="text-xs">{currentRegion}</span>
+            </div>
           </div>
 
           {/* Search Bar */}
           <div className="relative animate-slide-up" style={{ animationDelay: '100ms' }}>
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <Input
-              placeholder="Search restaurants, cuisines, areas..."
+              placeholder="Search by name, cuisine, or area..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-11 pr-10 h-12 rounded-2xl border-border/50 bg-secondary/30 focus:bg-card focus:border-purple/30 transition-all"
@@ -228,7 +207,7 @@ const Discover = () => {
             )}
           </div>
 
-          {/* Region Filter - NEW */}
+          {/* Region Filter */}
           <div className="mt-4 animate-slide-up" style={{ animationDelay: '150ms' }}>
             <RegionFilter
               selectedRegion={selectedRegion || "All"}
@@ -282,22 +261,16 @@ const Discover = () => {
         </div>
       </div>
 
-      {/* Restaurant Grid */}
+      {/* Restaurant Grid - Neutral browsing, no personalized banners */}
       <div className="px-4 py-6">
-        {/* AI Recommendation Banner */}
-        {isComplete && filteredRestaurants.length > 0 && (
-          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple/10 to-neon-pink/5 border border-purple/20 animate-slide-up">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-neon flex items-center justify-center shadow-glow">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Outa's picks for you</p>
-                <p className="text-xs text-muted-foreground/70">
-                  {filteredRestaurants.length} spots {selectedRegion ? `in ${selectedRegion}` : `near ${currentRegion}`}
-                </p>
-              </div>
-            </div>
+        {/* Results count - neutral tone */}
+        {!isLoading && filteredRestaurants.length > 0 && (
+          <div className="mb-4 animate-slide-up">
+            <p className="text-sm text-muted-foreground">
+              {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'restaurant' : 'restaurants'} 
+              {selectedRegion && selectedRegion !== 'All' ? ` in ${selectedRegion}` : ''}
+              {cuisineFilter ? ` · ${cuisineFilter}` : ''}
+            </p>
           </div>
         )}
 
@@ -310,12 +283,25 @@ const Discover = () => {
         ) : filteredRestaurants.length === 0 ? (
           <div className="text-center py-16 animate-slide-up">
             <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-4">
-              <MapPin className="h-8 w-8 text-muted-foreground/30" />
+              <Utensils className="h-8 w-8 text-muted-foreground/30" />
             </div>
             <p className="text-foreground font-medium mb-1">No restaurants found</p>
             <p className="text-sm text-muted-foreground/60">
               {selectedRegion ? `No spots in ${selectedRegion} yet` : 'Try adjusting your filters'}
             </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-4 text-purple"
+              onClick={() => {
+                setActiveFilter("all");
+                setCuisineFilter(null);
+                setSelectedRegion(null);
+                setSearchQuery("");
+              }}
+            >
+              Clear all filters
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
@@ -329,14 +315,13 @@ const Discover = () => {
                   restaurant={restaurant} 
                   variant="grid" 
                   index={index}
+                  hideMatchScore
                 />
               </div>
             ))}
           </div>
         )}
       </div>
-
-      <TasteProfileDialog open={showTasteDialog} onOpenChange={setShowTasteDialog} />
     </div>
   );
 };
