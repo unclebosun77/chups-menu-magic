@@ -95,26 +95,26 @@ const Index = () => {
           <HeroSection />
         </div>
 
-        {/* AI Smart Actions - Staggered Reveal */}
+        {/* AI Smart Actions - Personal context */}
         <section className="mt-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-purple/15 to-neon-pink/10 flex items-center justify-center shadow-sm border border-purple/10">
               <Sparkles className="h-3.5 w-3.5 text-purple animate-glow-pulse" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-foreground tracking-tight">Outa suggests</p>
-              <p className="text-[10px] text-muted-foreground/60">Personalized for you</p>
+              <p className="text-xs font-semibold text-foreground tracking-tight">What should you do right now?</p>
+              <p className="text-[10px] text-muted-foreground/60">Based on your taste</p>
             </div>
           </div>
           <SmartActionPills />
         </section>
 
-        {/* Nearby Restaurants Section - NEW */}
+        {/* Nearby Restaurants Section - Personal proximity */}
         <section className="mt-10 animate-slide-up" style={{ animationDelay: '250ms' }}>
           <NearbyRestaurantsRow restaurants={restaurants} />
         </section>
 
-        {/* Discover Section - Premium Cards */}
+        {/* For You Section - Personal recommendations (replaces generic Discover) */}
         <section className="mt-10 animate-slide-up" style={{ animationDelay: '300ms' }}>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
@@ -122,8 +122,8 @@ const Index = () => {
                 <TrendingUp className="h-4 w-4 text-purple" strokeWidth={1.5} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-foreground tracking-tight">Discover</h2>
-                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Trending in {currentRegion}</p>
+                <h2 className="text-lg font-bold text-foreground tracking-tight">For You</h2>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Recommended near {currentRegion}</p>
               </div>
             </div>
             <Button 
@@ -132,7 +132,7 @@ const Index = () => {
               className="text-xs text-purple hover:text-purple-hover hover:bg-purple/5 rounded-full px-3"
               onClick={() => navigate('/discover')}
             >
-              See all
+              Browse all
             </Button>
           </div>
           
@@ -146,8 +146,8 @@ const Index = () => {
             <div className="animate-slide-up">
               <EmptyState
                 icon={MapPin}
-                title="Mapping your vibe zone 🗺️"
-                description="Hang tight while we scout amazing spots near you!"
+                title="Finding spots for you 🗺️"
+                description="We're curating recommendations based on your taste!"
                 compact
               />
             </div>

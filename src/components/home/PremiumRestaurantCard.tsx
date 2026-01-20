@@ -32,6 +32,7 @@ interface PremiumRestaurantCardProps {
   variant?: "compact" | "featured" | "grid";
   index?: number;
   showAiTags?: boolean;
+  hideMatchScore?: boolean;
 }
 
 const getCuisineTag = (cuisineType: string) => {
@@ -41,7 +42,7 @@ const getCuisineTag = (cuisineType: string) => {
   return cuisineType;
 };
 
-const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0, showAiTags = true }: PremiumRestaurantCardProps) => {
+const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0, showAiTags = true, hideMatchScore = false }: PremiumRestaurantCardProps) => {
   const navigate = useNavigate();
   const { addRestaurantVisit } = useUserBehavior();
   const { profile, updateTasteFromInteraction } = useTasteProfile();
@@ -161,8 +162,8 @@ const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0, sho
           {/* Premium gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           
-          {/* Match score badge - using dynamic score */}
-          {dynamicMatchScore > 70 && (
+          {/* Match score badge - hidden on Discover for neutral browsing */}
+          {!hideMatchScore && dynamicMatchScore > 70 && (
             <TasteMatchBadge 
               score={dynamicMatchScore} 
               variant="compact" 

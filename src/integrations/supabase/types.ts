@@ -347,6 +347,7 @@ export type Database = {
           created_at: string
           cuisine_type: string
           description: string | null
+          gallery_images: Json | null
           hours: Json | null
           id: string
           is_open: boolean
@@ -357,6 +358,8 @@ export type Database = {
           phone: string | null
           primary_color: string
           secondary_color: string
+          status: string
+          tags: string[] | null
           updated_at: string
           user_id: string
         }
@@ -367,6 +370,7 @@ export type Database = {
           created_at?: string
           cuisine_type: string
           description?: string | null
+          gallery_images?: Json | null
           hours?: Json | null
           id?: string
           is_open?: boolean
@@ -377,6 +381,8 @@ export type Database = {
           phone?: string | null
           primary_color?: string
           secondary_color?: string
+          status?: string
+          tags?: string[] | null
           updated_at?: string
           user_id: string
         }
@@ -387,6 +393,7 @@ export type Database = {
           created_at?: string
           cuisine_type?: string
           description?: string | null
+          gallery_images?: Json | null
           hours?: Json | null
           id?: string
           is_open?: boolean
@@ -397,6 +404,8 @@ export type Database = {
           phone?: string | null
           primary_color?: string
           secondary_color?: string
+          status?: string
+          tags?: string[] | null
           updated_at?: string
           user_id?: string
         }
