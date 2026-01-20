@@ -35,9 +35,11 @@ const Index = () => {
 
   const loadRestaurants = useCallback(async () => {
     setIsLoading(true);
+    // Only fetch LIVE restaurants (not drafts)
     const { data, error } = await supabase
       .from("restaurants")
       .select("id, name, cuisine_type, description, logo_url, is_open, latitude, longitude")
+      .eq("status", "live")
       .order("created_at", { ascending: false })
       .limit(6);
 

@@ -72,9 +72,11 @@ const Discover = () => {
 
   const loadRestaurants = async () => {
     try {
+      // Only fetch LIVE restaurants (not drafts)
       const { data: restaurantsData, error } = await supabase
         .from("restaurants")
         .select("*")
+        .eq("status", "live")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
