@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { 
   ShoppingBag, Calendar, ChefHat, Star, Gift, 
   ArrowLeft, Package, Sparkles, Clock, Heart,
-  Eye, MessageSquare, MapPin, Compass, Play,
-  ArrowRight, Bookmark, Wand2
+  Eye, MessageSquare, MapPin, Compass
 } from "lucide-react";
 
 interface ActivityItem {
@@ -36,6 +35,7 @@ const Activity = () => {
   const { savedRestaurants } = useSavedRestaurants();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'all' | 'order' | 'booking' | 'discovery'>('all');
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -147,7 +147,7 @@ const Activity = () => {
         allActivities.push({
           id: `view-${visit.id}-${visit.timestamp}`,
           type: 'viewed',
-          title: 'Recently explored',
+          title: 'Restaurant Viewed',
           description: `${visit.cuisine} cuisine`,
           date: new Date(visit.timestamp),
           restaurantId: visit.id,
@@ -160,8 +160,8 @@ const Activity = () => {
         allActivities.push({
           id: `search-${index}-${Date.now()}`,
           type: 'suggested',
-          title: 'Something you looked for',
-          description: `"${search}"`,
+          title: 'Search Query',
+          description: `Searched for "${search}"`,
           date: new Date(Date.now() - index * 3600000), // Mock timestamps
         });
       });
@@ -184,7 +184,7 @@ const Activity = () => {
       case 'reward': return Star;
       case 'gift_card': return Gift;
       case 'saved': return Heart;
-      case 'viewed': return Compass;
+      case 'viewed': return Eye;
       case 'suggested': return MessageSquare;
       default: return Package;
     }
@@ -198,19 +198,34 @@ const Activity = () => {
       case 'reward': return 'from-yellow-500/20 to-yellow-500/10 text-yellow-500';
       case 'gift_card': return 'from-pink-500/20 to-pink-500/10 text-pink-500';
       case 'saved': return 'from-red-500/20 to-red-500/10 text-red-500';
-      case 'viewed': return 'from-muted to-muted/50 text-muted-foreground';
-      case 'suggested': return 'from-muted to-muted/50 text-muted-foreground';
+      case 'viewed': return 'from-emerald-500/20 to-emerald-500/10 text-emerald-500';
+      case 'suggested': return 'from-purple/20 to-purple/10 text-purple';
       default: return 'from-muted to-muted/50 text-muted-foreground';
     }
   };
 
-  // Categorize activities by intent level
-  const highIntentActivities = activities.filter(a => 
-    ['order', 'booking', 'catering', 'saved', 'reward', 'gift_card'].includes(a.type)
-  );
-  const lowIntentActivities = activities.filter(a => 
-    ['viewed', 'suggested'].includes(a.type)
-  );
+  const getActivityTypeLabel = (type: ActivityItem['type']) => {
+    switch (type) {
+      case 'order': return 'Order';
+      case 'booking': return 'Booking';
+      case 'catering': return 'Catering';
+      case 'reward': return 'Reward';
+      case 'gift_card': return 'Gift';
+      case 'saved': return 'Saved';
+      case 'viewed': return 'Viewed';
+      case 'suggested': return 'Search';
+      default: return 'Activity';
+    }
+  };
+
+  const filterActivities = (filter: 'all' | 'order' | 'booking' | 'discovery') => {
+    if (filter === 'all') return activities;
+    if (filter === 'discovery') return activities.filter(a => ['viewed', 'saved', 'suggested'].includes(a.type));
+    return activities.filter(a => a.type === filter);
+  };
+
+  const filteredActivities = filterActivities(activeTab);
+  const discoveryCount = activities.filter(a => ['viewed', 'saved', 'suggested'].includes(a.type)).length;
 
   // Show loading while auth is being determined
   if (authLoading) {
@@ -237,7 +252,7 @@ const Activity = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Activity</h1>
-              <p className="text-xs text-muted-foreground">Your journey so far</p>
+              <p className="text-xs text-muted-foreground">Your recent actions and recommendations</p>
             </div>
           </div>
         </div>
@@ -248,7 +263,7 @@ const Activity = () => {
               <Package className="h-8 w-8 text-purple" />
             </div>
             <p className="text-foreground font-semibold mb-2">Sign in to view activity</p>
-            <p className="text-sm text-muted-foreground mb-6">Track your plans, saves, and discoveries</p>
+            <p className="text-sm text-muted-foreground mb-6">Track your orders, bookings, and discoveries</p>
             <Button onClick={() => navigate("/auth", { state: { from: location } })} className="bg-purple hover:bg-purple/90">
               Sign In
             </Button>
@@ -271,212 +286,90 @@ const Activity = () => {
     );
   }
 
-  const hasNoActivity = activities.length === 0;
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
-        <div className="px-4 py-5">
-          <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+        <div className="px-4 py-4">
+          <div className="flex items-center gap-3 mb-4">
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">What's on your mind?</h1>
-              <p className="text-xs text-muted-foreground">Pick up where you left off</p>
+              <h1 className="text-xl font-bold text-foreground">Activity</h1>
+              <p className="text-xs text-muted-foreground">Your recent actions and recommendations</p>
             </div>
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/15 to-neon-pink/10 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-purple" />
+            </div>
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {[
+              { id: 'all', label: 'All', count: activities.length },
+              { id: 'order', label: 'Orders', count: filterActivities('order').length },
+              { id: 'booking', label: 'Bookings', count: filterActivities('booking').length },
+              { id: 'discovery', label: 'Discovery', count: discoveryCount },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-purple text-primary-foreground shadow-neon'
+                    : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
+                }`}
+              >
+                {tab.label}
+                <span className={`text-[10px] ${activeTab === tab.id ? 'opacity-80' : 'opacity-50'}`}>
+                  {tab.count}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* In Progress Section */}
-      <div className="px-4 py-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Play className="h-4 w-4 text-purple" />
-            <h2 className="text-sm font-semibold text-foreground tracking-wide">In progress</h2>
-          </div>
-          
-          {/* Empty state for in progress */}
-          <Card className="p-6 glass-card border-dashed border-border/50 animate-slide-up">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center mx-auto mb-3">
-                <Wand2 className="h-5 w-5 text-purple/60" />
+      {/* Stats Row */}
+      <div className="px-4 py-4">
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { icon: ShoppingBag, label: 'Orders', value: filterActivities('order').length, color: 'text-blue-500' },
+            { icon: Eye, label: 'Viewed', value: activities.filter(a => a.type === 'viewed').length, color: 'text-emerald-500' },
+            { icon: Heart, label: 'Saved', value: savedRestaurants.length, color: 'text-red-500' },
+          ].map((stat, index) => (
+            <Card 
+              key={stat.label}
+              className="p-3 glass-card animate-slide-up"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</span>
               </div>
-              <p className="text-sm text-foreground/80 mb-1">No active plans yet</p>
-              <p className="text-xs text-muted-foreground mb-4">Start planning your next outing</p>
-              <Button 
-                onClick={() => navigate("/outa-chat")} 
-                size="sm"
-                className="bg-purple/90 hover:bg-purple text-primary-foreground gap-2"
-              >
-                Start planning
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </Card>
+              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+            </Card>
+          ))}
         </div>
+      </div>
 
-        {/* High Intent Actions - Saved & Committed */}
-        {highIntentActivities.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Heart className="h-4 w-4 text-purple" />
-              <h2 className="text-sm font-semibold text-foreground tracking-wide">Things you're thinking about</h2>
+      {/* Activity Timeline */}
+      <div className="px-4 py-2">
+        {filteredActivities.length === 0 ? (
+          <Card className="p-12 text-center glass-card animate-slide-up">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center mx-auto mb-4">
+              <Compass className="h-8 w-8 text-purple/50" />
             </div>
-            
-            <div className="space-y-3">
-              {highIntentActivities.slice(0, 5).map((activity, index) => {
-                const Icon = getActivityIcon(activity.type);
-                const hasRestaurantLink = activity.restaurantId || activity.restaurantName;
-                
-                return (
-                  <Card
-                    key={activity.id}
-                    className={`p-4 glass-card transition-all animate-slide-up ${
-                      hasRestaurantLink ? 'hover:shadow-lg cursor-pointer active:scale-[0.98]' : ''
-                    }`}
-                    style={{ animationDelay: `${index * 50}ms` }}
-                    onClick={() => {
-                      if (activity.restaurantId) {
-                        navigate(`/restaurant/${activity.restaurantId}`);
-                      }
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getActivityColor(activity.type)} flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-foreground text-sm">{activity.title}</p>
-                          {activity.status && (
-                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-secondary/50">
-                              {activity.status}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        {activity.restaurantName && (
-                          <p className="text-sm text-purple font-medium mb-0.5">{activity.restaurantName}</p>
-                        )}
-                        
-                        <p className="text-xs text-muted-foreground line-clamp-1">{activity.description}</p>
-                        
-                        {/* Connective nudge */}
-                        {activity.type === 'saved' && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate("/outa-chat");
-                            }}
-                            className="text-[11px] text-purple/70 hover:text-purple mt-2 flex items-center gap-1 transition-colors"
-                          >
-                            <Wand2 className="h-3 w-3" />
-                            Turn this into a plan
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="text-right flex-shrink-0">
-                        {activity.amount !== undefined && (
-                          <p className="font-bold text-foreground">£{activity.amount.toFixed(2)}</p>
-                        )}
-                        {activity.points !== undefined && (
-                          <p className={`font-bold ${activity.points > 0 ? 'text-green-500' : 'text-orange-500'}`}>
-                            {activity.points > 0 ? '+' : ''}{activity.points} pts
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Low Intent - Recently Explored (visually demoted) */}
-        {lowIntentActivities.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Compass className="h-3.5 w-3.5 text-muted-foreground/60" />
-              <h2 className="text-xs font-medium text-muted-foreground tracking-wide">Places you checked out</h2>
-            </div>
-            
-            <div className="space-y-2">
-              {lowIntentActivities.slice(0, 4).map((activity, index) => {
-                const hasRestaurantLink = activity.restaurantId || activity.restaurantName;
-                
-                return (
-                  <div
-                    key={activity.id}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary/30 transition-all animate-slide-up ${
-                      hasRestaurantLink ? 'hover:bg-secondary/50 cursor-pointer active:scale-[0.98]' : ''
-                    }`}
-                    style={{ animationDelay: `${200 + index * 50}ms` }}
-                    onClick={() => {
-                      if (activity.restaurantId) {
-                        navigate(`/restaurant/${activity.restaurantId}`);
-                      }
-                    }}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
-                      <Compass className="h-4 w-4 text-muted-foreground/50" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      {activity.restaurantName ? (
-                        <p className="text-sm text-foreground/80 font-medium truncate">{activity.restaurantName}</p>
-                      ) : (
-                        <p className="text-sm text-foreground/80">{activity.description}</p>
-                      )}
-                      <p className="text-[10px] text-muted-foreground/60">
-                        {activity.date.toLocaleDateString()}
-                      </p>
-                    </div>
-                    
-                    {/* Subtle action nudges */}
-                    <div className="flex items-center gap-1.5">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/saved");
-                        }}
-                        className="p-1.5 rounded-md hover:bg-secondary/80 transition-colors"
-                        title="Save for later"
-                      >
-                        <Bookmark className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-purple/60" />
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/outa-chat");
-                        }}
-                        className="p-1.5 rounded-md hover:bg-secondary/80 transition-colors"
-                        title="Ask Outa about this"
-                      >
-                        <Wand2 className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-purple/60" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {hasNoActivity && (
-          <Card className="p-10 text-center glass-card animate-slide-up mt-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center mx-auto mb-4">
-              <Compass className="h-6 w-6 text-purple/50" />
-            </div>
-            <p className="text-foreground font-medium mb-2">Nothing here yet</p>
-            <p className="text-sm text-muted-foreground mb-5 max-w-[240px] mx-auto">
-              Start exploring restaurants and your activity will appear here
+            <p className="text-foreground font-medium mb-2">No activity yet</p>
+            <p className="text-sm text-muted-foreground mb-1">
+              {activeTab === 'all' && "Start exploring restaurants to build your activity feed"}
+              {activeTab === 'order' && "Your orders will appear here after you place one"}
+              {activeTab === 'booking' && "Book an experience to see it here"}
+              {activeTab === 'discovery' && "Browse restaurants to see your discovery history"}
+            </p>
+            <p className="text-xs text-muted-foreground/70 mb-4">
+              Outa learns from your activity to give better recommendations
             </p>
             <Button 
               onClick={() => navigate("/discover")} 
@@ -487,15 +380,76 @@ const Activity = () => {
               Discover Restaurants
             </Button>
           </Card>
+        ) : (
+          <div className="space-y-3">
+            {filteredActivities.map((activity, index) => {
+              const Icon = getActivityIcon(activity.type);
+              const hasRestaurantLink = activity.restaurantId || activity.restaurantName;
+              
+              return (
+                <Card
+                  key={activity.id}
+                  className={`p-4 glass-card transition-all animate-slide-up ${
+                    hasRestaurantLink ? 'hover:shadow-lg cursor-pointer active:scale-[0.98]' : ''
+                  }`}
+                  style={{ animationDelay: `${100 + index * 50}ms` }}
+                  onClick={() => {
+                    if (activity.restaurantId) {
+                      navigate(`/restaurant/${activity.restaurantId}`);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getActivityColor(activity.type)} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-foreground text-sm">{activity.title}</p>
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-secondary/50">
+                          {activity.status || getActivityTypeLabel(activity.type)}
+                        </Badge>
+                      </div>
+                      
+                      {activity.restaurantName && (
+                        <p className="text-sm text-purple font-medium mb-0.5">{activity.restaurantName}</p>
+                      )}
+                      
+                      <p className="text-xs text-muted-foreground line-clamp-1">{activity.description}</p>
+                      
+                      <div className="flex items-center gap-2 mt-2">
+                        <Clock className="h-3 w-3 text-muted-foreground/50" />
+                        <span className="text-[10px] text-muted-foreground">
+                          {activity.date.toLocaleDateString()} · {activity.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right flex-shrink-0">
+                      {activity.amount !== undefined && (
+                        <p className="font-bold text-foreground">£{activity.amount.toFixed(2)}</p>
+                      )}
+                      {activity.points !== undefined && (
+                        <p className={`font-bold ${activity.points > 0 ? 'text-green-500' : 'text-orange-500'}`}>
+                          {activity.points > 0 ? '+' : ''}{activity.points} pts
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
 
-      {/* Subtle Learning Indicator */}
-      {!hasNoActivity && (
-        <div className="px-4 pb-6">
-          <div className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground/50">
-            <Sparkles className="h-3 w-3" />
-            <span>Outa learns from this to personalize your experience</span>
+      {/* Learning Indicator */}
+      {filteredActivities.length > 0 && (
+        <div className="px-4 py-6">
+          <div className="flex items-center justify-center gap-2 text-xs text-purple/60">
+            <div className="w-2 h-2 bg-purple/40 rounded-full animate-pulse" />
+            <span>Outa uses this activity to personalize your experience</span>
           </div>
         </div>
       )}
