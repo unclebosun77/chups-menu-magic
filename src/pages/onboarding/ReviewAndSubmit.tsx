@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { loadRestaurantDraft, compileRestaurantProfile, clearDraft } from '@/utils/onboardingStore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const ReviewAndSubmit = () => {
   const navigate = useNavigate();
@@ -23,24 +24,101 @@ const ReviewAndSubmit = () => {
   }, []);
 
   const handlePublish = useCallback(async () => {
+    if (!compiled) return;
+    
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setShowConfetti(true);
-    
-    toast({
-      title: "🎉 Restaurant Published!",
-      description: "Your restaurant is now live on Outa",
-    });
-    
-    // Clear draft and redirect after animation
-    setTimeout(() => {
-      clearDraft();
-      navigate('/');
-    }, 3000);
-  }, [navigate, toast]);
+    try {
+      // Get current user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to publish your restaurant",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
+
+      const userId = session.user.id;
+      const { restaurant, menu } = compiled;
+
+      // Insert restaurant into Supabase
+      const { data: restaurantData, error: restaurantError } = await supabase
+        .from('restaurants')
+        .insert([{
+          user_id: userId,
+          name: restaurant.name,
+          description: restaurant.description,
+          cuisine_type: restaurant.cuisine_type || 'General',
+          brand_style: 'modern',
+          primary_color: '#8B5CF6',
+          secondary_color: '#10B981',
+          phone: restaurant.phone || null,
+          address: null,
+          city: restaurant.region || null,
+          latitude: restaurant.latitude ? Number(restaurant.latitude) : null,
+          longitude: restaurant.longitude ? Number(restaurant.longitude) : null,
+          logo_url: restaurant.logo_url || null,
+          hours: restaurant.hours as any || null,
+          is_open: true,
+        }])
+        .select()
+        .single();
+
+      if (restaurantError) {
+        throw restaurantError;
+      }
+
+      // Insert menu items if any exist
+      const allMenuItems = menu.flatMap(category => 
+        category.items.map(item => ({
+          restaurant_id: restaurantData.id,
+          name: item.name,
+          description: item.description || null,
+          price: item.price,
+          category: category.name,
+          image_url: item.image_url || null,
+          available: true,
+        }))
+      );
+
+      if (allMenuItems.length > 0) {
+        const { error: menuError } = await supabase
+          .from('menu_items')
+          .insert(allMenuItems);
+
+        if (menuError) {
+          console.error('Menu insert error:', menuError);
+          // Don't fail the whole publish if menu fails
+        }
+      }
+
+      setShowConfetti(true);
+      
+      toast({
+        title: "🎉 Restaurant Published!",
+        description: "Your restaurant is now live on Outa",
+      });
+      
+      // Clear draft and redirect after animation
+      setTimeout(() => {
+        clearDraft();
+        navigate('/');
+      }, 3000);
+
+    } catch (error: any) {
+      console.error('Publish error:', error);
+      toast({
+        title: "Failed to publish",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [compiled, navigate, toast]);
 
   if (!compiled) {
     return (
