@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Rocket, Sparkles, TrendingUp } from "lucide-react";
+import { MapPin, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SkeletonCard from "@/components/SkeletonCard";
 import EmptyState from "@/components/EmptyState";
@@ -77,20 +77,6 @@ const Index = () => {
         className="px-4 pb-28 transition-transform duration-100"
         style={{ transform: pullDistance > 0 ? `translateY(${pullDistance * 0.3}px)` : undefined }}
       >
-        {/* Empty State with Premium Styling */}
-        {restaurants.length === 0 && !isLoading && (
-          <div className="bg-gradient-to-br from-purple/5 to-neon-pink/5 border border-purple/20 rounded-2xl p-5 mt-4 shadow-premium animate-slide-up">
-            <p className="text-sm text-foreground mb-3 font-medium">👋 No spots yet!</p>
-            <Button 
-              onClick={() => navigate("/restaurant/onboarding")}
-              className="w-full bg-gradient-neon text-primary-foreground hover:opacity-90 rounded-xl h-11 shadow-glow transition-all duration-300 active:scale-[0.97]"
-              size="sm"
-            >
-              <Rocket className="mr-2 h-4 w-4" />
-              Add Your First Spot
-            </Button>
-          </div>
-        )}
 
         {/* Hero Section - Premium Entrance */}
         <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
