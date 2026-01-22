@@ -32,6 +32,7 @@ import AIOrderChat from "./pages/AIOrderChat";
 import OutaIntelligence from "./pages/OutaIntelligence";
 import CuratedExperiences from "./pages/CuratedExperiences";
 import OutaChat from "./pages/OutaChat";
+import ReviewsFeedback from "./pages/ReviewsFeedback";
 import OnboardingHome from "./pages/onboarding/OnboardingHome";
 import BrandingStep from "./pages/onboarding/BrandingStep";
 import RestaurantDetailsForm from "./pages/onboarding/RestaurantDetailsForm";
@@ -81,6 +82,7 @@ const App = () => (
                     <Route path="/outa-intelligence" element={<OutaIntelligence />} />
                     <Route path="/curated-experiences" element={<CuratedExperiences />} />
                     <Route path="/chat" element={<OutaChat />} />
+                    <Route path="/reviews-feedback" element={<ProtectedRoute><ReviewsFeedback /></ProtectedRoute>} />
                     
                     {/* Restaurant Onboarding Pro Suite - Protected */}
                     <Route path="/restaurant/onboarding" element={<ProtectedRoute><OnboardingHome /></ProtectedRoute>} />
