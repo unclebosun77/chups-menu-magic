@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { 
-  Sparkles, Compass, Bookmark, Crown, Calendar, ArrowRight
+  Sparkles, Compass, Bookmark, Crown, Calendar, ArrowRight, MessageSquareText
 } from "lucide-react";
 
 const Services = () => {
@@ -23,6 +23,13 @@ const Services = () => {
       title: "Ask Outa",
       description: "Personal recommendations, tailored to you",
       route: "/outa-chat",
+    },
+    {
+      id: 'reviews',
+      icon: <MessageSquareText className="w-5 h-5" />,
+      title: "Reviews & Feedback",
+      description: "Ratings, photos, and what people ordered",
+      route: "/reviews-feedback",
     },
     {
       id: 'saved',

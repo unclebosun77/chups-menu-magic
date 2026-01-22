@@ -423,27 +423,39 @@ export type Database = {
         Row: {
           comment: string | null
           created_at: string | null
+          dish_tag: string | null
           id: string
+          photos: Json | null
           rating: number
           restaurant_id: string
+          restaurant_response: string | null
+          restaurant_response_at: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           comment?: string | null
           created_at?: string | null
+          dish_tag?: string | null
           id?: string
+          photos?: Json | null
           rating: number
           restaurant_id: string
+          restaurant_response?: string | null
+          restaurant_response_at?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           comment?: string | null
           created_at?: string | null
+          dish_tag?: string | null
           id?: string
+          photos?: Json | null
           rating?: number
           restaurant_id?: string
+          restaurant_response?: string | null
+          restaurant_response_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
