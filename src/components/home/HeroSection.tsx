@@ -31,7 +31,7 @@ const HeroSection = () => {
               className="text-[10px] font-semibold text-purple/60 tracking-wider uppercase animate-[fadeIn_0.3s_ease-out_forwards]"
               style={{ opacity: 0, animationDelay: '200ms' }}
             >
-              Outa Intelligence
+              CHUPS
             </span>
           </div>
           
@@ -39,13 +39,13 @@ const HeroSection = () => {
             className="text-[22px] font-bold text-foreground leading-tight tracking-tight animate-[titleSlideUp_0.45s_ease-out_forwards]"
             style={{ opacity: 0, animationDelay: '150ms' }}
           >
-            Where are we heading tonight?
+            Good for tonight
           </h1>
           <p 
             className="text-[13px] text-muted-foreground/60 mt-2 font-light leading-relaxed animate-[subtitleFade_0.5s_ease-out_forwards]"
             style={{ opacity: 0, animationDelay: '250ms' }}
           >
-            Discover places that match your vibe.
+            Places that match your taste, vibe, and spend.
           </p>
         </div>
         
@@ -80,7 +80,7 @@ const HeroSection = () => {
           style={{ opacity: 0, animationDelay: '380ms' }}
           onClick={() => navigate("/discover")}
         >
-          <span>Let's goo</span>
+          <span>Explore places</span>
           <ArrowRight className="h-4 w-4" strokeWidth={2} />
         </Button>
       </div>

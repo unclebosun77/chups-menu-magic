@@ -296,8 +296,8 @@ User's message: ${userMessageContent}
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-foreground">Ask Outa</h1>
-                <p className="text-xs text-muted-foreground">Your AI dining guide</p>
+                <h1 className="font-bold text-foreground">Ask CHUPS</h1>
+                <p className="text-xs text-muted-foreground">Your AI dining assistant</p>
               </div>
             </div>
             
@@ -333,6 +333,29 @@ User's message: ${userMessageContent}
         ))}
         
         {isTyping && <TypingIndicator />}
+
+        {/* Pre-filled intent prompts when conversation just started */}
+        {messages.length <= 1 && !isTyping && (
+          <div className="px-4 pb-4">
+            <p className="text-xs text-muted-foreground/60 mb-3 px-1">Try asking…</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Easy dinner tonight",
+                "£20–£30, good vibes",
+                "Something new but safe",
+                "Date night spot nearby",
+              ].map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => handleSendMessage(prompt)}
+                  className="px-4 py-2.5 rounded-2xl bg-card border border-border/50 text-[13px] font-medium text-foreground hover:border-purple/30 hover:bg-secondary/40 transition-all active:scale-[0.97]"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input */}
