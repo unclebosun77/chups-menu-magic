@@ -102,7 +102,7 @@ const Index = () => {
               <Sparkles className="h-3.5 w-3.5 text-purple animate-glow-pulse" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-foreground tracking-tight">What should you do right now?</p>
+              <p className="text-xs font-semibold text-foreground tracking-tight">Quick decisions</p>
               <p className="text-[10px] text-muted-foreground/60">Based on your taste</p>
             </div>
           </div>
@@ -122,8 +122,8 @@ const Index = () => {
                 <TrendingUp className="h-4 w-4 text-purple" strokeWidth={1.5} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-foreground tracking-tight">For You</h2>
-                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Recommended near {currentRegion}</p>
+                <h2 className="text-lg font-bold text-foreground tracking-tight">New places you'll like</h2>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5">Matches your taste near {currentRegion}</p>
               </div>
             </div>
             <Button 

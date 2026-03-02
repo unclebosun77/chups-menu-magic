@@ -63,14 +63,14 @@ const App = () => (
                     <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
                     
                     {/* Main app routes with bottom nav */}
-                    <Route path="/services" element={<Layout><Services /></Layout>} />
+                    <Route path="/services" element={<Services />} />
                     <Route path="/activity" element={<Layout><Activity /></Layout>} />
                     <Route path="/account" element={<Layout><Account /></Layout>} />
                     
                     {/* Protected routes - require authentication */}
                     <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
                     <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-                    <Route path="/saved" element={<ProtectedRoute><SavedRestaurants /></ProtectedRoute>} />
+                    <Route path="/saved" element={<Layout><SavedRestaurants /></Layout>} />
                     <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
                     <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
                     <Route path="/order-summary" element={<ProtectedRoute><OrderSummary /></ProtectedRoute>} />
@@ -81,7 +81,7 @@ const App = () => (
                     <Route path="/ai-chat" element={<AIOrderChat />} />
                     <Route path="/outa-intelligence" element={<OutaIntelligence />} />
                     <Route path="/curated-experiences" element={<CuratedExperiences />} />
-                    <Route path="/chat" element={<OutaChat />} />
+                    <Route path="/outa-chat" element={<OutaChat />} />
                     <Route path="/reviews-feedback" element={<ProtectedRoute><ReviewsFeedback /></ProtectedRoute>} />
                     
                     {/* Restaurant Onboarding Pro Suite - Protected */}

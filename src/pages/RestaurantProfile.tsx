@@ -354,7 +354,7 @@ const RestaurantProfile = () => {
           style={{ opacity: 0, animationDelay: '400ms' }}
         >
           <span className="text-[10px] text-muted-foreground/40 flex items-center gap-1">
-            <Sparkles className="h-3 w-3" strokeWidth={1.5} /> Powered by Outa Intelligence
+            <Sparkles className="h-3 w-3" strokeWidth={1.5} /> Powered by CHUPS
           </span>
         </div>
       </div>
@@ -441,24 +441,12 @@ const RestaurantProfile = () => {
         </div>
       </div>
 
-      {/* Description - Premium Typography */}
-      <div 
-        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '580ms' }}
-      >
-        <p className="text-[14px] text-muted-foreground/75 leading-relaxed font-light">
-          {restaurant.description}
-        </p>
-      </div>
-
-      {/* Outa Intelligence Recommendation - Dynamic Premium Card */}
+      {/* Outa Intelligence Recommendation - Why you'll like this */}
       {(() => {
-        // Dynamic recommendation logic
         const cuisineMatch = restaurant.cuisine;
         const priceMatch = restaurant.priceLevel === "£" || restaurant.priceLevel === "££";
         const hasSignature = signatureItems.length > 0;
         
-        // Dynamic mood chips based on restaurant vibe
         const moodChips = [
           ...(restaurant.vibe.includes("Romantic") || restaurant.vibe.includes("Elegant") ? [{ label: "Date Night", icon: Heart }] : []),
           ...(restaurant.vibe.includes("Cozy") || restaurant.vibe.includes("Warm") ? [{ label: "Cozy Vibes", icon: Flame }] : []),
@@ -467,11 +455,10 @@ const RestaurantProfile = () => {
           ...(!restaurant.vibe.includes("Romantic") && !restaurant.vibe.includes("Cozy") ? [{ label: "Perfect Tonight", icon: Star }] : []),
         ].slice(0, 3);
         
-        // Dynamic microcopy based on context
         const getMicrocopy = () => {
           if (hasSignature) {
             return {
-              headline: "We think you'll love this",
+              headline: "Why you'll like this place",
               body: (
                 <>
                   The <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> is their signature — perfectly crafted and matches your taste.
@@ -492,7 +479,7 @@ const RestaurantProfile = () => {
             };
           }
           return {
-            headline: "This spot matches your vibe",
+            headline: "Why you'll like this place",
             body: (
               <>
                 Based on your taste, you'll love their <span className="font-semibold text-purple">{cuisineMatch}</span> dishes.
@@ -506,19 +493,14 @@ const RestaurantProfile = () => {
         return (
           <div 
             className="px-5 pb-6 mt-1 animate-[recommendationReveal_0.5s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '650ms' }}
+            style={{ opacity: 0, animationDelay: '580ms' }}
           >
-            {/* Section divider */}
-            <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mb-6" />
-            
             <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.07] via-purple/[0.04] to-neon-pink/[0.03] shadow-[0_6px_24px_-8px_rgba(139,92,246,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_36px_-10px_rgba(139,92,246,0.25)] hover:scale-[1.01] active:scale-[0.99]">
               <CardContent className="p-5 relative">
-                {/* Animated glow effects */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-purple/12 to-transparent rounded-full blur-2xl animate-[glowPulse_4s_ease-in-out_infinite]" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-radial from-neon-pink/8 to-transparent rounded-full blur-xl animate-[glowPulse_4s_ease-in-out_infinite_1s]" />
                 
                 <div className="flex items-start gap-4 relative">
-                  {/* Animated icon with glow */}
                   <div className="relative">
                     <div className="absolute inset-0 rounded-xl bg-purple/20 blur-md animate-[iconGlow_2s_ease-in-out_infinite]" />
                     <div className="relative p-3 rounded-xl bg-gradient-to-br from-purple/20 to-purple/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_-4px_rgba(139,92,246,0.3)]">
@@ -532,7 +514,6 @@ const RestaurantProfile = () => {
                       {copy.body}
                     </p>
                     
-                    {/* Dynamic mood chips with animations */}
                     <div className="flex flex-wrap gap-2 mt-4">
                       {moodChips.map((chip, idx) => {
                         const ChipIcon = chip.icon;
@@ -540,7 +521,7 @@ const RestaurantProfile = () => {
                           <button 
                             key={idx} 
                             className="flex items-center gap-1.5 text-[10px] text-purple/90 bg-gradient-to-r from-purple/12 to-purple/8 px-3 py-1.5 rounded-full font-semibold border border-purple/15 shadow-sm transition-all duration-200 hover:scale-105 hover:bg-purple/15 hover:border-purple/25 active:scale-95 animate-[chipReveal_0.35s_ease-out_forwards]"
-                            style={{ opacity: 0, animationDelay: `${750 + idx * 80}ms` }}
+                            style={{ opacity: 0, animationDelay: `${650 + idx * 80}ms` }}
                           >
                             <ChipIcon className="h-3 w-3" strokeWidth={2} />
                             {chip.label}
@@ -556,17 +537,38 @@ const RestaurantProfile = () => {
         );
       })()}
 
-      {/* About Section - Animated Cards */}
+      {/* Description */}
+      <div 
+        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '650ms' }}
+      >
+        <p className="text-[14px] text-muted-foreground/75 leading-relaxed font-light">
+          {restaurant.description}
+        </p>
+      </div>
+
+      {/* Menu Section - Signature dishes + full menu */}
+      <div 
+        className="animate-[sectionSlide_0.5s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '720ms' }}
+      >
+        <MenuSection
+          menu={restaurant.menu}
+          signatureDishes={restaurant.signatureDishes}
+          onAddToOrder={handleAddToOrder}
+        />
+      </div>
+
+      {/* About Section */}
       <div 
         className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '720ms' }}
+        style={{ opacity: 0, animationDelay: '800ms' }}
       >
         <h2 className="text-lg font-bold mb-4 tracking-tight">About</h2>
         <div className="grid grid-cols-2 gap-3.5">
-          {/* Hours Card */}
           <Card 
             className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '780ms' }}
+            style={{ opacity: 0, animationDelay: '860ms' }}
           >
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -589,10 +591,9 @@ const RestaurantProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Location Card */}
           <Card 
             className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '840ms' }}
+            style={{ opacity: 0, animationDelay: '920ms' }}
           >
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -617,29 +618,26 @@ const RestaurantProfile = () => {
         </div>
       </div>
 
-      {/* Unified Menu Section */}
-      <div 
-        className="animate-[sectionSlide_0.5s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '900ms' }}
-      >
-        <MenuSection
-          menu={restaurant.menu}
-          signatureDishes={restaurant.signatureDishes}
-          onAddToOrder={handleAddToOrder}
-        />
-      </div>
-
-      {/* Services Section */}
+      {/* Reviews Section */}
       <div 
         className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
         style={{ opacity: 0, animationDelay: '960ms' }}
       >
-        <h2 className="text-lg font-bold mb-4 tracking-tight">Services</h2>
+        <h2 className="text-lg font-bold mb-4 tracking-tight">Reviews</h2>
+        <ReviewsSection restaurantId={supabaseId} />
+      </div>
+
+      {/* Contextual Utilities */}
+      <div 
+        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
+        style={{ opacity: 0, animationDelay: '1020ms' }}
+      >
+        <h2 className="text-lg font-bold mb-4 tracking-tight">Quick actions</h2>
         <div className="grid grid-cols-2 gap-3">
           {[
             { icon: UtensilsCrossed, label: "Order Food", available: true, onClick: () => {} },
             { icon: Calendar, label: "Reserve Table", available: false },
-            { icon: MessageCircle, label: "Ask Outa", available: true, onClick: () => setShowAskOuta(true) },
+            { icon: MessageCircle, label: "Ask CHUPS", available: true, onClick: () => setShowAskOuta(true) },
             { icon: Info, label: "Event Booking", available: false },
           ].map((service, idx) => (
             <button
@@ -651,7 +649,7 @@ const RestaurantProfile = () => {
                   ? "bg-card border-border/40 hover:border-purple/30 hover:shadow-sm active:scale-[0.98] cursor-pointer"
                   : "bg-secondary/30 border-border/20 cursor-not-allowed opacity-60"
               }`}
-              style={{ animationDelay: `${1000 + idx * 60}ms` }}
+              style={{ animationDelay: `${1060 + idx * 60}ms` }}
             >
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                 service.available ? "bg-purple/10 text-purple" : "bg-muted/50 text-muted-foreground"
@@ -669,15 +667,6 @@ const RestaurantProfile = () => {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Reviews Section */}
-      <div 
-        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '1020ms' }}
-      >
-        <h2 className="text-lg font-bold mb-4 tracking-tight">Reviews</h2>
-        <ReviewsSection restaurantId={supabaseId} />
       </div>
 
       {/* Order Bar - Premium Floating */}

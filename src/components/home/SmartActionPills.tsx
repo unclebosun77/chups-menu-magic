@@ -23,7 +23,7 @@ const SmartActionPills = () => {
   // Dynamic smart actions based on user behavior
   const getSmartActions = (): SmartAction[] => {
     const baseActions: SmartAction[] = [
-      { icon: Sparkles, text: "Ask Outa", route: "/ai-assistant" },
+      { icon: Sparkles, text: "Ask CHUPS", route: "/outa-chat" },
       { icon: UtensilsCrossed, text: "Dine-In near you", route: "/discover?openNow=true&sort=distance" },
       { icon: Flame, text: "Vibes tonight", route: "/discover?sort=rating" },
     ];
