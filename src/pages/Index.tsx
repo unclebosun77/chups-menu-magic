@@ -38,14 +38,11 @@ const Index = () => {
       >
         {/* Minimal header */}
         <div className="pt-6 pb-1">
-          <p className="text-[10px] font-semibold text-purple/60 tracking-wider uppercase mb-1 animate-[fadeIn_0.3s_ease-out_forwards]" style={{ opacity: 0 }}>
-            CHUPS
-          </p>
           <h1
             className="text-[22px] font-bold text-foreground leading-tight tracking-tight animate-[fadeIn_0.4s_ease-out_forwards]"
             style={{ opacity: 0, animationDelay: '80ms' }}
           >
-            Where tonight?
+            Good for tonight
           </h1>
         </div>
 
@@ -55,7 +52,7 @@ const Index = () => {
             <Search className="h-3.5 w-3.5 text-muted-foreground/40" strokeWidth={1.5} />
           </div>
           <Input
-            placeholder="Search by name, cuisine, or vibe..."
+            placeholder="Search for a place or cuisine…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setQuery(query)}
@@ -86,8 +83,8 @@ const Index = () => {
               <MessageCircle className="h-5 w-5 text-purple" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-[13px] font-semibold text-foreground">Not sure? Ask CHUPS</p>
-              <p className="text-[11px] text-muted-foreground/50 mt-0.5">Tell me who you're with and I'll decide for you</p>
+              <p className="text-[13px] font-semibold text-foreground">Need a hand choosing?</p>
+              <p className="text-[11px] text-muted-foreground/50 mt-0.5">Tell me who's coming — I'll pick the right spot</p>
             </div>
           </button>
         </section>

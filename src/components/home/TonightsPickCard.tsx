@@ -63,7 +63,7 @@ const TonightsPickCard = () => {
         <div className="flex items-center gap-1.5">
           <Sparkles className="h-3.5 w-3.5 text-purple" />
           <span className="text-[12px] font-semibold text-foreground">
-            Pick {currentIndex + 1} of {picks.length}
+            Picked for you
           </span>
         </div>
         {picks.length > 1 && (
@@ -71,7 +71,7 @@ const TonightsPickCard = () => {
             onClick={handleSkip}
             className="flex items-center gap-0.5 text-[11px] font-medium text-purple hover:text-purple/80 transition-colors active:scale-95"
           >
-            Skip
+            Next option
             <ChevronRight className="h-3 w-3" />
           </button>
         )}
