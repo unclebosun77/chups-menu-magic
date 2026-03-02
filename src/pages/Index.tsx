@@ -4,7 +4,6 @@ import { Search, X, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import TonightsPickCard from "@/components/home/TonightsPickCard";
-import AlternativesRow from "@/components/home/AlternativesRow";
 import FloatingAIButton from "@/components/FloatingAIButton";
 import LiveSearchOverlay from "@/components/search/LiveSearchOverlay";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -75,11 +74,6 @@ const Index = () => {
         {/* THE decision — one confident pick */}
         <section className="animate-[fadeIn_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '200ms' }}>
           <TonightsPickCard />
-        </section>
-
-        {/* Backup options — minimal */}
-        <section className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '350ms' }}>
-          <AlternativesRow />
         </section>
 
         {/* Ask CHUPS nudge */}
