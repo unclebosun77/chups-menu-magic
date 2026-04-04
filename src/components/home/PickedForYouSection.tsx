@@ -53,7 +53,9 @@ const PickedForYouSection = () => {
         </h2>
       </div>
 
+      <div className="relative">
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
+
         {picks.map((pick) => (
           <div
             key={pick.id}
