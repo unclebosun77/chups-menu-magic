@@ -56,35 +56,37 @@ const App = () => (
                 <Sonner />
                 <BrowserRouter>
                   <Routes>
-                    {/* Public routes */}
+                    {/* Public routes with bottom nav */}
                     <Route path="/" element={<Layout><Index /></Layout>} />
                     <Route path="/auth" element={<Auth />} />
-                    <Route path="/discover" element={<Discover />} />
-                    <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
+                    <Route path="/discover" element={<Layout><Discover /></Layout>} />
+                    <Route path="/restaurant/:restaurantId" element={<Layout><RestaurantProfile /></Layout>} />
                     
                     {/* Main app routes with bottom nav */}
-                    <Route path="/services" element={<Services />} />
+                    <Route path="/services" element={<Layout><Services /></Layout>} />
                     <Route path="/activity" element={<Layout><Activity /></Layout>} />
                     <Route path="/account" element={<Layout><Account /></Layout>} />
                     
-                    {/* Protected routes - require authentication */}
-                    <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-                    <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                    {/* Protected routes with bottom nav */}
+                    <Route path="/bookings" element={<ProtectedRoute><Layout><MyBookings /></Layout></ProtectedRoute>} />
+                    <Route path="/my-orders" element={<ProtectedRoute><Layout><MyOrders /></Layout></ProtectedRoute>} />
                     <Route path="/saved" element={<Layout><SavedRestaurants /></Layout>} />
-                    <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
-                    <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-                    <Route path="/order-summary" element={<ProtectedRoute><OrderSummary /></ProtectedRoute>} />
+                    <Route path="/rewards" element={<ProtectedRoute><Layout><Rewards /></Layout></ProtectedRoute>} />
+                    <Route path="/order-success" element={<ProtectedRoute><Layout><OrderSuccess /></Layout></ProtectedRoute>} />
+                    <Route path="/order-summary" element={<ProtectedRoute><Layout><OrderSummary /></Layout></ProtectedRoute>} />
+                    
+                    {/* Chat / AI routes with bottom nav */}
+                    <Route path="/ai-assistant" element={<Layout><AIAssistant /></Layout>} />
+                    <Route path="/ai-chat" element={<Layout><AIOrderChat /></Layout>} />
+                    <Route path="/outa-intelligence" element={<Layout><OutaIntelligence /></Layout>} />
+                    <Route path="/curated-experiences" element={<Layout><CuratedExperiences /></Layout>} />
+                    <Route path="/outa-chat" element={<Layout><OutaChat /></Layout>} />
+                    <Route path="/reviews-feedback" element={<ProtectedRoute><Layout><ReviewsFeedback /></Layout></ProtectedRoute>} />
                     
                     {/* Full screen routes without bottom nav */}
                     <Route path="/catering" element={<Catering />} />
-                    <Route path="/ai-assistant" element={<AIAssistant />} />
-                    <Route path="/ai-chat" element={<AIOrderChat />} />
-                    <Route path="/outa-intelligence" element={<OutaIntelligence />} />
-                    <Route path="/curated-experiences" element={<CuratedExperiences />} />
-                    <Route path="/outa-chat" element={<OutaChat />} />
-                    <Route path="/reviews-feedback" element={<ProtectedRoute><ReviewsFeedback /></ProtectedRoute>} />
                     
-                    {/* Restaurant Onboarding Pro Suite - Protected */}
+                    {/* Restaurant Onboarding Pro Suite - Protected, no bottom nav */}
                     <Route path="/restaurant/onboarding" element={<ProtectedRoute><OnboardingHome /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/branding" element={<ProtectedRoute><BrandingStep /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/details" element={<ProtectedRoute><RestaurantDetailsForm /></ProtectedRoute>} />
