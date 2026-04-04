@@ -47,7 +47,7 @@ const PremiumRestaurantCard = ({ restaurant, variant = "compact", index = 0, sho
   const { addRestaurantVisit } = useUserBehavior();
   const { profile, updateTasteFromInteraction } = useTasteProfile();
   const [showQuickActions, setShowQuickActions] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPressTimer, setLongPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // AI-driven tags and match score
