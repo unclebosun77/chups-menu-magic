@@ -33,7 +33,7 @@ const PersonalizedRestaurantCard = ({ restaurant }: PersonalizedRestaurantCardPr
   const navigate = useNavigate();
   const { addRestaurantVisit } = useUserBehavior();
   const [showQuickActions, setShowQuickActions] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPressTimer, setLongPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleNavigate = useCallback(() => {
     addRestaurantVisit({

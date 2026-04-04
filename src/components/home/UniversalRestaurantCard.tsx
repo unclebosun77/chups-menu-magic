@@ -34,7 +34,7 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
   const navigate = useNavigate();
   const { addRestaurantVisit } = useUserBehavior();
   const [showQuickActions, setShowQuickActions] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPressTimer, setLongPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = useCallback(() => {
     addRestaurantVisit({ 
