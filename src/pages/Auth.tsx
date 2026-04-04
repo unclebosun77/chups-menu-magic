@@ -19,6 +19,7 @@ const signInSchema = z.object({
 });
 
 const signUpSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
   email: z.string().email("Please enter a valid email address"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
@@ -41,7 +42,6 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
       const from = (location.state as { from?: Location })?.from?.pathname || "/";
@@ -60,18 +60,16 @@ const Auth = () => {
     });
 
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
-      toast({ 
-        title: "Validation error", 
-        description: errorMessage, 
-        variant: "destructive" 
+      toast({
+        title: "Validation error",
+        description: validationResult.error.errors.map(e => e.message).join(", "),
+        variant: "destructive",
       });
       setIsLoading(false);
       return;
     }
 
     const { email, password } = validationResult.data;
-
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -92,29 +90,29 @@ const Auth = () => {
     const formData = new FormData(e.currentTarget);
 
     const validationResult = signUpSchema.safeParse({
+      fullName: formData.get("signup-fullname"),
       email: formData.get("signup-email"),
       password: formData.get("signup-password"),
     });
 
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.errors.map(e => e.message).join(", ");
-      toast({ 
-        title: "Validation error", 
-        description: errorMessage, 
-        variant: "destructive" 
+      toast({
+        title: "Validation error",
+        description: validationResult.error.errors.map(e => e.message).join(", "),
+        variant: "destructive",
       });
       setIsLoading(false);
       return;
     }
 
-    const { email, password } = validationResult.data;
+    const { fullName, email, password } = validationResult.data;
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: { role },
+        emailRedirectTo: `${window.location.origin}/auth`,
+        data: { role, full_name: fullName },
       },
     });
 
@@ -125,9 +123,11 @@ const Auth = () => {
       }
       toast({ title: "Error signing up", description: message, variant: "destructive" });
     } else {
-      toast({ title: "Account created!", description: "Welcome to Outa" });
+      toast({ title: "Welcome to CHUPS!", description: "Your account has been created." });
       if (role === "restaurant") {
         navigate("/restaurant/onboarding");
+      } else {
+        navigate("/");
       }
     }
     setIsLoading(false);
@@ -180,9 +180,9 @@ const Auth = () => {
         <Card className="w-full max-w-md border-0 shadow-lg">
           <CardHeader className="text-center space-y-2">
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-neon-pink rounded-2xl flex items-center justify-center mb-2">
-              <span className="text-2xl font-bold text-white">O</span>
+              <span className="text-2xl font-bold text-white">C</span>
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome to Outa</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to CHUPS</CardTitle>
             <CardDescription>Sign in to discover amazing dining experiences</CardDescription>
           </CardHeader>
 
@@ -199,14 +199,7 @@ const Auth = () => {
                     <Label htmlFor="signin-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signin-email"
-                        name="signin-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        className="pl-10"
-                        required
-                      />
+                      <Input id="signin-email" name="signin-email" type="email" placeholder="you@example.com" className="pl-10" required />
                     </div>
                   </div>
 
@@ -214,14 +207,7 @@ const Auth = () => {
                     <Label htmlFor="signin-password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signin-password"
-                        name="signin-password"
-                        type="password"
-                        placeholder="••••••••"
-                        className="pl-10"
-                        required
-                      />
+                      <Input id="signin-password" name="signin-password" type="password" placeholder="••••••••" className="pl-10" required />
                     </div>
                   </div>
 
@@ -231,24 +217,15 @@ const Auth = () => {
 
                   <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="link" className="w-full text-sm">
-                        Forgot password?
-                      </Button>
+                      <Button variant="link" className="w-full text-sm">Forgot password?</Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Reset Password</DialogTitle>
-                        <DialogDescription>
-                          Enter your email and we'll send you a reset link.
-                        </DialogDescription>
+                        <DialogDescription>Enter your email and we'll send you a reset link.</DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
-                        <Input
-                          type="email"
-                          placeholder="you@example.com"
-                          value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
-                        />
+                        <Input type="email" placeholder="you@example.com" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
                         <Button onClick={handleResetPassword} className="w-full" disabled={isLoading}>
                           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Reset Link"}
                         </Button>
@@ -261,17 +238,18 @@ const Auth = () => {
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="signup-fullname">Full name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input id="signup-fullname" name="signup-fullname" type="text" placeholder="Your full name" className="pl-10" required />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        name="signup-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        className="pl-10"
-                        required
-                      />
+                      <Input id="signup-email" name="signup-email" type="email" placeholder="you@example.com" className="pl-10" required />
                     </div>
                   </div>
 
@@ -279,14 +257,7 @@ const Auth = () => {
                     <Label htmlFor="signup-password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-password"
-                        name="signup-password"
-                        type="password"
-                        placeholder="Min 8 chars, 1 upper, 1 lower, 1 number"
-                        className="pl-10"
-                        required
-                      />
+                      <Input id="signup-password" name="signup-password" type="password" placeholder="Min 8 chars, 1 upper, 1 lower, 1 number" className="pl-10" required />
                     </div>
                   </div>
 
@@ -306,7 +277,7 @@ const Auth = () => {
                         <ChefHat className="h-4 w-4 text-primary" />
                         <Label htmlFor="restaurant" className="flex-1 cursor-pointer">
                           <span className="font-medium">Restaurant Owner</span>
-                          <p className="text-xs text-muted-foreground">Manage your restaurant on Outa</p>
+                          <p className="text-xs text-muted-foreground">Manage your restaurant on CHUPS</p>
                         </Label>
                       </div>
                     </RadioGroup>
