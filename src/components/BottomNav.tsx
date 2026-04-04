@@ -7,7 +7,7 @@ const BottomNav = () => {
   const location = useLocation();
 
   const tabs = [
-    { icon: Compass, label: "Explore", path: "/" },
+    { icon: Compass, label: "Discover", path: "/" },
     { icon: Bookmark, label: "Saved", path: "/saved" },
     { icon: Sparkles, label: "Ask CHUPS", path: "/outa-chat", primary: true },
     { icon: User, label: "Profile", path: "/account" },
