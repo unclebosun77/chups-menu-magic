@@ -53,7 +53,9 @@ const PickedForYouSection = () => {
         </h2>
       </div>
 
+      <div className="relative">
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
+
         {picks.map((pick) => (
           <div
             key={pick.id}
@@ -119,6 +121,9 @@ const PickedForYouSection = () => {
             </div>
           </div>
         ))}
+      </div>
+      {/* Fade hint on right edge */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
       </div>
     </section>
   );
