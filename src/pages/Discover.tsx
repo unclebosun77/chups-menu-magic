@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Star, Clock, X, TrendingUp, Navigation, Utensils, Coffee, Flame, DollarSign } from "lucide-react";
+import { Search, MapPin, Star, Clock, X, TrendingUp, Navigation, Utensils, Coffee, Flame, DollarSign, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "@/context/LocationContext";
 import PremiumRestaurantCard from "@/components/home/PremiumRestaurantCard";
@@ -28,6 +28,42 @@ type Restaurant = {
   distanceText?: string;
 };
 
+// Cuisine alias mapping for broader matching
+const cuisineAliases: Record<string, string[]> = {
+  "afro-caribbean": ["african", "west african", "caribbean", "nigerian", "ghanaian", "jamaican"],
+  "italian": ["italian", "modern italian", "pizza", "pasta"],
+  "japanese": ["japanese", "sushi", "ramen", "izakaya"],
+  "thai": ["thai"],
+  "chinese": ["chinese", "dim sum", "cantonese", "szechuan"],
+  "indian": ["indian", "curry", "tandoori", "south indian"],
+  "american": ["american", "burger", "bbq", "barbecue", "diner"],
+  "mediterranean": ["mediterranean", "greek", "turkish", "lebanese", "middle eastern"],
+};
+
+const matchesCuisineFilter = (cuisineType: string, filter: string): boolean => {
+  const normalizedType = cuisineType.toLowerCase();
+  const normalizedFilter = filter.toLowerCase();
+
+  // Direct partial match
+  if (normalizedType.includes(normalizedFilter) || normalizedFilter.includes(normalizedType)) {
+    return true;
+  }
+
+  // Check aliases
+  const aliases = cuisineAliases[normalizedFilter] || [];
+  return aliases.some(alias => normalizedType.includes(alias) || alias.includes(normalizedType));
+};
+
+// Shuffle array (Fisher-Yates)
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 const filterChips = [
   { id: "all", label: "All", icon: Utensils },
   { id: "open", label: "Open Now", icon: Clock },
@@ -36,13 +72,16 @@ const filterChips = [
   { id: "trending", label: "Trending", icon: TrendingUp },
 ];
 
-const vibeChips = [
-  { id: "casual", label: "Casual Dining" },
-  { id: "fine", label: "Fine Dining" },
-  { id: "quick", label: "Quick Bites" },
-  { id: "date", label: "Date Night" },
-  { id: "groups", label: "Groups" },
-];
+const cuisineDisplayNames: Record<string, string> = {
+  "afro-caribbean": "Afro-Caribbean",
+  "italian": "Italian",
+  "japanese": "Japanese",
+  "thai": "Thai",
+  "chinese": "Chinese",
+  "indian": "Indian",
+  "american": "American",
+  "mediterranean": "Mediterranean",
+};
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -56,6 +95,12 @@ const Discover = () => {
   const [cuisineFilter, setCuisineFilter] = useState<string | null>(searchParams.get("cuisine"));
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Determine if we're in "curated cuisine" mode
+  const isCuisineMode = !!cuisineFilter;
+  const cuisineDisplayName = cuisineFilter
+    ? cuisineDisplayNames[cuisineFilter.toLowerCase()] || cuisineFilter
+    : "";
 
   // Sync URL params with state
   useEffect(() => {
@@ -92,7 +137,6 @@ const Discover = () => {
             ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
             : 0;
 
-          // Enrich with location data
           const enriched = enrichWithLocation(restaurant);
 
           return {
@@ -115,16 +159,13 @@ const Discover = () => {
     }
   };
 
-  // Filter and sort restaurants - NEUTRAL logic, no personalization
   const filteredRestaurants = useMemo(() => {
     let filtered = [...restaurants];
 
-    // Apply region filter
     if (selectedRegion) {
       filtered = filterByRegion(filtered, selectedRegion);
     }
 
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
@@ -137,7 +178,6 @@ const Discover = () => {
       );
     }
 
-    // Active filter
     if (activeFilter === "open") {
       filtered = filtered.filter((r) => r.is_open);
     } else if (activeFilter === "top-rated") {
@@ -147,17 +187,21 @@ const Discover = () => {
       filtered = sortByDistance(filtered);
     }
 
-    // Cuisine filter
+    // Cuisine filter — case-insensitive partial match with aliases
     if (cuisineFilter) {
-      filtered = filtered.filter((r) => r.cuisine_type === cuisineFilter);
+      filtered = filtered.filter((r) => matchesCuisineFilter(r.cuisine_type, cuisineFilter));
+    }
+
+    // Shuffle in cuisine mode for fresh recommendations feel
+    if (isCuisineMode) {
+      filtered = shuffleArray(filtered);
     }
 
     return filtered;
-  }, [restaurants, searchQuery, activeFilter, cuisineFilter, selectedRegion, userLocation, sortByDistance, filterByRegion]);
+  }, [restaurants, searchQuery, activeFilter, cuisineFilter, selectedRegion, userLocation, sortByDistance, filterByRegion, isCuisineMode]);
 
   const cuisineTypes = Array.from(new Set(restaurants.map((r) => r.cuisine_type)));
 
-  // Count restaurants per region
   const regionCounts = useMemo(() => {
     const counts: Record<string, number> = { All: restaurants.length };
     restaurants.forEach(r => {
@@ -169,12 +213,79 @@ const Discover = () => {
     return counts;
   }, [restaurants]);
 
+  // --- Curated Cuisine Mode ---
+  if (isCuisineMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-24">
+        {/* Curated header */}
+        <div className="px-4 pt-6 pb-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="text-sm">Back</span>
+          </button>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight animate-slide-up">
+            {cuisineDisplayName}
+          </h1>
+          <p className="text-sm text-muted-foreground/70 mt-1 animate-slide-up" style={{ animationDelay: '50ms' }}>
+            Restaurants picked for you tonight
+          </p>
+        </div>
+
+        {/* Restaurant grid */}
+        <div className="px-4 py-6">
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-[220px] rounded-2xl bg-secondary/50 shimmer-loading" />
+              ))}
+            </div>
+          ) : filteredRestaurants.length === 0 ? (
+            <div className="text-center py-16 animate-slide-up">
+              <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-4">
+                <Utensils className="h-8 w-8 text-muted-foreground/30" />
+              </div>
+              <p className="text-foreground font-medium mb-1">No {cuisineDisplayName} restaurants yet</p>
+              <p className="text-sm text-muted-foreground/60">Check back soon — we're always adding more</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-4 text-purple"
+                onClick={() => navigate("/")}
+              >
+                Back to home
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {filteredRestaurants.map((restaurant, index) => (
+                <div
+                  key={restaurant.id}
+                  className="animate-scale-in"
+                  style={{ animationDelay: `${80 + index * 60}ms` }}
+                >
+                  <PremiumRestaurantCard
+                    restaurant={restaurant}
+                    variant="grid"
+                    index={index}
+                    hideMatchScore
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // --- Default Explore Mode ---
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-24">
-      {/* Neutral Exploratory Header */}
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="px-4 py-4">
-          {/* Title Row - Neutral, exploratory tone */}
           <div className="flex items-center justify-between mb-4">
             <div className="animate-slide-up">
               <h1 className="text-2xl font-bold text-foreground tracking-tight">Explore</h1>
@@ -188,7 +299,6 @@ const Discover = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
           <div className="relative animate-slide-up" style={{ animationDelay: '100ms' }}>
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <Input
@@ -198,7 +308,7 @@ const Discover = () => {
               className="pl-11 pr-10 h-12 rounded-2xl border-border/50 bg-secondary/30 focus:bg-card focus:border-purple/30 transition-all"
             />
             {searchQuery && (
-              <button 
+              <button
                 onClick={() => setSearchQuery("")}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
               >
@@ -207,7 +317,6 @@ const Discover = () => {
             )}
           </div>
 
-          {/* Region Filter */}
           <div className="mt-4 animate-slide-up" style={{ animationDelay: '150ms' }}>
             <RegionFilter
               selectedRegion={selectedRegion || "All"}
@@ -217,7 +326,6 @@ const Discover = () => {
             />
           </div>
 
-          {/* Filter Chips */}
           <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
             {filterChips.map((chip, index) => {
               const Icon = chip.icon;
@@ -227,8 +335,8 @@ const Discover = () => {
                   key={chip.id}
                   onClick={() => setActiveFilter(chip.id)}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all chip-animate ${
-                    isActive 
-                      ? 'bg-purple text-primary-foreground shadow-neon' 
+                    isActive
+                      ? 'bg-purple text-primary-foreground shadow-neon'
                       : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
                   }`}
                   style={{ animationDelay: `${200 + index * 50}ms` }}
@@ -240,7 +348,6 @@ const Discover = () => {
             })}
           </div>
 
-          {/* Cuisine Chips */}
           {cuisineTypes.length > 0 && (
             <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
               {cuisineTypes.map((cuisine) => (
@@ -248,8 +355,8 @@ const Discover = () => {
                   key={cuisine}
                   onClick={() => setCuisineFilter(cuisineFilter === cuisine ? null : cuisine)}
                   className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all chip-animate ${
-                    cuisineFilter === cuisine 
-                      ? 'bg-purple/20 text-purple border border-purple/30' 
+                    cuisineFilter === cuisine
+                      ? 'bg-purple/20 text-purple border border-purple/30'
                       : 'bg-secondary/30 text-muted-foreground/70 hover:bg-secondary/50'
                   }`}
                 >
@@ -261,15 +368,12 @@ const Discover = () => {
         </div>
       </div>
 
-      {/* Restaurant Grid - Neutral browsing, no personalized banners */}
       <div className="px-4 py-6">
-        {/* Results count - neutral tone */}
         {!isLoading && filteredRestaurants.length > 0 && (
           <div className="mb-4 animate-slide-up">
             <p className="text-sm text-muted-foreground">
-              {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'restaurant' : 'restaurants'} 
+              {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'restaurant' : 'restaurants'}
               {selectedRegion && selectedRegion !== 'All' ? ` in ${selectedRegion}` : ''}
-              {cuisineFilter ? ` · ${cuisineFilter}` : ''}
             </p>
           </div>
         )}
@@ -306,14 +410,14 @@ const Discover = () => {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {filteredRestaurants.map((restaurant, index) => (
-              <div 
+              <div
                 key={restaurant.id}
                 className="animate-scale-in"
                 style={{ animationDelay: `${100 + index * 50}ms` }}
               >
-                <PremiumRestaurantCard 
-                  restaurant={restaurant} 
-                  variant="grid" 
+                <PremiumRestaurantCard
+                  restaurant={restaurant}
+                  variant="grid"
                   index={index}
                   hideMatchScore
                 />
