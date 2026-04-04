@@ -220,11 +220,11 @@ const Discover = () => {
         {/* Curated header */}
         <div className="px-4 pt-6 pb-2">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm">Back</span>
+            <span className="text-sm">Home</span>
           </button>
           <h1 className="text-3xl font-bold text-foreground tracking-tight animate-slide-up">
             {cuisineDisplayName}
