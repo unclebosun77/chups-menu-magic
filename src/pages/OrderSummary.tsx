@@ -222,6 +222,11 @@ const OrderSummary = () => {
             )}
           </div>
 
+          {/* Bill Splitter */}
+          {orderItems.length > 0 && (
+            <BillSplitter items={orderItems} totalAmount={totalAmount} />
+          )}
+
           {/* Customer Information */}
           {orderItems.length > 0 && (
             <>
