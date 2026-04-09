@@ -61,7 +61,7 @@ const ReviewAndSubmit = () => {
           latitude: restaurant.latitude ? Number(restaurant.latitude) : null,
           longitude: restaurant.longitude ? Number(restaurant.longitude) : null,
           logo_url: restaurant.logo_url || null,
-          gallery_images: gallery.length > 0 ? gallery : null,
+          gallery_images: gallery.length > 0 ? JSON.parse(JSON.stringify(gallery)) : null,
           hours: restaurant.hours as any || null,
           tags: restaurant.tags?.length > 0 ? restaurant.tags : null,
           is_open: true,
