@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle, QrCode } from "lucide-react";
+import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle, QrCode, ArrowLeft } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -222,6 +222,9 @@ const RestaurantDashboard = () => {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full mr-1">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             {restaurant.logo_url && (
               <img src={restaurant.logo_url} alt={restaurant.name} className="h-12 w-12 object-contain rounded" />
             )}
