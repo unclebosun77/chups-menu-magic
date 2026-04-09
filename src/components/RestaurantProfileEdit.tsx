@@ -1,3 +1,6 @@
+// Storage bucket: "restaurant-logos" — public read, authenticated upload
+// Upload path: {userId}/logo.{ext}
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,19 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Upload, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const cuisineTypes = [
   "Italian", "Mexican", "Chinese", "Japanese", "Indian", "Thai", "French", "American",
   "Mediterranean", "Middle Eastern", "Korean", "Vietnamese", "Afro-Caribbean", "Fast Food", "Fusion", "Other"
-];
-
-const priceRanges = [
-  { value: "$", label: "$ - Budget Friendly" },
-  { value: "$$", label: "$$ - Moderate" },
-  { value: "$$$", label: "$$$ - Upscale" },
-  { value: "$$$$", label: "$$$$ - Fine Dining" }
 ];
 
 interface RestaurantProfileEditProps {
@@ -41,6 +38,8 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     name: restaurant.name,
     cuisine_type: restaurant.cuisine_type,
@@ -51,14 +50,52 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
     city: restaurant.city || "",
   });
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, logo: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    try {
+      setIsUploadingLogo(true);
+      setUploadProgress(10);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Please log in to upload", variant: "destructive" });
+        return;
+      }
+
+      const userId = session.user.id;
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${userId}/logo.${ext}`;
+
+      setUploadProgress(30);
+
+      const { error } = await supabase.storage
+        .from('restaurant-logos')
+        .upload(path, file, { upsert: true });
+
+      if (error) {
+        toast({ title: "Logo upload failed", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      setUploadProgress(80);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('restaurant-logos')
+        .getPublicUrl(path);
+
+      setUploadProgress(100);
+      setFormData(prev => ({ ...prev, logo: publicUrl }));
+      toast({ title: "Logo uploaded successfully" });
+    } catch (err: any) {
+      toast({ title: "Upload error", description: err.message, variant: "destructive" });
+    } finally {
+      setTimeout(() => {
+        setIsUploadingLogo(false);
+        setUploadProgress(0);
+      }, 500);
+      e.target.value = '';
     }
   };
 
@@ -86,10 +123,10 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
       onSuccess();
       onClose();
     } catch (error: any) {
-      toast({ 
-        title: "Error updating profile", 
-        description: error.message, 
-        variant: "destructive" 
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -120,8 +157,14 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
                 variant="outline"
                 className="w-full h-32 border-2 border-dashed"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingLogo}
               >
-                {formData.logo ? (
+                {isUploadingLogo ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-sm">Uploading...</span>
+                  </div>
+                ) : formData.logo ? (
                   <div className="flex flex-col items-center gap-3">
                     <img src={formData.logo} alt="Logo Preview" className="h-20 w-20 object-contain rounded" />
                     <span className="text-sm">Change Logo</span>
@@ -133,6 +176,7 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
                   </div>
                 )}
               </Button>
+              {isUploadingLogo && <Progress value={uploadProgress} className="h-1.5" />}
             </div>
           </div>
 
@@ -149,14 +193,10 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
           <div className="space-y-2">
             <Label htmlFor="edit-cuisine" className="text-base font-semibold">Cuisine Type *</Label>
             <Select value={formData.cuisine_type} onValueChange={(value) => setFormData({ ...formData, cuisine_type: value })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {cuisineTypes.map((cuisine) => (
-                  <SelectItem key={cuisine} value={cuisine}>
-                    {cuisine}
-                  </SelectItem>
+                  <SelectItem key={cuisine} value={cuisine}>{cuisine}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -192,7 +232,6 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
                 placeholder="123 Main St"
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="edit-city" className="text-base font-semibold">City</Label>
               <Input
@@ -205,10 +244,8 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
           </div>
 
           <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={isLoading || isUploadingLogo}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
             </Button>
