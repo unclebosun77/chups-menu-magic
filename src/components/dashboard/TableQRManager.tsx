@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Printer, QrCode, Plus, Minus } from "lucide-react";
+import { Download, Printer, QrCode, Plus, Minus, ExternalLink, Info } from "lucide-react";
 
 interface TableQRManagerProps {
   restaurantId: string;
@@ -98,6 +98,23 @@ const TableQRManager = ({ restaurantId, restaurantName }: TableQRManagerProps) =
 
   return (
     <div className="space-y-6">
+      {/* Instruction banner */}
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/15">
+        <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-medium text-foreground">How table QR codes work</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Set your table count, then print and place QR codes on each table. Customers scan to order directly from their seat.
+          </p>
+        </div>
+      </div>
+
+      {/* URL preview */}
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary/50 border border-border/40">
+        <QrCode className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <code className="text-xs text-muted-foreground break-all flex-1">{getTableUrl(1)}</code>
+      </div>
+
       {/* Table count control */}
       <Card>
         <CardHeader>
@@ -169,15 +186,26 @@ const TableQRManager = ({ restaurantId, restaurantName }: TableQRManagerProps) =
               <p className="text-[10px] text-muted-foreground break-all max-w-[180px]">
                 {getTableUrl(num)}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => handleDownload(num)}
-              >
-                <Download className="h-3 w-3 mr-1.5" />
-                Download PNG
-              </Button>
+              <div className="flex gap-2 w-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => handleDownload(num)}
+                >
+                  <Download className="h-3 w-3 mr-1.5" />
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => window.open(getTableUrl(num), "_blank")}
+                >
+                  <ExternalLink className="h-3 w-3 mr-1.5" />
+                  Test
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}

@@ -33,8 +33,8 @@ const CrowdPill = ({ level }: { level: string }) => {
   const config = CROWD_COLORS[level];
   if (!config) return null;
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${config.bg} ${config.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <span className={`w-2 h-2 rounded-full ${config.dot} animate-pulse`} />
       {config.label}
     </span>
   );
@@ -164,6 +164,7 @@ const RestaurantProfile = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [fallbackCrowdLevel, setFallbackCrowdLevel] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get("table");
 
@@ -253,6 +254,36 @@ const RestaurantProfile = () => {
     };
     loadRestaurant();
   }, [restaurantId]);
+
+  // Fallback crowd level from recent orders when no Supabase crowd data
+  useEffect(() => {
+    if (!supabaseId) return;
+    const hasFreshCrowd = restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000;
+    if (hasFreshCrowd) {
+      setFallbackCrowdLevel(null);
+      return;
+    }
+    const fetchRecentOrders = async () => {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("restaurant_id", supabaseId)
+        .gte("created_at", oneHourAgo);
+      const c = count || 0;
+      if (c === 0) setFallbackCrowdLevel("quiet");
+      else if (c <= 3) setFallbackCrowdLevel("moderate");
+      else setFallbackCrowdLevel("busy");
+    };
+    fetchRecentOrders();
+  }, [supabaseId, restaurant?.crowdLevel, restaurant?.crowdUpdatedAt]);
+
+  const effectiveCrowdLevel = useMemo(() => {
+    if (restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000) {
+      return restaurant.crowdLevel;
+    }
+    return fallbackCrowdLevel;
+  }, [restaurant?.crowdLevel, restaurant?.crowdUpdatedAt, fallbackCrowdLevel]);
 
   if (isLoading) {
     return (
@@ -367,7 +398,7 @@ const RestaurantProfile = () => {
                       <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
-                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
+                        {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
@@ -400,7 +431,7 @@ const RestaurantProfile = () => {
                     <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
-                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
+                      {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">

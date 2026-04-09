@@ -293,7 +293,9 @@ const RestaurantDashboard = () => {
             currentLevel={restaurant.crowd_level || null}
             updatedAt={restaurant.crowd_updated_at || null}
             orders={orders.map(o => ({ created_at: o.created_at, status: o.status }))}
-            onUpdate={handleProfileUpdate}
+            onUpdate={(level, updatedAt) => {
+              setRestaurant(prev => prev ? { ...prev, crowd_level: level, crowd_updated_at: updatedAt } : prev);
+            }}
           />
         </div>
 

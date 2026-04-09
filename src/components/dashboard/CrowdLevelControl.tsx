@@ -19,7 +19,7 @@ interface CrowdLevelControlProps {
   currentLevel: string | null;
   updatedAt: string | null;
   orders: { created_at: string; status: string }[];
-  onUpdate: () => void;
+  onUpdate: (level: string, updatedAt: string) => void;
 }
 
 const CrowdLevelControl = ({ restaurantId, currentLevel, updatedAt, orders, onUpdate }: CrowdLevelControlProps) => {
@@ -49,8 +49,9 @@ const CrowdLevelControl = ({ restaurantId, currentLevel, updatedAt, orders, onUp
 
       if (error) throw error;
 
+      const now = new Date().toISOString();
       toast({ title: "Crowd level updated", description: `Set to ${CROWD_LEVELS.find(l => l.value === level)?.label}` });
-      onUpdate();
+      onUpdate(level, now);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
