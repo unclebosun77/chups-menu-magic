@@ -102,8 +102,14 @@ const UniversalRestaurantCard = ({ restaurant, variant = "default" }: UniversalR
               <span className="text-foreground font-medium">Open</span>
             </div>
           )}
-          
-          {/* Rating overlay */}
+
+          {/* Crowd level dot */}
+          {restaurant.crowd_level && restaurant.crowd_updated_at && 
+            (Date.now() - new Date(restaurant.crowd_updated_at).getTime()) < 2 * 60 * 60 * 1000 && (
+            <div className="absolute top-2 left-2 flex items-center gap-1 bg-background/90 backdrop-blur-md px-1.5 py-1 rounded-full text-[9px] shadow-sm border border-border/30">
+              <span className={`w-2 h-2 rounded-full ${CROWD_DOT_COLORS[restaurant.crowd_level] || ""}`} />
+            </div>
+          )}
           <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 backdrop-blur-md px-2 py-1 rounded-full shadow-sm border border-border/30">
             <Star className="h-3 w-3 fill-purple text-purple" strokeWidth={1.5} />
             <span className="text-[10px] font-bold text-foreground">4.8</span>
