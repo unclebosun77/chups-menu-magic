@@ -13,6 +13,7 @@ interface OrderState {
   restaurantName?: string;
   totalAmount?: number;
   itemCount?: number;
+  paymentMethod?: string;
 }
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; icon: typeof CheckCircle2; color: string; description: string }> = {
@@ -29,7 +30,7 @@ const STATUS_FLOW: OrderStatus[] = ["pending", "accepted", "preparing", "ready",
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { orderId, restaurantName, totalAmount, itemCount } = (location.state || {}) as OrderState;
+  const { orderId, restaurantName, totalAmount, itemCount, paymentMethod } = (location.state || {}) as OrderState;
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>("pending");
   const [isPolling, setIsPolling] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
