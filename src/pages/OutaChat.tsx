@@ -134,7 +134,6 @@ User's message: ${userMessageContent}
       });
 
       if (resp.status === 429) {
-        toast.error("Outa is busy right now, try again in a moment");
         const fallback = getLocalFallback(userMessageContent);
         return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
       }
@@ -144,9 +143,8 @@ User's message: ${userMessageContent}
         let errorBody = '';
         try { errorBody = await resp.text(); } catch {}
 
-        if (resp.status === 500 && errorBody.includes('OPENAI_API_KEY')) {
-          toast.info("AI is being set up — using smart suggestions for now");
-        }
+        // Silently fall back
+
 
         const fallback = getLocalFallback(userMessageContent);
         return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
@@ -255,15 +253,15 @@ User's message: ${userMessageContent}
               <Sparkles className="h-5 w-5 text-white relative z-10" />
             </div>
             <div className="flex-1">
-              <h1 className="font-bold text-foreground text-lg leading-tight">Outa</h1>
-              <p className="text-[11px] text-muted-foreground">Your dining guide</p>
+              <h1 className="font-bold text-foreground text-lg leading-tight">Ask Outa 💜</h1>
+              <p className="text-[11px] text-muted-foreground">Your personal dining guide</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-2">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-32">
         {messages.map((message, index) => {
           // For outa messages after user has sent something, strip quickFilters
           const shouldShowQuickFilters = !hasUserSentMessage || index === messages.length - 1;
@@ -304,8 +302,8 @@ User's message: ${userMessageContent}
         )}
       </div>
 
-      {/* Input — sits above bottom nav (pb-16 for nav height) */}
-      <div className="flex-shrink-0 pb-16">
+      {/* Input — sticky at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 pb-16">
         <ChatInput onSend={handleSendMessage} disabled={isTyping} />
       </div>
     </div>
