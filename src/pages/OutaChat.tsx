@@ -10,10 +10,18 @@ import { ChatMessage, getInitialMessage, generateMessageId } from '@/utils/chatE
 import { useTasteProfile } from '@/context/TasteProfileContext';
 import { useLocation } from '@/context/LocationContext';
 import { useUserBehavior } from '@/context/UserBehaviorContext';
-import { getAllCanonicalRestaurants, getCanonicalRestaurant } from '@/data/canonicalRestaurants';
-import { enrichWithLocation } from '@/utils/mockLocations';
+import { supabase } from '@/integrations/supabase/client';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
+
+interface SupabaseRestaurant {
+  id: string;
+  name: string;
+  cuisine_type: string;
+  address: string | null;
+  is_open: boolean;
+  description: string | null;
+}
 
 const OutaChat = () => {
   const navigate = useNavigate();
@@ -24,8 +32,24 @@ const OutaChat = () => {
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
 
-  // Initialize with personalized greeting based on user profile and behavior
+  // Fetch restaurants from Supabase on mount
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('id, name, cuisine_type, address, is_open, description')
+        .eq('status', 'active');
+      
+      if (!error && data) {
+        setSupabaseRestaurants(data);
+      }
+    };
+    fetchRestaurants();
+  }, []);
+
+  // Initialize with personalized greeting
   useEffect(() => {
     const initialMessage = getInitialMessage(profile);
     setMessages([initialMessage]);
@@ -38,11 +62,18 @@ const OutaChat = () => {
     }
   }, [messages, isTyping]);
 
-  // Get canonical restaurants enriched with location data
-  const restaurants = getAllCanonicalRestaurants().map(r => enrichWithLocation({
-    ...r,
-    cuisine: r.cuisine,
-  }));
+  // Build restaurant context string for AI
+  const buildRestaurantContext = useCallback(() => {
+    return JSON.stringify(
+      supabaseRestaurants.map(r => ({
+        name: r.name,
+        cuisine: r.cuisine_type,
+        address: r.address,
+        isOpen: r.is_open,
+        description: r.description,
+      }))
+    );
+  }, [supabaseRestaurants]);
 
   // Build context from user profile and behavior
   const buildUserContext = () => {
@@ -51,7 +82,7 @@ const OutaChat = () => {
     const recentSearches = behavior.recentSearches.slice(0, 3).join(', ');
     
     return {
-      location: userLocation ? 'Birmingham city centre' : 'Birmingham city centre',
+      location: 'Birmingham city centre',
       cuisines: preferredCuisines,
       spiceLevel: profile?.spiceLevel || 'medium',
       pricePreference: profile?.pricePreference || 'mid',
@@ -62,7 +93,6 @@ const OutaChat = () => {
   };
 
   const streamAIResponse = async (userMessageContent: string, allMessages: ChatMessage[]) => {
-    // Build conversation history for the AI
     const conversationHistory = allMessages
       .filter(m => m.type === 'user' || m.type === 'outa')
       .map(m => ({
@@ -70,10 +100,8 @@ const OutaChat = () => {
         content: m.content,
       }));
 
-    // Build rich context from user profile and behavior
     const userContext = buildUserContext();
 
-    // Add context about user preferences and nearby restaurants
     const contextMessage = `
 User context:
 - Location: ${userContext.location}
@@ -83,10 +111,6 @@ User context:
 - Recently visited: ${userContext.recentRestaurants}
 - Recent searches: ${userContext.recentSearches}
 ${userContext.likesSpicy ? '- User enjoys spicy food' : ''}
-
-Available nearby restaurants: ${restaurants.slice(0, 5).map(r => 
-  `${r.name} (${r.cuisine || 'varied'}, ${r.priceLevel || '££'}, ${r.distance || 'nearby'})`
-).join('; ')}
 
 User's message: ${userMessageContent}
 `;
@@ -100,9 +124,10 @@ User's message: ${userMessageContent}
         },
         body: JSON.stringify({
           messages: [
-            ...conversationHistory.slice(-10), // Keep last 10 messages for context
+            ...conversationHistory.slice(-10),
             { role: 'user', content: contextMessage },
           ],
+          restaurantContext: buildRestaurantContext(),
         }),
       });
 
@@ -149,7 +174,6 @@ User's message: ${userMessageContent}
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
               fullContent += content;
-              // Update message in real-time
               setMessages(prev => {
                 const last = prev[prev.length - 1];
                 if (last?.type === 'outa' && last.id.startsWith('streaming-')) {
@@ -169,9 +193,8 @@ User's message: ${userMessageContent}
         }
       }
 
-      // Parse any remaining quick actions or restaurants from AI response
       const quickFilters = extractQuickActions(fullContent);
-      const mentionedRestaurants = findMentionedRestaurants(fullContent, restaurants);
+      const mentionedRestaurants = findMentionedRestaurants(fullContent);
 
       return { 
         content: fullContent, 
@@ -187,7 +210,6 @@ User's message: ${userMessageContent}
     }
   };
 
-  // Extract quick actions from AI response
   const extractQuickActions = (content: string): string[] => {
     const actions: string[] = [];
     if (content.toLowerCase().includes('book') || content.toLowerCase().includes('reserv')) {
@@ -205,19 +227,24 @@ User's message: ${userMessageContent}
     return actions.slice(0, 3);
   };
 
-  // Find mentioned restaurants from canonical data only
-  const findMentionedRestaurants = (content: string, allRestaurants: any[]): any[] => {
+  // Match restaurant names from AI response against Supabase data
+  const findMentionedRestaurants = (content: string): any[] => {
     const lower = content.toLowerCase();
-    return allRestaurants.filter(r => 
-      lower.includes(r.name.toLowerCase())
-    ).slice(0, 3);
+    return supabaseRestaurants
+      .filter(r => lower.includes(r.name.toLowerCase()))
+      .slice(0, 3)
+      .map(r => ({
+        id: r.id,
+        name: r.name,
+        cuisine: r.cuisine_type,
+        address: r.address,
+        isOpen: r.is_open,
+      }));
   };
 
   const handleSendMessage = useCallback(async (content: string) => {
-    // Log search for user behavior tracking
     addSearch(content);
 
-    // Add user message
     const userMessage: ChatMessage = {
       id: generateMessageId(),
       type: 'user',
@@ -228,7 +255,6 @@ User's message: ${userMessageContent}
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Create placeholder for streaming response
     const streamingId = `streaming-${generateMessageId()}`;
     const placeholderMessage: ChatMessage = {
       id: streamingId,
@@ -240,16 +266,14 @@ User's message: ${userMessageContent}
     setMessages(prev => [...prev, placeholderMessage]);
     setIsTyping(false);
 
-    // Stream AI response
     const response = await streamAIResponse(content, [...messages, userMessage]);
     
-    // Finalize message with full content and data
     setMessages(prev => 
       prev.map(m => 
         m.id === streamingId 
           ? {
               ...m,
-              id: generateMessageId(), // Replace streaming ID
+              id: generateMessageId(),
               content: response.content,
               data: {
                 restaurants: response.restaurants,
@@ -259,20 +283,18 @@ User's message: ${userMessageContent}
           : m
       )
     );
-  }, [messages, profile, userLocation, restaurants, addSearch]);
+  }, [messages, profile, userLocation, supabaseRestaurants, addSearch]);
 
   const handleQuickAction = useCallback((action: string) => {
     handleSendMessage(action);
   }, [handleSendMessage]);
 
   const handleRestaurantClick = useCallback((restaurant: any) => {
-    // Log restaurant visit for activity tracking
     addRestaurantVisit({
       id: restaurant.id,
       name: restaurant.name,
       cuisine: restaurant.cuisine || 'varied',
     });
-    // Navigate to canonical restaurant profile
     navigate(`/restaurant/${restaurant.id}`);
   }, [navigate, addRestaurantVisit]);
 
@@ -334,7 +356,6 @@ User's message: ${userMessageContent}
         
         {isTyping && <TypingIndicator />}
 
-        {/* Pre-filled intent prompts when conversation just started */}
         {messages.length <= 1 && !isTyping && (
           <div className="px-4 pb-4">
             <p className="text-xs text-muted-foreground/60 mb-3 px-1">Try asking…</p>

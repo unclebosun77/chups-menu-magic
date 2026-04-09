@@ -12,12 +12,16 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const { messages, restaurantContext } = await req.json();
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured');
     }
+
+    const restaurantData = restaurantContext
+      ? `\n\nYou have access to the following real restaurants on the Chups platform:\n${restaurantContext}\n\nAlways recommend from this list when possible. Include name, cuisine, price range, and whether currently open.`
+      : '';
 
     const systemPrompt = `You are Outa, the AI dining guide for CHUPS — a premium restaurant discovery app in Birmingham, UK.
 
@@ -40,17 +44,18 @@ Guidelines:
 - When user mentions location/preferences, acknowledge and use that context
 - If asked to plan an evening, create a structured itinerary with times
 - Be confident in your recommendations — you know Birmingham's dining scene!
+- When recommending restaurants, always use the EXACT name from the list below so the app can link to them.
 
-Remember: You have context about the user's taste preferences and nearby restaurants. Use this to personalize your recommendations.`;
+Remember: You have context about the user's taste preferences and nearby restaurants. Use this to personalize your recommendations.${restaurantData}`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages
@@ -66,16 +71,10 @@ Remember: You have context about the user's taste preferences and nearby restaur
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Payment required, please add funds to your Lovable AI workspace.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
       const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
+      console.error('OpenAI API error:', response.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'AI gateway error' }),
+        JSON.stringify({ error: 'AI API error' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
