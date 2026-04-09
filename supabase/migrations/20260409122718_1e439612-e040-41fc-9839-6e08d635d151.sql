@@ -1,0 +1,1 @@
+ALTER TABLE public.restaurants ADD COLUMN is_temporarily_closed boolean NOT NULL DEFAULT false;
