@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle } from "lucide-react";
+import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle, QrCode } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MenuItemForm from "@/components/MenuItemForm";
 import MenuItemCard from "@/components/MenuItemCard";
 import RestaurantProfileEdit from "@/components/RestaurantProfileEdit";
 import OrderManagement from "@/components/dashboard/OrderManagement";
+import TableQRManager from "@/components/dashboard/TableQRManager";
 
 type Restaurant = {
   id: string;
@@ -64,6 +66,7 @@ const RestaurantDashboard = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
+  const [activeTab, setActiveTab] = useState("orders");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -277,10 +280,29 @@ const RestaurantDashboard = () => {
           </CardContent>
         </Card>
         {/* Order Management Section */}
-        <OrderManagement 
-          orders={orders} 
-          onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)} 
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="mb-4">
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="menu">Menu</TabsTrigger>
+            <TabsTrigger value="tables" className="flex items-center gap-1.5">
+              <QrCode className="h-3.5 w-3.5" />
+              Tables
+            </TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="orders">
+            <OrderManagement 
+              orders={orders} 
+              onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)} 
+            />
+          </TabsContent>
+
+          <TabsContent value="tables">
+            <TableQRManager restaurantId={restaurant.id} restaurantName={restaurant.name} />
+          </TabsContent>
+
+          <TabsContent value="insights">
 
         {/* Insights Section */}
         <div className="mb-8">

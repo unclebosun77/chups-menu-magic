@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useAuth } from "@/context/AuthContext";
@@ -38,6 +38,8 @@ const RestaurantProfile = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [searchParams] = useSearchParams();
+  const tableNumber = searchParams.get("table");
 
   // Get the normalized Supabase ID
   const supabaseId = restaurantId ? getSupabaseId(restaurantId) : "";
@@ -180,6 +182,7 @@ const RestaurantProfile = () => {
       state: {
         restaurantName: restaurant.name,
         restaurantId: restaurant.id,
+        tableNumber: tableNumber || null,
         items: order.map(item => ({
           id: item.id,
           name: item.name,

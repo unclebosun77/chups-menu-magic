@@ -25,7 +25,7 @@ const OrderSummary = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  const { restaurantName, restaurantId, items: initialItems } = location.state || {};
+  const { restaurantName, restaurantId, items: initialItems, tableNumber } = location.state || {};
   
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialItems || []);
   const [customerName, setCustomerName] = useState(user?.email?.split('@')[0] || "");
@@ -84,6 +84,7 @@ const OrderSummary = () => {
         customer_name: customerName,
         customer_email: customerEmail || null,
         customer_phone: customerPhone || null,
+        table_number: tableNumber || null,
         items: orderItems.map(item => ({ 
           id: item.id, 
           name: item.name, 
