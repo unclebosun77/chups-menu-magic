@@ -108,7 +108,7 @@ const ReviewAndSubmit = () => {
       // Clear draft and redirect after animation
       setTimeout(() => {
         clearDraft();
-        navigate('/');
+        navigate('/restaurant/dashboard');
       }, 3000);
 
     } catch (error: any) {
