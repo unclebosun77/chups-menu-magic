@@ -365,6 +365,8 @@ export type Database = {
           brand_style: string
           city: string | null
           created_at: string
+          crowd_level: string | null
+          crowd_updated_at: string | null
           cuisine_type: string
           description: string | null
           gallery_images: Json | null
@@ -389,6 +391,8 @@ export type Database = {
           brand_style: string
           city?: string | null
           created_at?: string
+          crowd_level?: string | null
+          crowd_updated_at?: string | null
           cuisine_type: string
           description?: string | null
           gallery_images?: Json | null
@@ -413,6 +417,8 @@ export type Database = {
           brand_style?: string
           city?: string | null
           created_at?: string
+          crowd_level?: string | null
+          crowd_updated_at?: string | null
           cuisine_type?: string
           description?: string | null
           gallery_images?: Json | null
