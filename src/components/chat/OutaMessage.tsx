@@ -25,13 +25,14 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick 
       <div className="max-w-[85%]">
         {/* Avatar */}
         <div className="flex items-start gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple to-neon-pink flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple/30">
-            <Sparkles className="h-4 w-4 text-white" />
+          <div className="relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple via-neon-pink to-purple animate-[spin_4s_linear_infinite] bg-[length:200%_200%]" />
+            <Sparkles className="h-4 w-4 text-white relative z-10" />
           </div>
           
           <div className="flex-1 space-y-3">
             {/* Main message bubble */}
-            <div className="bg-secondary/80 backdrop-blur-xl border border-border/50 px-4 py-3 rounded-2xl rounded-tl-md shadow-lg">
+            <div className="bg-purple/8 border border-purple/10 px-4 py-3 rounded-2xl rounded-tl-md shadow-sm">
               <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
                 {content}
               </p>
