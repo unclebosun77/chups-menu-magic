@@ -13,6 +13,7 @@ import MenuItemCard from "@/components/MenuItemCard";
 import RestaurantProfileEdit from "@/components/RestaurantProfileEdit";
 import OrderManagement from "@/components/dashboard/OrderManagement";
 import TableQRManager from "@/components/dashboard/TableQRManager";
+import CrowdLevelControl from "@/components/dashboard/CrowdLevelControl";
 
 type Restaurant = {
   id: string;
@@ -24,6 +25,8 @@ type Restaurant = {
   address?: string;
   city?: string;
   is_temporarily_closed?: boolean;
+  crowd_level?: string | null;
+  crowd_updated_at?: string | null;
 };
 
 type MenuItem = {
@@ -79,7 +82,7 @@ const RestaurantDashboard = () => {
 
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed")
+        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at")
         .eq("user_id", session.user.id)
         .single();
 
@@ -196,7 +199,7 @@ const RestaurantDashboard = () => {
     if (session) {
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed")
+        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at")
         .eq("user_id", session.user.id)
         .single();
       
