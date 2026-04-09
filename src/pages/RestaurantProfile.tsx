@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info } from "lucide-react";
+import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info, Share2, ChevronDown } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,6 @@ import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 import ReviewsSection from "@/components/ReviewsSection";
 import { ReservationDialog } from "@/components/ReservationDialog";
 
-// Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
 
 const CROWD_COLORS: Record<string, { dot: string; bg: string; text: string; label: string }> = {
@@ -41,6 +40,115 @@ const CrowdPill = ({ level }: { level: string }) => {
   );
 };
 
+/* ─── Quick Info: Hours row with expandable week ─── */
+const QuickInfoHoursRow = ({ status, todayDisplay, openingHours }: { status: any; todayDisplay: string | null; openingHours: any }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="flex items-center gap-3 px-4 py-3 w-full hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+      >
+        <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+          <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
+        </div>
+        <div className="flex-1 text-left">
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${status.isOpen ? 'bg-emerald-500' : 'bg-red-400'}`} />
+            <span className={`text-[13px] font-semibold ${status.isOpen ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>
+              {status.label}
+            </span>
+          </div>
+          {todayDisplay && (
+            <p className="text-[11px] text-muted-foreground mt-0.5">Today: {todayDisplay}</p>
+          )}
+        </div>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground/40 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded && openingHours && (
+        <div className="px-4 pb-3 pl-[60px] space-y-1">
+          {Object.entries(openingHours).map(([day, hours]: [string, any]) => {
+            const display = typeof hours === 'object' && hours !== null
+              ? (hours.closed ? 'Closed' : `${hours.open} – ${hours.close}`)
+              : String(hours);
+            return (
+              <div key={day} className="flex justify-between text-[11px]">
+                <span className="text-muted-foreground capitalize">{day}</span>
+                <span className="font-medium text-foreground/75">{display}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── Quick Info Section ─── */
+const QuickInfoSection = ({ restaurant }: { restaurant: DemoRestaurant }) => {
+  const status = getOpeningStatus(restaurant.openingHours as any);
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  const todayHours = (restaurant.openingHours as any)?.[today];
+  const todayDisplay = todayHours
+    ? (typeof todayHours === 'object' && todayHours !== null
+        ? (todayHours.closed ? 'Closed' : `${todayHours.open} – ${todayHours.close}`)
+        : String(todayHours))
+    : null;
+
+  return (
+    <div
+      className="px-5 pt-4 pb-3 animate-[sectionSlide_0.45s_ease-out_forwards]"
+      style={{ opacity: 0, animationDelay: '300ms' }}
+    >
+      <Card className="border-border/30 shadow-sm overflow-hidden">
+        <CardContent className="p-0 divide-y divide-border/30">
+          {restaurant.address && (
+            <a
+              href={`https://maps.google.com?q=${encodeURIComponent(restaurant.address + (restaurant.city ? ', ' + restaurant.city : ''))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+            >
+              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+                <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-foreground truncate">{restaurant.address}{restaurant.city ? `, ${restaurant.city}` : ''}</p>
+              </div>
+              {restaurant.distance && (
+                <span className="text-[11px] text-muted-foreground font-medium flex-shrink-0">{restaurant.distance}</span>
+              )}
+              <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+            </a>
+          )}
+
+          <a
+            href="tel:+441234567890"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+          >
+            <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+              <Phone className="h-4 w-4 text-purple" strokeWidth={1.5} />
+            </div>
+            <p className="text-[13px] text-foreground flex-1">+44 1234 567 890</p>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+          </a>
+
+          <QuickInfoHoursRow status={status} todayDisplay={todayDisplay} openingHours={restaurant.openingHours} />
+
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-[13px] font-bold text-purple">{restaurant.priceLevel?.[0] || '£'}</span>
+            </div>
+            <p className="text-[13px] text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// ─── Main Component ───
+
 const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
@@ -59,29 +167,18 @@ const RestaurantProfile = () => {
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get("table");
 
-  // Get the normalized Supabase ID
   const supabaseId = restaurantId ? getSupabaseId(restaurantId) : "";
-  
-  // Check if this restaurant is saved
   const isFavorite = checkIsSaved(supabaseId);
 
   // Load restaurant data
   useEffect(() => {
     const loadRestaurant = async () => {
       setIsLoading(true);
-      
-      if (!restaurantId) {
-        setIsLoading(false);
-        return;
-      }
+      if (!restaurantId) { setIsLoading(false); return; }
 
-      // Normalize the ID - convert legacy demo IDs to Supabase UUIDs
       const supabaseId = getSupabaseId(restaurantId);
-      
-      // Check if we have rich demo data for this restaurant (now keyed by Supabase UUID)
       const demoData = demoRestaurants[supabaseId];
       
-      // Try loading from Supabase first
       const { data, error } = await supabase
         .from("restaurants")
         .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
@@ -89,7 +186,6 @@ const RestaurantProfile = () => {
         .maybeSingle();
 
       if (data && !error) {
-        // Merge Supabase data with rich demo data if available
         if (demoData) {
           setRestaurant({
             ...demoData,
@@ -106,7 +202,6 @@ const RestaurantProfile = () => {
             crowdUpdatedAt: data.crowd_updated_at,
           });
         } else {
-          // No demo data - fetch menu items from Supabase
           const { data: menuData } = await supabase
             .from("menu_items")
             .select("*")
@@ -123,7 +218,6 @@ const RestaurantProfile = () => {
             tags: [],
           }));
 
-          // Extract gallery from gallery_images JSON if available
           const galleryRaw = data.gallery_images as any[];
           const galleryUrls: string[] = Array.isArray(galleryRaw)
             ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
@@ -153,13 +247,10 @@ const RestaurantProfile = () => {
           });
         }
       } else if (demoData) {
-        // Fallback to demo data only if Supabase fails
         setRestaurant(demoData);
       }
-      
       setIsLoading(false);
     };
-
     loadRestaurant();
   }, [restaurantId]);
 
@@ -191,9 +282,7 @@ const RestaurantProfile = () => {
     vibrate(20);
     setOrder(prev => {
       const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i);
-      }
+      if (existing) return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i);
       return [...prev, { ...item, quantity }];
     });
     toast({ title: `Added ${item.name} to order ✨` });
@@ -205,13 +294,7 @@ const RestaurantProfile = () => {
         restaurantName: restaurant.name,
         restaurantId: restaurant.id,
         tableNumber: tableNumber || null,
-        items: order.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          description: item.description
-        }))
+        items: order.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity, description: item.description }))
       }
     });
   };
@@ -222,12 +305,10 @@ const RestaurantProfile = () => {
       navigate("/auth");
       return;
     }
-    
     vibrate(20);
     setIsSaving(true);
     const result = await toggleSave(supabaseId);
     setIsSaving(false);
-    
     if (result.error) {
       toast({ title: "Error", description: result.error, variant: "destructive" });
     } else {
@@ -238,103 +319,55 @@ const RestaurantProfile = () => {
   const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Get signature items for recommendation
   const signatureItems = restaurant.menu.filter(item => 
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28 animate-[pageEnter_0.35s_ease-out_forwards]" style={{ opacity: 0 }}>
-      {/* Hero Section with Gallery - Cinematic */}
+      {/* ─── HERO SECTION ─── */}
       <div className="relative">
-        {/* Top Navigation - Floating with Animation */}
         <div 
           className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center animate-[navFloat_0.4s_ease-out_forwards]"
           style={{ opacity: 0 }}
         >
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
           </Button>
           <div className="flex gap-2.5">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              disabled={isSaving}
-              className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${
-                isFavorite ? 'bg-red-50 text-red-500 border-red-200' : 'bg-background/85 hover:bg-background'
-              }`}
-              onClick={handleToggleFavorite}
-            >
+            <Button variant="ghost" size="icon" disabled={isSaving} className={`h-10 w-10 rounded-full backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 transition-all duration-200 hover:scale-105 active:scale-95 ${isFavorite ? 'bg-red-50 text-red-500 border-red-200' : 'bg-background/85 hover:bg-background'}`} onClick={handleToggleFavorite}>
               <Heart className={`h-5 w-5 transition-all ${isFavorite ? 'fill-current scale-110' : ''}`} strokeWidth={1.5} />
             </Button>
             {totalItems > 0 && (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 relative transition-all duration-200 hover:scale-105 active:scale-95"
-                onClick={handleViewOrder}
-              >
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/85 backdrop-blur-md hover:bg-background shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] border border-border/30 relative transition-all duration-200 hover:scale-105 active:scale-95" onClick={handleViewOrder}>
                 <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
-                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg animate-[badgePop_0.3s_ease-out]">
-                  {totalItems}
-                </span>
+                <span className="absolute -top-1 -right-1 bg-purple text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg animate-[badgePop_0.3s_ease-out]">{totalItems}</span>
               </Button>
             )}
           </div>
         </div>
 
-        {/* Smart Banner - Detects Logo vs Photo */}
+        {/* Smart Banner */}
         {(() => {
-          // Smart detection: if heroImage contains 'logo' in the URL or is same as logoUrl, treat as logo mode
           const currentImage = restaurant.galleryImages[galleryIndex] || restaurant.heroImage;
-          const isLogoMode = currentImage === restaurant.logoUrl || 
-            currentImage.toLowerCase().includes('logo') ||
-            restaurant.galleryImages.length === 0;
+          const isLogoMode = currentImage === restaurant.logoUrl || currentImage.toLowerCase().includes('logo') || restaurant.galleryImages.length === 0;
           
           if (isLogoMode) {
-            // Logo Mode - Centered, contained, premium presentation
             return (
-              <div 
-                className="relative min-h-[280px] overflow-hidden animate-[bannerReveal_0.6s_ease-out_forwards] bg-gradient-to-b from-secondary/50 via-secondary/30 to-background"
-                style={{ opacity: 0 }}
-              >
-                {/* Decorative background pattern */}
+              <div className="relative min-h-[280px] overflow-hidden animate-[bannerReveal_0.6s_ease-out_forwards] bg-gradient-to-b from-secondary/50 via-secondary/30 to-background" style={{ opacity: 0 }}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(139,92,246,0.08),transparent_60%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(236,72,153,0.05),transparent_50%)]" />
-                
-                {/* Centered Logo Container */}
                 <div className="flex flex-col items-center justify-center pt-16 pb-24 px-8">
-                  <div 
-                    className="w-[65%] max-w-[200px] aspect-square rounded-3xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(139,92,246,0.08)] p-4 border border-border/40 transition-transform duration-500 hover:scale-105 animate-[logoFloat_0.6s_ease-out_forwards]"
-                    style={{ opacity: 0, animationDelay: '150ms' }}
-                  >
-                    <img 
-                      src={restaurant.logoUrl} 
-                      alt={restaurant.name}
-                      className="w-full h-full object-contain"
-                    />
+                  <div className="w-[65%] max-w-[200px] aspect-square rounded-3xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12)] p-4 border border-border/40 animate-[logoFloat_0.6s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '150ms' }}>
+                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain" />
                   </div>
                 </div>
-                
-                {/* Restaurant Name Overlay */}
-                <div 
-                  className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-background via-background/80 to-transparent animate-[titleReveal_0.5s_ease-out_forwards]"
-                  style={{ opacity: 0, animationDelay: '250ms' }}
-                >
+                <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-background via-background/80 to-transparent animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '250ms' }}>
                   <div className="flex items-end justify-between">
                     <div className="flex-1">
                       <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
-                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
-                          (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
-                          <CrowdPill level={restaurant.crowdLevel} />
-                        )}
+                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
@@ -346,58 +379,28 @@ const RestaurantProfile = () => {
               </div>
             );
           }
-          
-          // Photo Mode - Cinematic hero banner
+
           return (
-            <div 
-              className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]"
-              style={{ opacity: 0 }}
-              onClick={() => setShowFullGallery(true)}
-            >
-              <img
-                src={currentImage}
-                alt={restaurant.name}
-                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-              />
+            <div className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
+              <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-              
-              {/* Gallery dots with animation */}
               {restaurant.galleryImages.length > 1 && (
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
                   {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"
-                      }`}
-                    />
+                    <button key={idx} onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }} className={`h-2 rounded-full transition-all duration-300 ${idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"}`} />
                   ))}
                 </div>
               )}
-
-              {/* Restaurant Name Overlay - Animated */}
-              <div 
-                className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]"
-                style={{ opacity: 0, animationDelay: '200ms' }}
-              >
+              <div className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '200ms' }}>
                 <div className="flex items-end gap-4">
-                  {/* Logo with glow */}
-                  <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0 transition-transform duration-300 hover:scale-105">
-                    <img 
-                      src={restaurant.logoUrl} 
-                      alt={restaurant.name}
-                      className="w-full h-full object-contain rounded-xl"
-                    />
+                  <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0">
+                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain rounded-xl" />
                   </div>
                   <div className="flex-1 pb-1">
                     <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
-                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
-                        (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
-                        <CrowdPill level={restaurant.crowdLevel} />
-                      )}
+                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
@@ -409,185 +412,77 @@ const RestaurantProfile = () => {
             </div>
           );
         })()}
-
-        {/* Powered by Outa tag */}
-        <div 
-          className="absolute bottom-2 right-4 animate-[fadeIn_0.4s_ease-out_forwards]"
-          style={{ opacity: 0, animationDelay: '400ms' }}
-        >
-          <span className="text-[10px] text-muted-foreground/40 flex items-center gap-1">
-            <Sparkles className="h-3 w-3" strokeWidth={1.5} /> Powered by CHUPS
-          </span>
-        </div>
       </div>
 
-      {/* Action Row - Staggered Animation */}
-      <div 
-        className="px-5 py-5 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '300ms' }}
-      >
-        <div className="flex gap-3">
+      {/* ─── 3. QUICK INFO ─── */}
+      <QuickInfoSection restaurant={restaurant} />
+
+      {/* ─── 4. ACTION BUTTONS ─── */}
+      <div className="px-5 pb-5 animate-[sectionSlide_0.45s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '380ms' }}>
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { icon: Phone, label: "Call", onClick: () => window.open(`tel:+441234567890`), variant: "outline" as const },
-            { icon: Navigation, label: "Directions", onClick: () => window.open(`https://maps.google.com?q=${restaurant.address}`), variant: "outline" as const },
-            { icon: Sparkles, label: "Ask Outa", onClick: () => setShowAskOuta(true), variant: "default" as const },
-          ].map((action, index) => (
-            <Button
-              key={action.label}
-              variant={action.variant}
-              className={`flex-1 h-12 rounded-2xl text-[13px] font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] animate-[actionButtonPop_0.35s_ease-out_forwards] ${
-                action.variant === "default" 
-                  ? "bg-purple hover:bg-purple/90 text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.4)]" 
-                  : "border-border/40 hover:bg-secondary/60 hover:border-purple/20"
+            { icon: Calendar, label: "Book", onClick: () => setShowReservation(true), primary: true },
+            { icon: UtensilsCrossed, label: "Order", onClick: () => {}, primary: true },
+            { icon: Bookmark, label: isFavorite ? "Saved" : "Save", onClick: handleToggleFavorite, primary: false },
+            { icon: Share2, label: "Share", onClick: () => { navigator.share?.({ title: restaurant.name, url: window.location.href }).catch(() => {}); }, primary: false },
+          ].map((btn, i) => (
+            <button
+              key={btn.label}
+              onClick={btn.onClick}
+              className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] animate-[actionButtonPop_0.35s_ease-out_forwards] ${
+                btn.primary ? 'bg-purple text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.4)]' : 'bg-secondary/60 text-foreground border border-border/40'
               }`}
-              style={{ opacity: 0, animationDelay: `${350 + index * 80}ms` }}
-              onClick={action.onClick}
+              style={{ opacity: 0, animationDelay: `${400 + i * 60}ms` }}
             >
-              <action.icon className={`h-4 w-4 mr-2 ${action.variant === "default" ? "" : "text-purple"}`} strokeWidth={1.5} />
-              {action.label}
-            </Button>
+              <btn.icon className="h-5 w-5" strokeWidth={1.5} />
+              <span className="text-[11px] font-medium">{btn.label}</span>
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Gallery Carousel - Animated */}
-      {restaurant.galleryImages.length > 1 && (
-        <div 
-          className="px-5 pb-5 animate-[sectionSlide_0.45s_ease-out_forwards]"
-          style={{ opacity: 0, animationDelay: '450ms' }}
-        >
-          <ScrollArea className="w-full">
-            <div className="flex gap-2.5 pb-2">
-              {restaurant.galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => { setGalleryIndex(idx); setShowFullGallery(true); }}
-                  className={`flex-shrink-0 w-22 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 active:scale-95 ${
-                    idx === galleryIndex ? "border-purple shadow-[0_4px_12px_-4px_rgba(139,92,246,0.3)]" : "border-transparent opacity-70 hover:opacity-100"
-                  }`}
-                  style={{ 
-                    animationDelay: `${500 + idx * 50}ms`
-                  }}
-                >
-                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-      )}
-
-      {/* Vibe Tags & Price - Animated */}
-      <div 
-        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '520ms' }}
-      >
+      {/* Vibe Tags */}
+      <div className="px-5 pb-4 animate-[sectionSlide_0.4s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '480ms' }}>
         <div className="flex flex-wrap gap-2 items-center">
           {restaurant.vibe.map((tag, idx) => (
-            <Badge 
-              key={idx} 
-              variant="secondary" 
-              className="text-[11px] bg-secondary/60 text-muted-foreground border-0 rounded-full px-3.5 py-1.5 font-medium shadow-sm transition-all duration-200 hover:bg-secondary/80 hover:scale-105"
-              style={{ animationDelay: `${560 + idx * 40}ms` }}
-            >
-              {tag}
-            </Badge>
+            <Badge key={idx} variant="secondary" className="text-[11px] bg-secondary/60 text-muted-foreground border-0 rounded-full px-3.5 py-1.5 font-medium shadow-sm">{tag}</Badge>
           ))}
-          <Badge 
-            variant="outline" 
-            className="text-[11px] border-border/50 rounded-full px-3.5 py-1.5 font-medium"
-          >
-            {restaurant.priceLevel}
-          </Badge>
         </div>
       </div>
 
-      {/* Outa Intelligence Recommendation - Why you'll like this */}
+      {/* Why you'll like this */}
       {(() => {
-        const cuisineMatch = restaurant.cuisine;
-        const priceMatch = restaurant.priceLevel === "£" || restaurant.priceLevel === "££";
         const hasSignature = signatureItems.length > 0;
-        
         const moodChips = [
           ...(restaurant.vibe.includes("Romantic") || restaurant.vibe.includes("Elegant") ? [{ label: "Date Night", icon: Heart }] : []),
           ...(restaurant.vibe.includes("Cozy") || restaurant.vibe.includes("Warm") ? [{ label: "Cozy Vibes", icon: Flame }] : []),
-          ...(priceMatch ? [{ label: "Great Value", icon: Zap }] : []),
+          ...(restaurant.priceLevel === "£" || restaurant.priceLevel === "££" ? [{ label: "Great Value", icon: Zap }] : []),
           ...(restaurant.rating >= 4.5 ? [{ label: "Top Rated", icon: Award }] : []),
           ...(!restaurant.vibe.includes("Romantic") && !restaurant.vibe.includes("Cozy") ? [{ label: "Perfect Tonight", icon: Star }] : []),
         ].slice(0, 3);
-        
-        const getMicrocopy = () => {
-          if (hasSignature) {
-            return {
-              headline: "Why you'll like this place",
-              body: (
-                <>
-                  The <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> is their signature — perfectly crafted and matches your taste.
-                </>
-              )
-            };
-          }
-          if (cuisineMatch.toLowerCase().includes("italian")) {
-            return {
-              headline: "Perfect for your Italian cravings",
-              body: "This spot delivers authentic flavors you've been searching for."
-            };
-          }
-          if (cuisineMatch.toLowerCase().includes("afro") || cuisineMatch.toLowerCase().includes("nigerian")) {
-            return {
-              headline: "A match for your bold taste",
-              body: "Rich, bold flavors that match your preference for authentic cuisine."
-            };
-          }
-          return {
-            headline: "Why you'll like this place",
-            body: (
-              <>
-                Based on your taste, you'll love their <span className="font-semibold text-purple">{cuisineMatch}</span> dishes.
-              </>
-            )
-          };
-        };
-        
-        const copy = getMicrocopy();
-        
+        const copy = hasSignature
+          ? { headline: "Why you'll like this place", body: (<>The <span className="font-semibold text-purple">{signatureItems[0]?.name}</span> is their signature.</>) }
+          : { headline: "Why you'll like this place", body: (<>Based on your taste, you'll love their <span className="font-semibold text-purple">{restaurant.cuisine}</span> dishes.</>) };
+
         return (
-          <div 
-            className="px-5 pb-6 mt-1 animate-[recommendationReveal_0.5s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '580ms' }}
-          >
-            <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.07] via-purple/[0.04] to-neon-pink/[0.03] shadow-[0_6px_24px_-8px_rgba(139,92,246,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_36px_-10px_rgba(139,92,246,0.25)] hover:scale-[1.01] active:scale-[0.99]">
+          <div className="px-5 pb-5 animate-[recommendationReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '520ms' }}>
+            <Card className="border-purple/15 bg-gradient-to-br from-purple/[0.07] via-purple/[0.04] to-neon-pink/[0.03] shadow-[0_6px_24px_-8px_rgba(139,92,246,0.18)] overflow-hidden">
               <CardContent className="p-5 relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-purple/12 to-transparent rounded-full blur-2xl animate-[glowPulse_4s_ease-in-out_infinite]" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-radial from-neon-pink/8 to-transparent rounded-full blur-xl animate-[glowPulse_4s_ease-in-out_infinite_1s]" />
-                
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-radial from-purple/12 to-transparent rounded-full blur-2xl" />
                 <div className="flex items-start gap-4 relative">
-                  <div className="relative">
-                    <div className="absolute inset-0 rounded-xl bg-purple/20 blur-md animate-[iconGlow_2s_ease-in-out_infinite]" />
-                    <div className="relative p-3 rounded-xl bg-gradient-to-br from-purple/20 to-purple/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_-4px_rgba(139,92,246,0.3)]">
-                      <Sparkles className="h-5 w-5 text-purple animate-[sparkleFloat_2.5s_ease-in-out_infinite]" strokeWidth={1.5} />
-                    </div>
+                  <div className="relative p-3 rounded-xl bg-gradient-to-br from-purple/20 to-purple/30">
+                    <Sparkles className="h-5 w-5 text-purple" strokeWidth={1.5} />
                   </div>
-                  
                   <div className="flex-1">
-                    <p className="font-bold text-[15px] text-foreground mb-1 tracking-tight">{copy.headline}</p>
-                    <p className="text-[13px] text-muted-foreground/70 leading-relaxed">
-                      {copy.body}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mt-4">
+                    <p className="font-bold text-[15px] text-foreground mb-1">{copy.headline}</p>
+                    <p className="text-[13px] text-muted-foreground/70 leading-relaxed">{copy.body}</p>
+                    <div className="flex flex-wrap gap-2 mt-3">
                       {moodChips.map((chip, idx) => {
                         const ChipIcon = chip.icon;
                         return (
-                          <button 
-                            key={idx} 
-                            className="flex items-center gap-1.5 text-[10px] text-purple/90 bg-gradient-to-r from-purple/12 to-purple/8 px-3 py-1.5 rounded-full font-semibold border border-purple/15 shadow-sm transition-all duration-200 hover:scale-105 hover:bg-purple/15 hover:border-purple/25 active:scale-95 animate-[chipReveal_0.35s_ease-out_forwards]"
-                            style={{ opacity: 0, animationDelay: `${650 + idx * 80}ms` }}
-                          >
-                            <ChipIcon className="h-3 w-3" strokeWidth={2} />
-                            {chip.label}
-                          </button>
+                          <span key={idx} className="flex items-center gap-1.5 text-[10px] text-purple/90 bg-purple/10 px-3 py-1.5 rounded-full font-semibold border border-purple/15">
+                            <ChipIcon className="h-3 w-3" strokeWidth={2} />{chip.label}
+                          </span>
                         );
                       })}
                     </div>
@@ -600,364 +495,74 @@ const RestaurantProfile = () => {
       })()}
 
       {/* Description */}
-      <div 
-        className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '650ms' }}
-      >
-        <p className="text-[14px] text-muted-foreground/75 leading-relaxed font-light">
-          {restaurant.description}
-        </p>
+      <div className="px-5 pb-5 animate-[sectionSlide_0.4s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '580ms' }}>
+        <p className="text-[14px] text-muted-foreground/75 leading-relaxed font-light">{restaurant.description}</p>
       </div>
 
-      {/* Menu Section - Signature dishes + full menu */}
-      <div 
-        className="animate-[sectionSlide_0.5s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '720ms' }}
-      >
-        <MenuSection
-          menu={restaurant.menu}
-          signatureDishes={restaurant.signatureDishes}
-          onAddToOrder={handleAddToOrder}
-        />
+      {/* ─── 5. MENU ─── */}
+      <div className="animate-[sectionSlide_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '640ms' }}>
+        <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
       </div>
 
-      {/* About Section */}
-      <div 
-        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '800ms' }}
-      >
-        <h2 className="text-lg font-bold mb-4 tracking-tight">About</h2>
-        <div className="grid grid-cols-2 gap-3.5">
-          {(() => {
-            const status = getOpeningStatus(restaurant.openingHours as any);
-            return (
-              <Card 
-                className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
-                style={{ opacity: 0, animationDelay: '860ms' }}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
-                      <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
-                    </div>
-                    <span className="font-semibold text-[13px]">Hours</span>
-                  </div>
-                  {/* Live open/closed status */}
-                  <div className={`flex items-center gap-1.5 mb-3 text-[12px] font-semibold ${status.isOpen ? 'text-emerald-500' : 'text-red-400'}`}>
-                    <span className={`w-2 h-2 rounded-full ${status.isOpen ? 'bg-emerald-500' : 'bg-red-400'}`} />
-                    {status.label}
-                  </div>
-                  <div className="space-y-1.5">
-                    {Object.entries(restaurant.openingHours).slice(0, 3).map(([day, hours]) => {
-                      const display = typeof hours === 'object' && hours !== null
-                        ? ((hours as any).closed ? 'Closed' : `${(hours as any).open} – ${(hours as any).close}`)
-                        : String(hours);
-                      return (
-                        <div key={day} className="flex justify-between text-[11px]">
-                          <span className="text-muted-foreground/50 capitalize">{day}</span>
-                          <span className="font-medium text-foreground/75">{display}</span>
-                        </div>
-                      );
-                    })}
-                    {Object.keys(restaurant.openingHours).length > 3 && (
-                      <button className="text-[10px] text-purple mt-2 font-medium hover:text-purple/80 transition-colors">View all hours</button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })()}
-
-          <Card 
-            className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '920ms' }}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
-                  <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
-                </div>
-                <span className="font-semibold text-[13px]">Location</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground/50 mb-3 leading-relaxed">
-                {restaurant.address}<br />{restaurant.city}
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full text-[10px] h-8 rounded-xl border-border/40 hover:bg-purple/5 hover:border-purple/20 transition-all duration-200"
-              >
-                Get Directions
-                <ChevronRight className="h-4 w-4 ml-1" strokeWidth={1.5} />
-              </Button>
-            </CardContent>
-          </Card>
+      {/* ─── 6. GALLERY ─── */}
+      {restaurant.galleryImages.length > 1 && (
+        <div className="px-5 py-6 animate-[sectionSlide_0.45s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '720ms' }}>
+          <h2 className="text-lg font-bold mb-4 tracking-tight">Gallery</h2>
+          <ScrollArea className="w-full">
+            <div className="flex gap-2.5 pb-2">
+              {restaurant.galleryImages.map((img, idx) => (
+                <button key={idx} onClick={() => { setGalleryIndex(idx); setShowFullGallery(true); }} className={`flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 active:scale-95 ${idx === galleryIndex ? "border-purple shadow-[0_4px_12px_-4px_rgba(139,92,246,0.3)]" : "border-transparent opacity-80 hover:opacity-100"}`}>
+                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
-      </div>
+      )}
 
-      {/* Reviews Section */}
-      <div 
-        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '960ms' }}
-      >
+      {/* ─── 7. REVIEWS ─── */}
+      <div className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '800ms' }}>
         <h2 className="text-lg font-bold mb-4 tracking-tight">Reviews</h2>
         <ReviewsSection restaurantId={supabaseId} />
       </div>
 
-      {/* Contextual Utilities */}
-      <div 
-        className="px-5 pb-6 animate-[sectionSlide_0.45s_ease-out_forwards]"
-        style={{ opacity: 0, animationDelay: '1020ms' }}
-      >
-        <h2 className="text-lg font-bold mb-4 tracking-tight">Quick actions</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { icon: UtensilsCrossed, label: "Order Food", available: true, onClick: () => {} },
-            { icon: Calendar, label: "Reserve Table", available: true, onClick: () => setShowReservation(true) },
-            { icon: MessageCircle, label: "Ask CHUPS", available: true, onClick: () => setShowAskOuta(true) },
-            { icon: Info, label: "Event Booking", available: false },
-          ].map((service, idx) => (
-            <button
-              key={service.label}
-              onClick={service.available ? service.onClick : undefined}
-              disabled={!service.available}
-              className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 ${
-                service.available 
-                  ? "bg-card border-border/40 hover:border-purple/30 hover:shadow-sm active:scale-[0.98] cursor-pointer"
-                  : "bg-secondary/30 border-border/20 cursor-not-allowed opacity-60"
-              }`}
-              style={{ animationDelay: `${1060 + idx * 60}ms` }}
-            >
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                service.available ? "bg-purple/10 text-purple" : "bg-muted/50 text-muted-foreground"
-              }`}>
-                <service.icon className="h-4 w-4" strokeWidth={1.5} />
-              </div>
-              <div className="text-left flex-1">
-                <span className={`text-[13px] font-medium ${service.available ? "text-foreground" : "text-muted-foreground"}`}>
-                  {service.label}
-                </span>
-                {!service.available && (
-                  <p className="text-[9px] text-muted-foreground/60">Coming soon</p>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Order Bar - Premium Floating */}
+      {/* Order Bar */}
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/40 p-4 z-50 animate-[orderBarSlide_0.35s_ease-out_forwards]">
           {tableNumber && (
             <div className="flex justify-center mb-2">
-              <span className="text-[11px] font-semibold text-purple bg-purple/10 px-3 py-1 rounded-full border border-purple/20">
-                Table {tableNumber}
-              </span>
+              <span className="text-[11px] font-semibold text-purple bg-purple/10 px-3 py-1 rounded-full border border-purple/20">Table {tableNumber}</span>
             </div>
           )}
-          <Button 
-            className="w-full bg-gradient-to-r from-purple to-purple/90 hover:from-purple/95 hover:to-purple/85 text-white h-14 rounded-2xl shadow-[0_8px_32px_-8px_rgba(139,92,246,0.4)] hover:shadow-[0_10px_40px_-8px_rgba(139,92,246,0.5)] text-[15px] font-semibold transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
-            onClick={handleViewOrder}
-          >
+          <Button className="w-full bg-gradient-to-r from-purple to-purple/90 hover:from-purple/95 hover:to-purple/85 text-white h-14 rounded-2xl shadow-[0_8px_32px_-8px_rgba(139,92,246,0.4)] text-[15px] font-semibold transition-all duration-300" onClick={handleViewOrder}>
             <ShoppingCart className="h-5 w-5 mr-2.5" strokeWidth={1.5} />
             View Order ({totalItems} items) · £{totalAmount.toFixed(2)}
           </Button>
         </div>
       )}
 
-      {/* Full Gallery Modal */}
-      <FullGalleryModal
-        images={restaurant.galleryImages}
-        open={showFullGallery}
-        onOpenChange={setShowFullGallery}
-        restaurantName={restaurant.name}
-        initialIndex={galleryIndex}
-      />
+      {/* Modals */}
+      <FullGalleryModal images={restaurant.galleryImages} open={showFullGallery} onOpenChange={setShowFullGallery} restaurantName={restaurant.name} initialIndex={galleryIndex} />
+      <AskOutaModal open={showAskOuta} onOpenChange={setShowAskOuta} restaurantName={restaurant.name} menu={restaurant.menu} onAddToOrder={handleAddToOrder} />
 
-      {/* Ask Outa Modal */}
-      <AskOutaModal
-        open={showAskOuta}
-        onOpenChange={setShowAskOuta}
-        restaurantName={restaurant.name}
-        menu={restaurant.menu}
-        onAddToOrder={handleAddToOrder}
-      />
-
-      {/* Premium Animation Keyframes */}
       <style>{`
-        @keyframes pageEnter {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes navFloat {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes bannerReveal {
-          from {
-            opacity: 0;
-            transform: scale(1.02);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        @keyframes titleReveal {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes sectionSlide {
-          from {
-            opacity: 0;
-            transform: translateY(14px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes actionButtonPop {
-          from {
-            opacity: 0;
-            transform: translateY(8px) scale(0.96);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        @keyframes recommendationReveal {
-          from {
-            opacity: 0;
-            transform: translateY(12px) scale(0.98);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        @keyframes cardPop {
-          from {
-            opacity: 0;
-            transform: translateY(10px) scale(0.97);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes badgePop {
-          from {
-            transform: scale(0);
-          }
-          to {
-            transform: scale(1);
-          }
-        }
-        
-        @keyframes orderBarSlide {
-          from {
-            opacity: 0;
-            transform: translateY(100%);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes sparkleFloat {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-2px);
-          }
-        }
-        
-        @keyframes logoFloat {
-          from {
-            opacity: 0;
-            transform: scale(0.9) translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-        
-        @keyframes glowPulse {
-          0%, 100% {
-            opacity: 0.6;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.1);
-          }
-        }
-        
-        @keyframes iconGlow {
-          0%, 100% {
-            opacity: 0.4;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.7;
-            transform: scale(1.15);
-          }
-        }
-        
-        @keyframes chipReveal {
-          from {
-            opacity: 0;
-            transform: translateY(6px) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
+        @keyframes pageEnter { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes navFloat { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bannerReveal { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+        @keyframes titleReveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes sectionSlide { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes actionButtonPop { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes recommendationReveal { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes cardPop { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes badgePop { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes orderBarSlide { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes logoFloat { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes glowPulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
       `}</style>
 
-      <ReservationDialog
-        isOpen={showReservation}
-        onClose={() => setShowReservation(false)}
-        restaurantId={supabaseId}
-        restaurantName={restaurant?.name}
-        restaurantAddress={restaurant?.address}
-      />
+      <ReservationDialog isOpen={showReservation} onClose={() => setShowReservation(false)} restaurantId={supabaseId} restaurantName={restaurant?.name} restaurantAddress={restaurant?.address} />
     </div>
   );
 };
