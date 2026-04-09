@@ -255,8 +255,8 @@ User's message: ${userMessageContent}
               <Sparkles className="h-5 w-5 text-white relative z-10" />
             </div>
             <div className="flex-1">
-              <h1 className="font-bold text-foreground text-lg leading-tight">Outa</h1>
-              <p className="text-[11px] text-muted-foreground">Your dining guide</p>
+              <h1 className="font-bold text-foreground text-lg leading-tight">Ask Outa 💜</h1>
+              <p className="text-[11px] text-muted-foreground">Your personal dining guide</p>
             </div>
           </div>
         </div>
