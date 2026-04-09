@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag } from "lucide-react";
+import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import MenuItemForm from "@/components/MenuItemForm";
 import MenuItemCard from "@/components/MenuItemCard";
@@ -20,6 +21,7 @@ type Restaurant = {
   phone?: string;
   address?: string;
   city?: string;
+  is_temporarily_closed?: boolean;
 };
 
 type MenuItem = {
@@ -73,7 +75,7 @@ const RestaurantDashboard = () => {
 
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city")
+        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed")
         .eq("user_id", session.user.id)
         .single();
 
@@ -246,6 +248,34 @@ const RestaurantDashboard = () => {
       />
 
       <main className="container mx-auto px-4 py-8">
+        {/* Temporarily Closed Toggle */}
+        <Card className="mb-8">
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className={`h-5 w-5 ${restaurant.is_temporarily_closed ? 'text-red-500' : 'text-muted-foreground'}`} />
+              <div>
+                <p className="font-medium text-sm">Temporarily closed today</p>
+                <p className="text-xs text-muted-foreground">Override opening hours and appear as closed to customers</p>
+              </div>
+            </div>
+            <Switch
+              checked={restaurant.is_temporarily_closed || false}
+              onCheckedChange={async (checked) => {
+                const { error } = await supabase
+                  .from("restaurants")
+                  .update({ is_temporarily_closed: checked })
+                  .eq("id", restaurant.id);
+                
+                if (error) {
+                  toast({ title: "Error", description: error.message, variant: "destructive" });
+                } else {
+                  setRestaurant(prev => prev ? { ...prev, is_temporarily_closed: checked } : prev);
+                  toast({ title: checked ? "Restaurant marked as temporarily closed" : "Restaurant reopened" });
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
         {/* Order Management Section */}
         <OrderManagement 
           orders={orders} 

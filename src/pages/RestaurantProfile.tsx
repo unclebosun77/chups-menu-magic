@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
@@ -63,7 +64,7 @@ const RestaurantProfile = () => {
       // Try loading from Supabase first
       const { data, error } = await supabase
         .from("restaurants")
-        .select("*")
+        .select("*, is_temporarily_closed")
         .eq("id", supabaseId)
         .maybeSingle();
 
@@ -77,7 +78,7 @@ const RestaurantProfile = () => {
             cuisine: data.cuisine_type || demoData.cuisine,
             description: data.description || demoData.description,
             logoUrl: data.logo_url || demoData.logoUrl,
-            isOpen: data.is_open,
+            isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             address: data.address || demoData.address,
             city: data.city || demoData.city,
             openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
@@ -123,7 +124,7 @@ const RestaurantProfile = () => {
             galleryTheme: "light",
             rating: 4.5,
             distance: "1.0 km",
-            isOpen: data.is_open,
+            isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             menu: supabaseMenu,
           });
         }
@@ -590,30 +591,45 @@ const RestaurantProfile = () => {
       >
         <h2 className="text-lg font-bold mb-4 tracking-tight">About</h2>
         <div className="grid grid-cols-2 gap-3.5">
-          <Card 
-            className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '860ms' }}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
-                  <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
-                </div>
-                <span className="font-semibold text-[13px]">Hours</span>
-              </div>
-              <div className="space-y-1.5">
-                {Object.entries(restaurant.openingHours).slice(0, 3).map(([day, hours]) => (
-                  <div key={day} className="flex justify-between text-[11px]">
-                    <span className="text-muted-foreground/50">{day}</span>
-                    <span className="font-medium text-foreground/75">{hours}</span>
+          {(() => {
+            const status = getOpeningStatus(restaurant.openingHours as any);
+            return (
+              <Card 
+                className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
+                style={{ opacity: 0, animationDelay: '860ms' }}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
+                      <Clock className="h-4 w-4 text-purple" strokeWidth={1.5} />
+                    </div>
+                    <span className="font-semibold text-[13px]">Hours</span>
                   </div>
-                ))}
-                {Object.keys(restaurant.openingHours).length > 3 && (
-                  <button className="text-[10px] text-purple mt-2 font-medium hover:text-purple/80 transition-colors">View all hours</button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  {/* Live open/closed status */}
+                  <div className={`flex items-center gap-1.5 mb-3 text-[12px] font-semibold ${status.isOpen ? 'text-emerald-500' : 'text-red-400'}`}>
+                    <span className={`w-2 h-2 rounded-full ${status.isOpen ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                    {status.label}
+                  </div>
+                  <div className="space-y-1.5">
+                    {Object.entries(restaurant.openingHours).slice(0, 3).map(([day, hours]) => {
+                      const display = typeof hours === 'object' && hours !== null
+                        ? ((hours as any).closed ? 'Closed' : `${(hours as any).open} – ${(hours as any).close}`)
+                        : String(hours);
+                      return (
+                        <div key={day} className="flex justify-between text-[11px]">
+                          <span className="text-muted-foreground/50 capitalize">{day}</span>
+                          <span className="font-medium text-foreground/75">{display}</span>
+                        </div>
+                      );
+                    })}
+                    {Object.keys(restaurant.openingHours).length > 3 && (
+                      <button className="text-[10px] text-purple mt-2 font-medium hover:text-purple/80 transition-colors">View all hours</button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
 
           <Card 
             className="border-border/30 shadow-[0_4px_16px_-6px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_-8px_rgba(139,92,246,0.12)] transition-all duration-300 hover:scale-[1.02] animate-[cardPop_0.4s_ease-out_forwards]"
