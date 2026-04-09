@@ -109,6 +109,16 @@ const OrderSuccess = () => {
             <p className="text-muted-foreground text-lg">
               They're cooking it up. You'll eat good soon.
             </p>
+            {paymentMethod === "pos" && (
+              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-200">
+                Order sent — a member of staff will bring your card machine.
+              </div>
+            )}
+            {paymentMethod === "stripe" && (
+              <div className="mt-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4 text-sm text-green-800 dark:text-green-200">
+                Payment confirmed ✓
+              </div>
+            )}
           </div>
 
           {/* Order Summary Card */}
