@@ -283,6 +283,17 @@ const RestaurantDashboard = () => {
             />
           </CardContent>
         </Card>
+        {/* Crowd Level Control */}
+        <div className="mb-8">
+          <CrowdLevelControl
+            restaurantId={restaurant.id}
+            currentLevel={restaurant.crowd_level || null}
+            updatedAt={restaurant.crowd_updated_at || null}
+            orders={orders.map(o => ({ created_at: o.created_at, status: o.status }))}
+            onUpdate={handleProfileUpdate}
+          />
+        </div>
+
         {/* Order Management Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList className="mb-4">
