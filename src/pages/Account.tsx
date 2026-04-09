@@ -5,9 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight 
+  LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight, Calendar, ShoppingBag 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 import TasteProfileCard from "@/components/TasteProfileCard";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import LocationPreferencesCard from "@/components/LocationPreferencesCard";
@@ -20,6 +22,22 @@ const Account = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const [showTasteDialog, setShowTasteDialog] = useState(false);
+  const [upcomingBookings, setUpcomingBookings] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchBookingCount = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { count } = await supabase
+        .from('bookings')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('booking_date', today)
+        .neq('status', 'cancelled');
+      setUpcomingBookings(count || 0);
+    };
+    fetchBookingCount();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -129,6 +147,38 @@ const Account = () => {
       </div>
 
       <div className="px-4 space-y-4">
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 gap-3 animate-slide-up">
+          <Card
+            className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+            onClick={() => navigate('/bookings')}
+          >
+            <CardContent className="flex flex-col items-center gap-2 p-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center relative">
+                <Calendar className="h-5 w-5 text-purple" />
+                {upcomingBookings > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple text-white text-[10px] font-bold flex items-center justify-center">
+                    {upcomingBookings}
+                  </span>
+                )}
+              </div>
+              <p className="font-semibold text-sm text-foreground">My Bookings</p>
+            </CardContent>
+          </Card>
+          <Card
+            className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+            onClick={() => navigate('/my-orders')}
+          >
+            <CardContent className="flex flex-col items-center gap-2 p-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
+                <ShoppingBag className="h-5 w-5 text-purple" />
+              </div>
+              <p className="font-semibold text-sm text-foreground">My Orders</p>
+            </CardContent>
+          </Card>
+        </div>
+
+
         {/* Location Preferences Section */}
         <LocationPreferencesCard className="animate-slide-up" />
 
