@@ -134,6 +134,7 @@ const OrderSummary = () => {
           totalAmount,
           itemCount: totalItems,
           paymentMethod: "pos",
+          tableNumber: tableNumber || null,
         },
       });
     } catch (error: any) {
@@ -314,18 +315,23 @@ const OrderSummary = () => {
                 <span className="text-2xl font-bold text-primary">£{totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex gap-3">
-                <Button
-                  onClick={handlePayNow}
-                  disabled={paymentProcessing || isSubmitting}
-                  className="flex-1 h-12 text-base font-semibold"
-                >
-                  {paymentProcessing ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <CreditCard className="h-4 w-4 mr-2" />
+                <div className="flex-1 flex flex-col gap-1">
+                  <Button
+                    onClick={handlePayNow}
+                    disabled={paymentProcessing || isSubmitting}
+                    className="w-full h-12 text-base font-semibold"
+                  >
+                    {paymentProcessing ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <CreditCard className="h-4 w-4 mr-2" />
+                    )}
+                    Pay now — £{totalAmount.toFixed(2)}
+                  </Button>
+                  {import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
+                    <p className="text-[10px] text-muted-foreground text-center">Powered by Stripe</p>
                   )}
-                  Pay now — £{totalAmount.toFixed(2)}
-                </Button>
+                </div>
                 <Button
                   variant="outline"
                   onClick={handlePayAtTable}
