@@ -81,7 +81,29 @@ const RestaurantProfile = () => {
             openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
           });
         } else {
-          // No demo data - create from Supabase only
+          // No demo data - fetch menu items from Supabase
+          const { data: menuData } = await supabase
+            .from("menu_items")
+            .select("*")
+            .eq("restaurant_id", data.id)
+            .eq("available", true);
+
+          const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
+            id: item.id,
+            name: item.name,
+            description: item.description || "",
+            price: Number(item.price),
+            category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
+            image: item.image_url || undefined,
+            tags: [],
+          }));
+
+          // Extract gallery from gallery_images JSON if available
+          const galleryRaw = data.gallery_images as any[];
+          const galleryUrls: string[] = Array.isArray(galleryRaw)
+            ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
+            : [];
+
           setRestaurant({
             id: data.id,
             name: data.name,
@@ -94,13 +116,13 @@ const RestaurantProfile = () => {
             openingHours: (data.hours as Record<string, string>) || {},
             signatureDishes: [],
             logoUrl: data.logo_url || "",
-            heroImage: data.logo_url || "",
-            galleryImages: data.logo_url ? [data.logo_url] : [],
+            heroImage: galleryUrls[0] || data.logo_url || "",
+            galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
             galleryTheme: "light",
             rating: 4.5,
             distance: "1.0 km",
             isOpen: data.is_open,
-            menu: []
+            menu: supabaseMenu,
           });
         }
       } else if (demoData) {
