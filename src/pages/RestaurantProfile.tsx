@@ -23,6 +23,24 @@ import { ReservationDialog } from "@/components/ReservationDialog";
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
 
+const CROWD_COLORS: Record<string, { dot: string; bg: string; text: string; label: string }> = {
+  quiet: { dot: "bg-green-500", bg: "bg-green-100 dark:bg-green-950/40", text: "text-green-700 dark:text-green-300", label: "Quiet" },
+  moderate: { dot: "bg-amber-500", bg: "bg-amber-100 dark:bg-amber-950/40", text: "text-amber-700 dark:text-amber-300", label: "Moderate" },
+  busy: { dot: "bg-orange-500", bg: "bg-orange-100 dark:bg-orange-950/40", text: "text-orange-700 dark:text-orange-300", label: "Busy" },
+  very_busy: { dot: "bg-red-500", bg: "bg-red-100 dark:bg-red-950/40", text: "text-red-700 dark:text-red-300", label: "Very Busy" },
+};
+
+const CrowdPill = ({ level }: { level: string }) => {
+  const config = CROWD_COLORS[level];
+  if (!config) return null;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${config.bg} ${config.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+      {config.label}
+    </span>
+  );
+};
+
 const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
@@ -66,7 +84,7 @@ const RestaurantProfile = () => {
       // Try loading from Supabase first
       const { data, error } = await supabase
         .from("restaurants")
-        .select("*, is_temporarily_closed")
+        .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
         .eq("id", supabaseId)
         .maybeSingle();
 
@@ -75,7 +93,7 @@ const RestaurantProfile = () => {
         if (demoData) {
           setRestaurant({
             ...demoData,
-            id: data.id, // Use Supabase UUID as canonical ID
+            id: data.id,
             name: data.name || demoData.name,
             cuisine: data.cuisine_type || demoData.cuisine,
             description: data.description || demoData.description,
@@ -84,6 +102,8 @@ const RestaurantProfile = () => {
             address: data.address || demoData.address,
             city: data.city || demoData.city,
             openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
+            crowdLevel: data.crowd_level,
+            crowdUpdatedAt: data.crowd_updated_at,
           });
         } else {
           // No demo data - fetch menu items from Supabase
@@ -128,6 +148,8 @@ const RestaurantProfile = () => {
             distance: "1.0 km",
             isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             menu: supabaseMenu,
+            crowdLevel: data.crowd_level,
+            crowdUpdatedAt: data.crowd_updated_at,
           });
         }
       } else if (demoData) {
@@ -307,7 +329,13 @@ const RestaurantProfile = () => {
                   <div className="flex items-end justify-between">
                     <div className="flex-1">
                       <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                      <p className="text-[14px] text-muted-foreground/70 mt-1">{restaurant.cuisine}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
+                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
+                          (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
+                          <CrowdPill level={restaurant.crowdLevel} />
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                       <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
@@ -364,7 +392,13 @@ const RestaurantProfile = () => {
                   </div>
                   <div className="flex-1 pb-1">
                     <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                    <p className="text-[14px] text-muted-foreground/80 mt-0.5">{restaurant.cuisine}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
+                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
+                        (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
+                        <CrowdPill level={restaurant.crowdLevel} />
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                     <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />

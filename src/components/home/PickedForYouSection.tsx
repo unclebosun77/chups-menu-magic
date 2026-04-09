@@ -38,7 +38,7 @@ const PickedForYouSection = () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, address, city, is_open, latitude, longitude, hours, is_temporarily_closed")
+          .select("id, name, cuisine_type, description, logo_url, address, city, is_open, latitude, longitude, hours, is_temporarily_closed, crowd_level, crowd_updated_at")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
