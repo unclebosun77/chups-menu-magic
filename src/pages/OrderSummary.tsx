@@ -70,7 +70,9 @@ const OrderSummary = () => {
   };
 
   const createOrder = async () => {
+    const orderId = crypto.randomUUID();
     const insertPayload = {
+      id: orderId,
       restaurant_id: restaurantId,
       user_id: user?.id || null,
       customer_name: customerName,
@@ -83,19 +85,17 @@ const OrderSummary = () => {
 
     console.log("[OrderSummary] Inserting order:", insertPayload);
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("orders")
-      .insert(insertPayload)
-      .select('id')
-      .single();
+      .insert(insertPayload);
 
     if (error) {
       console.error('Order insert error:', JSON.stringify(error));
       throw new Error(error.message || 'Failed to create order');
     }
 
-    console.log("[OrderSummary] Order created successfully:", data);
-    return data;
+    console.log("[OrderSummary] Order created successfully:", orderId);
+    return { id: orderId };
   };
 
   const handlePayAtTable = async () => {
