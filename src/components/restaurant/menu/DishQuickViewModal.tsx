@@ -147,7 +147,7 @@ const DishQuickViewModal = ({ dish, open, onOpenChange, onAddToOrder }: DishQuic
 
           {/* Add to Order Button */}
           <Button
-            className="w-full h-14 bg-purple hover:bg-purple/90 text-white rounded-2xl text-[15px] font-semibold shadow-lg"
+            className="w-full h-12 bg-purple hover:bg-purple/90 text-white rounded-xl text-sm font-semibold shadow-md"
             onClick={handleAddToOrder}
           >
             Add {quantity} to Order · £{(dish.price * quantity).toFixed(2)}
