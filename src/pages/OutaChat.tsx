@@ -304,8 +304,8 @@ User's message: ${userMessageContent}
         )}
       </div>
 
-      {/* Input — sits above bottom nav (pb-16 for nav height) */}
-      <div className="flex-shrink-0 pb-16">
+      {/* Input — sticky at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 pb-16">
         <ChatInput onSend={handleSendMessage} disabled={isTyping} />
       </div>
     </div>
