@@ -398,7 +398,7 @@ const RestaurantProfile = () => {
                       <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
-                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
+                        {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
@@ -431,7 +431,7 @@ const RestaurantProfile = () => {
                     <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
-                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && <CrowdPill level={restaurant.crowdLevel} />}
+                      {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
