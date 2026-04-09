@@ -251,7 +251,14 @@ const MyOrders = () => {
                       </div>
                       <div className="pt-3 border-t flex justify-between font-semibold">
                         <span>Total</span>
-                        <span className="text-purple">£{Number(order.total).toFixed(2)}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-purple">£{Number(order.total).toFixed(2)}</span>
+                          {order.status === 'completed' && (
+                            <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
+                              +{Math.floor(Number(order.total) * 10)} pts
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
