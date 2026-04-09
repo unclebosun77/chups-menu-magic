@@ -27,6 +27,8 @@ type Order = {
   customer_phone: string | null;
   created_at: string;
   table_number?: string | null;
+  payment_status?: string | null;
+  payment_method?: string | null;
 };
 
 const ORDER_STATUSES = [
