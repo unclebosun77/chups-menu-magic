@@ -192,7 +192,7 @@ const RestaurantDashboard = () => {
     if (session) {
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city")
+        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed")
         .eq("user_id", session.user.id)
         .single();
       
