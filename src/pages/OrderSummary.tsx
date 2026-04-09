@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import BillSplitter from "@/components/order/BillSplitter";
 
 interface OrderItem {
   id: string;
