@@ -59,6 +59,49 @@ const Rewards = () => {
     checkAuth();
   }, []);
 
+  // Real-time subscription for rewards updates
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupRealtime = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      channel = supabase
+        .channel('rewards-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'rewards_transactions',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            fetchRewardsData(user.id);
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'rewards_accounts',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            fetchRewardsData(user.id);
+          }
+        )
+        .subscribe();
+    };
+
+    setupRealtime();
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, []);
+
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {

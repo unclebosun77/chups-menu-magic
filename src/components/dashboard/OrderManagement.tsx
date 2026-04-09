@@ -62,10 +62,21 @@ const OrderManagement = ({ orders, onOrderUpdate }: OrderManagementProps) => {
 
       if (error) throw error;
 
-      toast({
-        title: "Order updated",
-        description: `Order status changed to ${newStatus}`,
-      });
+      if (newStatus === "completed") {
+        const order = orders.find((o) => o.id === orderId);
+        if (order) {
+          const points = Math.floor(Number(order.total) * 10);
+          toast({
+            title: "Order complete",
+            description: `Order completed — customer earned ${points} points 🎉`,
+          });
+        }
+      } else {
+        toast({
+          title: "Order updated",
+          description: `Order status changed to ${newStatus}`,
+        });
+      }
       onOrderUpdate();
     } catch (error: any) {
       toast({
