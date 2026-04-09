@@ -35,7 +35,7 @@ const ChatInput = ({ onSend, disabled = false }: ChatInputProps) => {
   }, [message]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border/50">
+    <div className="p-4 bg-background/80 backdrop-blur-xl border-t border-border/50">
       <div className="flex items-end gap-2">
         <div className="flex-1 relative">
           <textarea
