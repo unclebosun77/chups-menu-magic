@@ -164,6 +164,7 @@ const RestaurantProfile = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [fallbackCrowdLevel, setFallbackCrowdLevel] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get("table");
 
