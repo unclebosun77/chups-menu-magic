@@ -102,7 +102,7 @@ const OrderSummary = () => {
     if (!validateOrder()) return;
     setIsSubmitting(true);
     try {
-      const data = await createOrder("pos", "pos_requested");
+      const data = await createOrder();
       navigate("/order-success", {
         state: {
           orderId: data?.id,
@@ -110,7 +110,6 @@ const OrderSummary = () => {
           totalAmount,
           itemCount: totalItems,
           paymentMethod: "pos",
-          tableNumber: tableNumber || null,
         },
       });
     } catch (error: any) {
@@ -132,7 +131,7 @@ const OrderSummary = () => {
         return;
       }
 
-      const orderData = await createOrder("stripe", "pending");
+      const orderData = await createOrder();
       const orderId = orderData?.id;
 
       const { data: piData, error: piError } = await supabase.functions.invoke("create-payment-intent", {
