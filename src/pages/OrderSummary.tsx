@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2, CreditCard, Landmark } from "lucide-react";
 import { toast } from "sonner";
 import BillSplitter from "@/components/order/BillSplitter";
@@ -151,7 +152,6 @@ const OrderSummary = () => {
     try {
       const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
       if (!stripeKey) {
-        // No Stripe key — fall back to pay at table
         toast.error("Online payments aren't set up yet — use Pay at table");
         setPaymentProcessing(false);
         return;
@@ -173,7 +173,6 @@ const OrderSummary = () => {
         throw new Error(piError?.message || "Failed to create payment intent");
       }
 
-      // Lazy-load Stripe only when needed
       const { loadStripe } = await import("@stripe/stripe-js");
       const stripe = await loadStripe(stripeKey);
       if (!stripe) throw new Error("Stripe failed to load");
@@ -207,7 +206,7 @@ const OrderSummary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-app pb-24">
+    <div className="min-h-screen bg-gradient-app pb-32">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
@@ -223,7 +222,7 @@ const OrderSummary = () => {
         </div>
 
         <div className="p-4 space-y-6">
-          {/* Order Items */}
+          {/* 1. Order Items */}
           <div className="space-y-3">
             <h2 className="text-xl font-bold">Your Order</h2>
             {orderItems.length === 0 ? (
@@ -269,9 +268,17 @@ const OrderSummary = () => {
             )}
           </div>
 
-          {/* Customer Information */}
           {orderItems.length > 0 && (
             <>
+              {/* 2. Order Total */}
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-semibold">Total ({totalItems} items)</span>
+                  <span className="text-2xl font-bold text-primary">£{totalAmount.toFixed(2)}</span>
+                </div>
+              </Card>
+
+              {/* 3. Customer Details */}
               <div className="space-y-3">
                 <h2 className="text-xl font-bold">Your Information</h2>
                 <Card className="p-4">
@@ -288,7 +295,7 @@ const OrderSummary = () => {
                 </Card>
               </div>
 
-              {/* Order Note */}
+              {/* Kitchen note */}
               <Card className="p-4 bg-primary/5 border-primary/20">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 rounded-full p-2 flex-shrink-0">
@@ -297,26 +304,26 @@ const OrderSummary = () => {
                   <p className="text-sm font-medium">Order gets sent straight to the kitchen 🚀</p>
                 </div>
               </Card>
-            </>
-          )}
 
-          {/* Bill Splitter — below action buttons */}
-          {orderItems.length > 0 && (
-            <BillSplitter items={orderItems} totalAmount={totalAmount} restaurantName={restaurantName} />
-          )}
-        </div>
+              {/* 4. Payment Buttons — inline, not fixed */}
+              <div className="space-y-3">
+                <Button
+                  variant="purple"
+                  onClick={handlePayAtTable}
+                  disabled={paymentProcessing || isSubmitting}
+                  className="w-full h-14 text-base font-semibold"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  ) : (
+                    <Landmark className="h-5 w-5 mr-2" />
+                  )}
+                  Pay at table — £{totalAmount.toFixed(2)}
+                </Button>
 
-        {/* Fixed Bottom Bar with Payment Options */}
-        {orderItems.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-20">
-            <div className="max-w-2xl mx-auto space-y-3">
-              <div className="flex items-center justify-between text-lg">
-                <span className="font-semibold">Total ({totalItems} items)</span>
-                <span className="text-2xl font-bold text-primary">£{totalAmount.toFixed(2)}</span>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-1 flex flex-col gap-1">
+                <div className="flex flex-col gap-1">
                   <Button
+                    variant="outline"
                     onClick={handlePayNow}
                     disabled={paymentProcessing || isSubmitting}
                     className="w-full h-12 text-base font-semibold"
@@ -326,29 +333,23 @@ const OrderSummary = () => {
                     ) : (
                       <CreditCard className="h-4 w-4 mr-2" />
                     )}
-                    Pay now — £{totalAmount.toFixed(2)}
+                    Pay now with card
                   </Button>
                   {import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
                     <p className="text-[10px] text-muted-foreground text-center">Powered by Stripe</p>
                   )}
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={handlePayAtTable}
-                  disabled={paymentProcessing || isSubmitting}
-                  className="flex-1 h-12 text-base font-semibold"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Landmark className="h-4 w-4 mr-2" />
-                  )}
-                  Pay at table
-                </Button>
               </div>
-            </div>
-          </div>
-        )}
+
+              {/* 5. Divider + Split Bill (optional, last) */}
+              <div className="pt-2">
+                <Separator className="mb-4" />
+                <p className="text-xs text-muted-foreground text-center mb-4">Optional: split the bill with your group</p>
+                <BillSplitter items={orderItems} totalAmount={totalAmount} restaurantName={restaurantName} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

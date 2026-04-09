@@ -73,7 +73,7 @@ const App = () => (
                     <Route path="/saved" element={<Layout><SavedRestaurants /></Layout>} />
                     <Route path="/rewards" element={<ProtectedRoute><Layout><Rewards /></Layout></ProtectedRoute>} />
                     <Route path="/order-success" element={<ProtectedRoute><Layout><OrderSuccess /></Layout></ProtectedRoute>} />
-                    <Route path="/order-summary" element={<ProtectedRoute><Layout><OrderSummary /></Layout></ProtectedRoute>} />
+                    <Route path="/order-summary" element={<ProtectedRoute><OrderSummary /></ProtectedRoute>} />
                     
                     {/* Chat / AI routes with bottom nav */}
                     <Route path="/ai-assistant" element={<Layout><AIAssistant /></Layout>} />
