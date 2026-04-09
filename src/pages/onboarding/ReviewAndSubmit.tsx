@@ -42,7 +42,7 @@ const ReviewAndSubmit = () => {
       }
 
       const userId = session.user.id;
-      const { restaurant, menu } = compiled;
+      const { restaurant, menu, gallery } = compiled;
 
       // Insert restaurant into Supabase
       const { data: restaurantData, error: restaurantError } = await supabase
@@ -61,8 +61,11 @@ const ReviewAndSubmit = () => {
           latitude: restaurant.latitude ? Number(restaurant.latitude) : null,
           longitude: restaurant.longitude ? Number(restaurant.longitude) : null,
           logo_url: restaurant.logo_url || null,
+          gallery_images: gallery.length > 0 ? gallery : null,
           hours: restaurant.hours as any || null,
+          tags: restaurant.tags?.length > 0 ? restaurant.tags : null,
           is_open: true,
+          status: 'active',
         }])
         .select()
         .single();
