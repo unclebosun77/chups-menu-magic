@@ -95,7 +95,7 @@ const App = () => (
                     <Route path="/restaurant/onboarding/gallery" element={<ProtectedRoute><GalleryUploader /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/hours" element={<ProtectedRoute><OpeningHoursEditor /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><ReviewAndSubmit /></ProtectedRoute>} />
-                    <Route path="/restaurant/dashboard" element={<ProtectedRoute><RestaurantDashboard /></ProtectedRoute>} />
+                    <Route path="/restaurant/dashboard" element={<ProtectedRoute><Layout><RestaurantDashboard /></Layout></ProtectedRoute>} />
                     
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />

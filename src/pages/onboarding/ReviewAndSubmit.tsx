@@ -99,17 +99,12 @@ const ReviewAndSubmit = () => {
       }
 
       setShowConfetti(true);
+      clearDraft();
       
       toast({
         title: "🎉 Restaurant Published!",
         description: "Your restaurant is now live on Outa",
       });
-      
-      // Clear draft and redirect after animation
-      setTimeout(() => {
-        clearDraft();
-        navigate('/restaurant/dashboard');
-      }, 3000);
 
     } catch (error: any) {
       console.error('Publish error:', error);
@@ -138,12 +133,27 @@ const ReviewAndSubmit = () => {
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30 pb-32 relative overflow-hidden">
       {/* Confetti Effect */}
       {showConfetti && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
+        <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm">
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center animate-scale-in">
+            <div className="text-center animate-scale-in px-6">
               <PartyPopper className="h-24 w-24 text-purple mx-auto mb-4 animate-bounce" />
               <h2 className="text-3xl font-bold text-foreground mb-2">You're Live! 🎉</h2>
-              <p className="text-muted-foreground">Redirecting to home...</p>
+              <p className="text-muted-foreground mb-8">Explore your restaurant or head home.</p>
+              <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                <Button
+                  onClick={() => navigate('/restaurant/dashboard')}
+                  className="w-full h-12 bg-gradient-to-r from-purple to-neon-pink text-white font-medium rounded-xl"
+                >
+                  View my restaurant
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                  className="w-full h-12 rounded-xl"
+                >
+                  Go to home
+                </Button>
+              </div>
             </div>
           </div>
         </div>
