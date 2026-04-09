@@ -75,7 +75,7 @@ const RestaurantProfile = () => {
         if (demoData) {
           setRestaurant({
             ...demoData,
-            id: data.id, // Use Supabase UUID as canonical ID
+            id: data.id,
             name: data.name || demoData.name,
             cuisine: data.cuisine_type || demoData.cuisine,
             description: data.description || demoData.description,
@@ -84,6 +84,8 @@ const RestaurantProfile = () => {
             address: data.address || demoData.address,
             city: data.city || demoData.city,
             openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
+            crowdLevel: data.crowd_level,
+            crowdUpdatedAt: data.crowd_updated_at,
           });
         } else {
           // No demo data - fetch menu items from Supabase
