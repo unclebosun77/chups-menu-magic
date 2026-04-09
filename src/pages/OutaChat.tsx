@@ -134,7 +134,6 @@ User's message: ${userMessageContent}
       });
 
       if (resp.status === 429) {
-        toast.error("Outa is busy right now, try again in a moment");
         const fallback = getLocalFallback(userMessageContent);
         return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
       }
