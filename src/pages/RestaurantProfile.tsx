@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useAuth } from "@/context/AuthContext";
@@ -38,6 +38,8 @@ const RestaurantProfile = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [searchParams] = useSearchParams();
+  const tableNumber = searchParams.get("table");
 
   // Get the normalized Supabase ID
   const supabaseId = restaurantId ? getSupabaseId(restaurantId) : "";
@@ -180,6 +182,7 @@ const RestaurantProfile = () => {
       state: {
         restaurantName: restaurant.name,
         restaurantId: restaurant.id,
+        tableNumber: tableNumber || null,
         items: order.map(item => ({
           id: item.id,
           name: item.name,
@@ -712,6 +715,13 @@ const RestaurantProfile = () => {
       {/* Order Bar - Premium Floating */}
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/40 p-4 z-50 animate-[orderBarSlide_0.35s_ease-out_forwards]">
+          {tableNumber && (
+            <div className="flex justify-center mb-2">
+              <span className="text-[11px] font-semibold text-purple bg-purple/10 px-3 py-1 rounded-full border border-purple/20">
+                Table {tableNumber}
+              </span>
+            </div>
+          )}
           <Button 
             className="w-full bg-gradient-to-r from-purple to-purple/90 hover:from-purple/95 hover:to-purple/85 text-white h-14 rounded-2xl shadow-[0_8px_32px_-8px_rgba(139,92,246,0.4)] hover:shadow-[0_10px_40px_-8px_rgba(139,92,246,0.5)] text-[15px] font-semibold transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
             onClick={handleViewOrder}

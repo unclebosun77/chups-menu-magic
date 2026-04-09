@@ -26,6 +26,7 @@ type Order = {
   customer_email: string | null;
   customer_phone: string | null;
   created_at: string;
+  table_number?: string | null;
 };
 
 const ORDER_STATUSES = [
@@ -125,9 +126,16 @@ const OrderManagement = ({ orders, onOrderUpdate }: OrderManagementProps) => {
                 <div className={`absolute top-0 left-0 right-0 h-1 ${statusConfig.color}`} />
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      Order #{order.id.slice(-6).toUpperCase()}
-                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-lg">
+                        Order #{order.id.slice(-6).toUpperCase()}
+                      </CardTitle>
+                      {order.table_number && (
+                        <Badge className="bg-purple/15 text-purple border-purple/30 text-xs">
+                          Table {order.table_number}
+                        </Badge>
+                      )}
+                    </div>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <StatusIcon className="h-3 w-3" />
                       {statusConfig.label}

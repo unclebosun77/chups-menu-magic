@@ -290,6 +290,7 @@ export type Database = {
           notes: string | null
           restaurant_id: string
           status: string
+          table_number: string | null
           total: number
           updated_at: string | null
           user_id: string | null
@@ -304,6 +305,7 @@ export type Database = {
           notes?: string | null
           restaurant_id: string
           status?: string
+          table_number?: string | null
           total: number
           updated_at?: string | null
           user_id?: string | null
@@ -318,6 +320,7 @@ export type Database = {
           notes?: string | null
           restaurant_id?: string
           status?: string
+          table_number?: string | null
           total?: number
           updated_at?: string | null
           user_id?: string | null
