@@ -423,7 +423,9 @@ const RestaurantDashboard = () => {
             </>
           )}
         </div>
+          </TabsContent>
 
+          <TabsContent value="menu">
         {/* Menu Summary Cards */}
         <div className="grid gap-6 mb-8 md:grid-cols-3">
           <Card>
@@ -507,7 +509,8 @@ const RestaurantDashboard = () => {
             ))}
           </div>
         )}
-      </main>
+          </TabsContent>
+        </Tabs>
     </div>
   );
 };
