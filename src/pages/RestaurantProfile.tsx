@@ -255,6 +255,36 @@ const RestaurantProfile = () => {
     loadRestaurant();
   }, [restaurantId]);
 
+  // Fallback crowd level from recent orders when no Supabase crowd data
+  useEffect(() => {
+    if (!supabaseId) return;
+    const hasFreshCrowd = restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000;
+    if (hasFreshCrowd) {
+      setFallbackCrowdLevel(null);
+      return;
+    }
+    const fetchRecentOrders = async () => {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("restaurant_id", supabaseId)
+        .gte("created_at", oneHourAgo);
+      const c = count || 0;
+      if (c === 0) setFallbackCrowdLevel("quiet");
+      else if (c <= 3) setFallbackCrowdLevel("moderate");
+      else setFallbackCrowdLevel("busy");
+    };
+    fetchRecentOrders();
+  }, [supabaseId, restaurant?.crowdLevel, restaurant?.crowdUpdatedAt]);
+
+  const effectiveCrowdLevel = useMemo(() => {
+    if (restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000) {
+      return restaurant.crowdLevel;
+    }
+    return fallbackCrowdLevel;
+  }, [restaurant?.crowdLevel, restaurant?.crowdUpdatedAt, fallbackCrowdLevel]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 flex items-center justify-center">
