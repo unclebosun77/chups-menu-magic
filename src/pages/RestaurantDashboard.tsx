@@ -511,6 +511,7 @@ const RestaurantDashboard = () => {
         )}
           </TabsContent>
         </Tabs>
+      </main>
     </div>
   );
 };
