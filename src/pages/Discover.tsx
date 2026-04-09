@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { isRestaurantOpen } from "@/utils/openingHours";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -179,7 +180,7 @@ const Discover = () => {
     }
 
     if (activeFilter === "open") {
-      filtered = filtered.filter((r) => r.is_open);
+      filtered = filtered.filter((r) => isRestaurantOpen((r as any).hours, (r as any).is_temporarily_closed));
     } else if (activeFilter === "top-rated") {
       filtered = filtered.filter((r) => (r.average_rating || 0) >= 4);
       filtered.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));

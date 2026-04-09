@@ -362,6 +362,7 @@ export type Database = {
           hours: Json | null
           id: string
           is_open: boolean
+          is_temporarily_closed: boolean
           latitude: number | null
           logo_url: string | null
           longitude: number | null
@@ -385,6 +386,7 @@ export type Database = {
           hours?: Json | null
           id?: string
           is_open?: boolean
+          is_temporarily_closed?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -408,6 +410,7 @@ export type Database = {
           hours?: Json | null
           id?: string
           is_open?: boolean
+          is_temporarily_closed?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
