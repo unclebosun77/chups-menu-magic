@@ -2,14 +2,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Clock, Users, MapPin, CalendarPlus } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -204,17 +201,16 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
 
               <div className="space-y-2">
                 <Label>Date *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background" align="start">
-                    <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} initialFocus className="pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
+                <div className="relative">
+                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={date ? format(date, 'yyyy-MM-dd') : ''}
+                    onChange={(e) => setDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
