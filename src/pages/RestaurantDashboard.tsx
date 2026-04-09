@@ -46,6 +46,7 @@ type Order = {
   customer_email: string | null;
   customer_phone: string | null;
   created_at: string;
+  table_number?: string | null;
 };
 
 type Insights = {
