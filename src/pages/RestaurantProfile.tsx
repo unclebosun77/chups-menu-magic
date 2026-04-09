@@ -311,7 +311,13 @@ const RestaurantProfile = () => {
                   <div className="flex items-end justify-between">
                     <div className="flex-1">
                       <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                      <p className="text-[14px] text-muted-foreground/70 mt-1">{restaurant.cuisine}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
+                        {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
+                          (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
+                          <CrowdPill level={restaurant.crowdLevel} />
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                       <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
@@ -368,7 +374,13 @@ const RestaurantProfile = () => {
                   </div>
                   <div className="flex-1 pb-1">
                     <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                    <p className="text-[14px] text-muted-foreground/80 mt-0.5">{restaurant.cuisine}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
+                      {restaurant.crowdLevel && restaurant.crowdUpdatedAt && 
+                        (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000 && (
+                        <CrowdPill level={restaurant.crowdLevel} />
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                     <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
