@@ -263,7 +263,7 @@ User's message: ${userMessageContent}
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-2">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-32">
         {messages.map((message, index) => {
           // For outa messages after user has sent something, strip quickFilters
           const shouldShowQuickFilters = !hasUserSentMessage || index === messages.length - 1;
