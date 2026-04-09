@@ -1,0 +1,1 @@
+ALTER TABLE public.bookings ADD COLUMN restaurant_id uuid REFERENCES public.restaurants(id) ON DELETE SET NULL;
