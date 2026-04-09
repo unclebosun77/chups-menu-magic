@@ -16,6 +16,15 @@ type Restaurant = {
   is_open: boolean;
   latitude: number | null;
   longitude: number | null;
+  crowd_level?: string | null;
+  crowd_updated_at?: string | null;
+};
+
+const CROWD_DOT_COLORS: Record<string, string> = {
+  quiet: "bg-green-500",
+  moderate: "bg-amber-500",
+  busy: "bg-orange-500",
+  very_busy: "bg-red-500",
 };
 
 interface UniversalRestaurantCardProps {
