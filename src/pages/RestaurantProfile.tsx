@@ -66,7 +66,7 @@ const RestaurantProfile = () => {
       // Try loading from Supabase first
       const { data, error } = await supabase
         .from("restaurants")
-        .select("*, is_temporarily_closed")
+        .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
         .eq("id", supabaseId)
         .maybeSingle();
 

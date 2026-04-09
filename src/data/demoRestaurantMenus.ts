@@ -53,6 +53,8 @@ export interface DemoRestaurant {
   distance: string;
   isOpen: boolean;
   menu: DemoMenuItem[];
+  crowdLevel?: string | null;
+  crowdUpdatedAt?: string | null;
 }
 
 // Using Supabase UUIDs as keys for direct lookup
