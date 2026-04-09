@@ -7,9 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2 } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2, CreditCard, Landmark } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BillSplitter from "@/components/order/BillSplitter";
+import { loadStripe } from "@stripe/stripe-js";
 
 interface OrderItem {
   id: string;
@@ -19,6 +20,8 @@ interface OrderItem {
   image?: string;
   tags?: string[];
 }
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
 
 const OrderSummary = () => {
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ const OrderSummary = () => {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   if (!restaurantName || !restaurantId) {
     navigate("/");
@@ -48,80 +52,117 @@ const OrderSummary = () => {
 
   const removeItem = (id: string) => {
     setOrderItems(orderItems.filter(item => item.id !== id));
-    toast({
-      title: "Item removed",
-      description: "Item has been removed from your order",
-    });
+    toast({ title: "Item removed", description: "Item has been removed from your order" });
   };
 
   const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handlePlaceOrder = async () => {
+  const validateOrder = () => {
     if (!customerName || !customerPhone) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter your name and phone number",
-        variant: "destructive",
-      });
-      return;
+      toast({ title: "Missing Information", description: "Please enter your name and phone number", variant: "destructive" });
+      return false;
     }
-
     if (orderItems.length === 0) {
-      toast({
-        title: "Empty Order",
-        description: "Please add items to your order",
-        variant: "destructive",
-      });
-      return;
+      toast({ title: "Empty Order", description: "Please add items to your order", variant: "destructive" });
+      return false;
     }
+    return true;
+  };
 
+  const createOrder = async (paymentMethod: string, paymentStatus: string) => {
+    const { data, error } = await supabase.from("orders").insert({
+      restaurant_id: restaurantId,
+      user_id: user?.id || null,
+      customer_name: customerName,
+      customer_email: customerEmail || null,
+      customer_phone: customerPhone || null,
+      table_number: tableNumber || null,
+      items: orderItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+      total: totalAmount,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
+    }).select('id').single();
+
+    if (error) throw error;
+    return data;
+  };
+
+  const handlePayAtTable = async () => {
+    if (!validateOrder()) return;
     setIsSubmitting(true);
-
     try {
-      const { data, error } = await supabase.from("orders").insert({
-        restaurant_id: restaurantId,
-        user_id: user?.id || null,
-        customer_name: customerName,
-        customer_email: customerEmail || null,
-        customer_phone: customerPhone || null,
-        table_number: tableNumber || null,
-        items: orderItems.map(item => ({ 
-          id: item.id, 
-          name: item.name, 
-          price: item.price, 
-          quantity: item.quantity 
-        })),
-        total: totalAmount,
-      }).select('id').single();
-
-      if (error) {
-        toast({ 
-          title: "Error placing order", 
-          description: error.message, 
-          variant: "destructive" 
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Navigate to success page with order ID
+      const data = await createOrder("pos", "pos_requested");
       navigate("/order-success", {
         state: {
           orderId: data?.id,
           restaurantName,
           totalAmount,
           itemCount: totalItems,
+          paymentMethod: "pos",
         },
       });
-    } catch (error) {
-      console.error("Error placing order:", error);
-      toast({ 
-        title: "Error", 
-        description: "Failed to place order. Please try again.", 
-        variant: "destructive" 
-      });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Failed to place order.", variant: "destructive" });
+    } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePayNow = async () => {
+    if (!validateOrder()) return;
+    setPaymentProcessing(true);
+    try {
+      // 1. Create the order first
+      const orderData = await createOrder("stripe", "pending");
+      const orderId = orderData?.id;
+
+      // 2. Create payment intent
+      const { data: piData, error: piError } = await supabase.functions.invoke("create-payment-intent", {
+        body: {
+          amount: Math.round(totalAmount * 100), // pence
+          restaurantId,
+          orderId,
+        },
+      });
+
+      if (piError || !piData?.clientSecret) {
+        throw new Error(piError?.message || "Failed to create payment intent");
+      }
+
+      // 3. Confirm payment with Stripe
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to load");
+
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(piData.clientSecret, {
+        payment_method: {
+          card: { token: "tok_visa" } as any, // In production, use Stripe Elements
+        },
+      });
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+
+      if (paymentIntent?.status === "succeeded") {
+        // 4. Update order payment status
+        await supabase.from("orders").update({ payment_status: "paid" }).eq("id", orderId);
+
+        navigate("/order-success", {
+          state: {
+            orderId,
+            restaurantName,
+            totalAmount,
+            itemCount: totalItems,
+            paymentMethod: "stripe",
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast({ title: "Payment Failed", description: error.message || "Payment could not be processed.", variant: "destructive" });
+    } finally {
+      setPaymentProcessing(false);
     }
   };
 
@@ -131,11 +172,7 @@ const OrderSummary = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="flex items-center gap-3 p-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
@@ -152,13 +189,7 @@ const OrderSummary = () => {
             {orderItems.length === 0 ? (
               <Card className="p-8 text-center">
                 <p className="text-muted-foreground">Your order is empty</p>
-                <Button
-                  variant="link"
-                  onClick={() => navigate(-1)}
-                  className="mt-2"
-                >
-                  Continue Shopping
-                </Button>
+                <Button variant="link" onClick={() => navigate(-1)} className="mt-2">Continue Shopping</Button>
               </Card>
             ) : (
               orderItems.map((item) => (
@@ -166,53 +197,29 @@ const OrderSummary = () => {
                   <CardContent className="p-4">
                     <div className="flex gap-4">
                       {item.image && (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                        />
+                        <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base mb-1">{item.name}</h3>
-                        <p className="text-lg font-bold text-primary mb-2">
-                          ${item.price.toFixed(2)}
-                        </p>
+                        <p className="text-lg font-bold text-primary mb-2">£{item.price.toFixed(2)}</p>
                         {item.tags && item.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {item.tags.map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
+                              <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                             ))}
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                          >
+                          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
                             <Minus className="h-4 w-4" />
                           </Button>
                           <span className="font-semibold w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
+                          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeItem(item.id)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -236,24 +243,11 @@ const OrderSummary = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Name *</Label>
-                      <Input
-                        id="name"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        placeholder="Your full name"
-                        className="h-12"
-                      />
+                      <Input id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Your full name" className="h-12" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        placeholder="(123) 456-7890"
-                        className="h-12"
-                      />
+                      <Input id="phone" type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="(123) 456-7890" className="h-12" />
                     </div>
                   </div>
                 </Card>
@@ -265,31 +259,48 @@ const OrderSummary = () => {
                   <div className="bg-primary/10 rounded-full p-2 flex-shrink-0">
                     <Rocket className="w-5 h-5 text-primary" />
                   </div>
-                  <p className="text-sm font-medium">
-                    Order gets sent straight to the kitchen 🚀
-                  </p>
+                  <p className="text-sm font-medium">Order gets sent straight to the kitchen 🚀</p>
                 </div>
               </Card>
             </>
           )}
         </div>
 
-        {/* Fixed Bottom Bar */}
+        {/* Fixed Bottom Bar with Payment Options */}
         {orderItems.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg">
             <div className="max-w-2xl mx-auto space-y-3">
               <div className="flex items-center justify-between text-lg">
                 <span className="font-semibold">Total ({totalItems} items)</span>
-                <span className="text-2xl font-bold text-primary">
-                  ${totalAmount.toFixed(2)}
-                </span>
+                <span className="text-2xl font-bold text-primary">£{totalAmount.toFixed(2)}</span>
               </div>
-              <Button
-                onClick={handlePlaceOrder}
-                className="w-full h-12 text-base font-semibold bg-purple text-white hover:bg-purple-hover"
-              >
-                Place Order
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handlePayNow}
+                  disabled={paymentProcessing || isSubmitting}
+                  className="flex-1 h-12 text-base font-semibold bg-purple text-white hover:bg-purple-hover"
+                >
+                  {paymentProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <CreditCard className="h-4 w-4 mr-2" />
+                  )}
+                  Pay now — £{totalAmount.toFixed(2)}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handlePayAtTable}
+                  disabled={paymentProcessing || isSubmitting}
+                  className="flex-1 h-12 text-base font-semibold"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Landmark className="h-4 w-4 mr-2" />
+                  )}
+                  Pay at table
+                </Button>
+              </div>
             </div>
           </div>
         )}
