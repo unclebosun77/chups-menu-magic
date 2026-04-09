@@ -25,6 +25,8 @@ interface Booking {
   pricing: string;
   status: string;
   created_at: string;
+  restaurant_id?: string;
+  restaurants?: { name: string; address?: string } | null;
 }
 
 const MyBookings = () => {
@@ -62,7 +64,7 @@ const MyBookings = () => {
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select('*, restaurants(name, address)')
         .eq('user_id', user.id)
         .order('booking_date', { ascending: false });
 
@@ -160,8 +162,14 @@ const MyBookings = () => {
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <CardTitle className="text-xl">{booking.experience_name}</CardTitle>
+              {booking.restaurants?.name && (
+                <p className="text-sm font-semibold text-primary flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {booking.restaurants.name}
+                </p>
+              )}
               <CardDescription className="flex items-center gap-2">
-                <span className="text-primary font-medium">{booking.category_title}</span>
+                <span className="text-muted-foreground">{booking.category_title}</span>
               </CardDescription>
             </div>
             {getStatusBadge(booking.status)}
