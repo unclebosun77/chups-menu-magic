@@ -149,10 +149,27 @@ const OrderManagement = ({ orders, onOrderUpdate }: OrderManagementProps) => {
                         </Badge>
                       )}
                     </div>
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <StatusIcon className="h-3 w-3" />
-                      {statusConfig.label}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {order.payment_status === "paid" && (
+                        <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
+                          Paid
+                        </Badge>
+                      )}
+                      {order.payment_status === "pos_requested" && (
+                        <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/30 text-xs">
+                          POS Requested
+                        </Badge>
+                      )}
+                      {(!order.payment_status || order.payment_status === "pending") && (
+                        <Badge className="bg-muted text-muted-foreground text-xs">
+                          Pending
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <StatusIcon className="h-3 w-3" />
+                        {statusConfig.label}
+                      </Badge>
+                    </div>
                   </div>
                   <CardDescription>
                     {format(new Date(order.created_at), "MMM d, h:mm a")}
