@@ -23,6 +23,24 @@ import { ReservationDialog } from "@/components/ReservationDialog";
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
 
+const CROWD_COLORS: Record<string, { dot: string; bg: string; text: string; label: string }> = {
+  quiet: { dot: "bg-green-500", bg: "bg-green-100 dark:bg-green-950/40", text: "text-green-700 dark:text-green-300", label: "Quiet" },
+  moderate: { dot: "bg-amber-500", bg: "bg-amber-100 dark:bg-amber-950/40", text: "text-amber-700 dark:text-amber-300", label: "Moderate" },
+  busy: { dot: "bg-orange-500", bg: "bg-orange-100 dark:bg-orange-950/40", text: "text-orange-700 dark:text-orange-300", label: "Busy" },
+  very_busy: { dot: "bg-red-500", bg: "bg-red-100 dark:bg-red-950/40", text: "text-red-700 dark:text-red-300", label: "Very Busy" },
+};
+
+const CrowdPill = ({ level }: { level: string }) => {
+  const config = CROWD_COLORS[level];
+  if (!config) return null;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${config.bg} ${config.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+      {config.label}
+    </span>
+  );
+};
+
 const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
