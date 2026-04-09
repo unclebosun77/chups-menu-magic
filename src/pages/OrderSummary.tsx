@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2, CreditCard, Landmark } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2, CreditCard, Landmark, Split } from "lucide-react";
 import { toast } from "sonner";
 import BillSplitter from "@/components/order/BillSplitter";
 
@@ -34,6 +34,7 @@ const OrderSummary = () => {
   const [customerEmail, setCustomerEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [showSplitBill, setShowSplitBill] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   if (!restaurantName || !restaurantId) {
@@ -341,11 +342,26 @@ const OrderSummary = () => {
                 </div>
               </div>
 
-              {/* 5. Divider + Split Bill (optional, last) */}
+              {/* 5. Split Bill — collapsible */}
               <div className="pt-2">
                 <Separator className="mb-4" />
-                <p className="text-xs text-muted-foreground text-center mb-4">Optional: split the bill with your group</p>
-                <BillSplitter items={orderItems} totalAmount={totalAmount} restaurantName={restaurantName} />
+                {!showSplitBill ? (
+                  <button
+                    onClick={() => setShowSplitBill(true)}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border hover:border-purple/40 hover:bg-purple/5 transition-all text-sm text-muted-foreground hover:text-purple"
+                  >
+                    <Split className="h-4 w-4" />
+                    Split the bill with your group
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Splitting is optional — your order is already placed above</p>
+                      <button onClick={() => setShowSplitBill(false)} className="text-xs text-muted-foreground hover:text-foreground underline">Hide</button>
+                    </div>
+                    <BillSplitter items={orderItems} totalAmount={totalAmount} restaurantName={restaurantName} />
+                  </div>
+                )}
               </div>
             </>
           )}
