@@ -130,6 +130,8 @@ const RestaurantProfile = () => {
             distance: "1.0 km",
             isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             menu: supabaseMenu,
+            crowdLevel: data.crowd_level,
+            crowdUpdatedAt: data.crowd_updated_at,
           });
         }
       } else if (demoData) {
