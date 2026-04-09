@@ -74,13 +74,13 @@ const DishCard = ({ dish, onSelect }: DishCardProps) => {
           )}
           {/* Floating Add button */}
           <button
-            className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-purple text-white shadow-md flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
+            className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-purple text-white shadow-sm flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               onSelect(dish);
             }}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
           </button>
         </div>
       </div>

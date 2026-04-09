@@ -60,7 +60,7 @@ const App = () => (
                     <Route path="/" element={<Layout><Index /></Layout>} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/discover" element={<Layout><Discover /></Layout>} />
-                    <Route path="/restaurant/:restaurantId" element={<Layout><RestaurantProfile /></Layout>} />
+                    <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
                     
                     {/* Main app routes with bottom nav */}
                     <Route path="/services" element={<Layout><Services /></Layout>} />
