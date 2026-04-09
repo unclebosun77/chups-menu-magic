@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
+import { isRestaurantOpen } from "@/utils/openingHours";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Star, MapPin, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,8 +38,8 @@ const PickedForYouSection = () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, address, city, is_open, latitude, longitude")
-          .eq("is_open", true)
+          .select("id, name, cuisine_type, description, logo_url, address, city, is_open, latitude, longitude, hours, is_temporarily_closed")
+          .eq("status", "active")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -56,7 +57,7 @@ const PickedForYouSection = () => {
             priceLevel: "££",
             matchScore: 75 + Math.floor(Math.random() * 15),
             aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
-            isOpen: r.is_open,
+            isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
             distance: "Nearby",
             rating: 4.5,
             logoUrl: r.logo_url || "",
