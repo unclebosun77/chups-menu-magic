@@ -262,7 +262,7 @@ const OrderSummary = () => {
                       <Input id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Your full name" className="h-12" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone">Phone Number (optional)</Label>
                       <Input id="phone" type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="(123) 456-7890" className="h-12" />
                     </div>
                   </div>
