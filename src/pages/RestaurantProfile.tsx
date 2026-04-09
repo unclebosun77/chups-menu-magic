@@ -890,6 +890,14 @@ const RestaurantProfile = () => {
           }
         }
       `}</style>
+
+      <ReservationDialog
+        isOpen={showReservation}
+        onClose={() => setShowReservation(false)}
+        restaurantId={supabaseId}
+        restaurantName={restaurant?.name}
+        restaurantAddress={restaurant?.address}
+      />
     </div>
   );
 };
