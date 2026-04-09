@@ -14,6 +14,7 @@ interface OrderState {
   totalAmount?: number;
   itemCount?: number;
   paymentMethod?: string;
+  tableNumber?: string | null;
 }
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; icon: typeof CheckCircle2; color: string; description: string }> = {
@@ -30,7 +31,7 @@ const STATUS_FLOW: OrderStatus[] = ["pending", "accepted", "preparing", "ready",
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { orderId, restaurantName, totalAmount, itemCount, paymentMethod } = (location.state || {}) as OrderState;
+  const { orderId, restaurantName, totalAmount, itemCount, paymentMethod, tableNumber } = (location.state || {}) as OrderState;
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>("pending");
   const [isPolling, setIsPolling] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -110,8 +111,22 @@ const OrderSuccess = () => {
               They're cooking it up. You'll eat good soon.
             </p>
             {paymentMethod === "pos" && (
-              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-200">
-                Order sent — a member of staff will bring your card machine.
+              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 space-y-2">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                  Show this to your server
+                </p>
+                <div className="flex items-center justify-center gap-3 text-amber-900 dark:text-amber-100">
+                  {tableNumber && (
+                    <span className="text-lg font-bold">Table {tableNumber}</span>
+                  )}
+                  {tableNumber && orderId && <span className="text-amber-400">·</span>}
+                  {orderId && (
+                    <span className="text-lg font-bold">Order #{orderId.slice(0, 6).toUpperCase()}</span>
+                  )}
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  A member of staff will bring your card machine
+                </p>
               </div>
             )}
             {paymentMethod === "stripe" && (
