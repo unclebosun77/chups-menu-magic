@@ -50,6 +50,7 @@ export type Database = {
           id: string
           party_size: string
           pricing: string
+          restaurant_id: string | null
           special_requests: string | null
           status: string
           time_slot: string
@@ -67,6 +68,7 @@ export type Database = {
           id?: string
           party_size: string
           pricing: string
+          restaurant_id?: string | null
           special_requests?: string | null
           status?: string
           time_slot: string
@@ -84,13 +86,22 @@ export type Database = {
           id?: string
           party_size?: string
           pricing?: string
+          restaurant_id?: string | null
           special_requests?: string | null
           status?: string
           time_slot?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bookings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       catering_orders: {
         Row: {

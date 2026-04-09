@@ -17,6 +17,7 @@ import { vibrate } from "@/utils/haptics";
 import { getSupabaseId } from "@/utils/restaurantMapping";
 import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 import ReviewsSection from "@/components/ReviewsSection";
+import { ReservationDialog } from "@/components/ReservationDialog";
 
 // Restaurant profile component types
 type OrderItem = DemoMenuItem & { quantity: number };
@@ -35,6 +36,7 @@ const RestaurantProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
 
   // Get the normalized Supabase ID
   const supabaseId = restaurantId ? getSupabaseId(restaurantId) : "";
@@ -658,7 +660,7 @@ const RestaurantProfile = () => {
         <div className="grid grid-cols-2 gap-3">
           {[
             { icon: UtensilsCrossed, label: "Order Food", available: true, onClick: () => {} },
-            { icon: Calendar, label: "Reserve Table", available: false },
+            { icon: Calendar, label: "Reserve Table", available: true, onClick: () => setShowReservation(true) },
             { icon: MessageCircle, label: "Ask CHUPS", available: true, onClick: () => setShowAskOuta(true) },
             { icon: Info, label: "Event Booking", available: false },
           ].map((service, idx) => (
@@ -888,6 +890,14 @@ const RestaurantProfile = () => {
           }
         }
       `}</style>
+
+      <ReservationDialog
+        isOpen={showReservation}
+        onClose={() => setShowReservation(false)}
+        restaurantId={supabaseId}
+        restaurantName={restaurant?.name}
+        restaurantAddress={restaurant?.address}
+      />
     </div>
   );
 };
