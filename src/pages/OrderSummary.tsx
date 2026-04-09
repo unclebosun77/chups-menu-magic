@@ -58,8 +58,8 @@ const OrderSummary = () => {
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const validateOrder = () => {
-    if (!customerName || !customerPhone) {
-      toast.error("Please enter your name and phone number");
+    if (!customerName.trim()) {
+      toast.error("Please enter your name");
       return false;
     }
     if (orderItems.length === 0) {
@@ -69,66 +69,40 @@ const OrderSummary = () => {
     return true;
   };
 
-  const createOrder = async (paymentMethod: string, paymentStatus: string) => {
-    const controller = new AbortController();
-    abortRef.current = controller;
+  const createOrder = async () => {
+    const insertPayload = {
+      restaurant_id: restaurantId,
+      user_id: user?.id || null,
+      customer_name: customerName,
+      customer_email: customerEmail || null,
+      customer_phone: customerPhone || null,
+      items: orderItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+      total: totalAmount,
+      status: "pending",
+    };
 
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, 10000);
+    console.log("[OrderSummary] Inserting order:", insertPayload);
 
-    try {
-      const insertPayload = {
-        restaurant_id: restaurantId,
-        user_id: user?.id || null,
-        customer_name: customerName,
-        customer_email: customerEmail || null,
-        customer_phone: customerPhone || null,
-        table_number: tableNumber || null,
-        items: orderItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
-        total: totalAmount,
-        payment_method: paymentMethod || "pos",
-        payment_status: paymentStatus,
-      };
+    const { data, error } = await supabase
+      .from("orders")
+      .insert(insertPayload)
+      .select('id')
+      .single();
 
-      console.log("[OrderSummary] Inserting order:", insertPayload);
-
-      const queryPromise = supabase
-        .from("orders")
-        .insert(insertPayload)
-        .select('id')
-        .single();
-
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        const id = setTimeout(() => reject(new Error("Order timed out after 10 seconds — please try again")), 10000);
-        controller.signal.addEventListener("abort", () => clearTimeout(id));
-      });
-
-      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
-
-      clearTimeout(timeoutId);
-
-      if (error) {
-        console.error("[OrderSummary] Supabase insert error:", error.message, error.details, error.hint, error.code);
-        throw new Error(error.message);
-      }
-
-      console.log("[OrderSummary] Order created successfully:", data);
-      return data;
-    } catch (err: any) {
-      clearTimeout(timeoutId);
-      if (err.name === "AbortError" || controller.signal.aborted) {
-        throw new Error("Order timed out after 10 seconds — please try again");
-      }
-      throw err;
+    if (error) {
+      console.error('Order insert error:', JSON.stringify(error));
+      throw new Error(error.message || 'Failed to create order');
     }
+
+    console.log("[OrderSummary] Order created successfully:", data);
+    return data;
   };
 
   const handlePayAtTable = async () => {
     if (!validateOrder()) return;
     setIsSubmitting(true);
     try {
-      const data = await createOrder("pos", "pos_requested");
+      const data = await createOrder();
       navigate("/order-success", {
         state: {
           orderId: data?.id,
@@ -136,7 +110,6 @@ const OrderSummary = () => {
           totalAmount,
           itemCount: totalItems,
           paymentMethod: "pos",
-          tableNumber: tableNumber || null,
         },
       });
     } catch (error: any) {
@@ -158,7 +131,7 @@ const OrderSummary = () => {
         return;
       }
 
-      const orderData = await createOrder("stripe", "pending");
+      const orderData = await createOrder();
       const orderId = orderData?.id;
 
       const { data: piData, error: piError } = await supabase.functions.invoke("create-payment-intent", {
@@ -289,7 +262,7 @@ const OrderSummary = () => {
                       <Input id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Your full name" className="h-12" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone">Phone Number (optional)</Label>
                       <Input id="phone" type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="(123) 456-7890" className="h-12" />
                     </div>
                   </div>
