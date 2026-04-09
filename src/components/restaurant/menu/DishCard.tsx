@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { DemoMenuItem } from "@/data/demoRestaurantMenus";
 
 interface DishCardProps {
@@ -59,17 +60,29 @@ const DishCard = ({ dish, onSelect }: DishCardProps) => {
           )}
         </div>
 
-        {/* Image */}
-        {dish.image && (
-          <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-border/30">
-            <img 
-              src={dish.image} 
-              alt={dish.name} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-            />
-          </div>
-        )}
+        {/* Image + Add button */}
+        <div className="relative flex-shrink-0">
+          {dish.image && (
+            <div className="w-24 h-24 rounded-xl overflow-hidden ring-1 ring-border/30">
+              <img 
+                src={dish.image} 
+                alt={dish.name} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          )}
+          {/* Floating Add button */}
+          <button
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-purple text-white shadow-md flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(dish);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
