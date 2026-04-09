@@ -143,9 +143,8 @@ User's message: ${userMessageContent}
         let errorBody = '';
         try { errorBody = await resp.text(); } catch {}
 
-        if (resp.status === 500 && errorBody.includes('OPENAI_API_KEY')) {
-          toast.info("AI is being set up — using smart suggestions for now");
-        }
+        // Silently fall back
+
 
         const fallback = getLocalFallback(userMessageContent);
         return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
