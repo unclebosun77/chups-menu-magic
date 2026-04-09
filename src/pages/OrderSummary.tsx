@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Minus, Plus, Trash2, Rocket, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import BillSplitter from "@/components/order/BillSplitter";
 
 interface OrderItem {
   id: string;
@@ -220,6 +221,11 @@ const OrderSummary = () => {
               ))
             )}
           </div>
+
+          {/* Bill Splitter */}
+          {orderItems.length > 0 && (
+            <BillSplitter items={orderItems} totalAmount={totalAmount} />
+          )}
 
           {/* Customer Information */}
           {orderItems.length > 0 && (
