@@ -91,12 +91,18 @@ const OrderSummary = () => {
 
       console.log("[OrderSummary] Inserting order:", insertPayload);
 
-      const { data, error } = await supabase
+      const queryPromise = supabase
         .from("orders")
         .insert(insertPayload)
         .select('id')
-        .single()
-        .abortSignal(controller.signal);
+        .single();
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        const id = setTimeout(() => reject(new Error("Order timed out after 10 seconds — please try again")), 10000);
+        controller.signal.addEventListener("abort", () => clearTimeout(id));
+      });
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
       clearTimeout(timeoutId);
 
