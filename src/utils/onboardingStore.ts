@@ -244,3 +244,37 @@ function calculateCompleteness(draft: RestaurantDraft): number {
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
+
+// Save draft to Supabase (non-blocking cloud sync)
+export const saveDraftToSupabase = async (draft?: RestaurantDraft) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const draftData = draft || loadRestaurantDraft();
+    await supabase.from('onboarding_drafts').upsert({
+      user_id: session.user.id,
+      draft: draftData as any,
+      current_step: draftData.step,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  } catch (err) {
+    console.error('Failed to save draft to cloud:', err);
+  }
+};
+
+// Load draft from Supabase
+export const loadDraftFromSupabase = async (): Promise<RestaurantDraft | null> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+    const { data } = await supabase
+      .from('onboarding_drafts')
+      .select('draft')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    return (data?.draft as unknown as RestaurantDraft) || null;
+  } catch (err) {
+    console.error('Failed to load draft from cloud:', err);
+    return null;
+  }
+};
