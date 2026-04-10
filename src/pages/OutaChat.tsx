@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
-import UserMessage from '@/components/chat/UserMessage';
+import { RotateCcw } from 'lucide-react';
 import OutaMessage from '@/components/chat/OutaMessage';
+import UserMessage from '@/components/chat/UserMessage';
 import TypingIndicator from '@/components/chat/TypingIndicator';
-import ChatInput from '@/components/chat/ChatInput';
 import { ChatMessage, getInitialMessage, generateMessageId, processUserMessage } from '@/utils/chatEngine';
 import { useTasteProfile } from '@/context/TasteProfileContext';
 import { useLocation } from '@/context/LocationContext';
 import { useUserBehavior } from '@/context/UserBehaviorContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { personalizedRestaurants } from '@/data/personalizedRestaurants';
+import { cn } from '@/lib/utils';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 
@@ -24,16 +23,26 @@ interface SupabaseRestaurant {
   description: string | null;
 }
 
+const QUICK_PILLS = [
+  "Plan my evening ✨",
+  "Romantic dinner 💕",
+  "Best spots nearby 📍",
+  "Budget meal 💰",
+  "Surprise me 🎲",
+];
+
 const OutaChat = () => {
   const navigate = useNavigate();
   const { profile } = useTasteProfile();
   const { userLocation } = useLocation();
   const { behavior, addRestaurantVisit, addSearch } = useUserBehavior();
   const scrollRef = useRef<HTMLDivElement>(null);
-  
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -55,6 +64,14 @@ const OutaChat = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 120)}px`;
+    }
+  }, [inputValue]);
 
   const buildRestaurantContext = useCallback(() => {
     return JSON.stringify(
@@ -80,8 +97,7 @@ const OutaChat = () => {
   };
 
   const getLocalFallback = (userMessageContent: string) => {
-    const result = processUserMessage(userMessageContent, profile, userLocation, personalizedRestaurants);
-    return result;
+    return processUserMessage(userMessageContent, profile, userLocation, personalizedRestaurants);
   };
 
   const extractQuickActions = (content: string): string[] => {
@@ -107,18 +123,7 @@ const OutaChat = () => {
       .map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content }));
 
     const userContext = buildUserContext();
-    const contextMessage = `
-User context:
-- Location: ${userContext.location}
-- Taste preferences: ${userContext.cuisines}
-- Spice level: ${userContext.spiceLevel}
-- Price preference: ${userContext.pricePreference}
-- Recently visited: ${userContext.recentRestaurants}
-- Recent searches: ${userContext.recentSearches}
-${userContext.likesSpicy ? '- User enjoys spicy food' : ''}
-
-User's message: ${userMessageContent}
-`;
+    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}\n\nUser's message: ${userMessageContent}`;
 
     try {
       const resp = await fetch(CHAT_URL, {
@@ -133,24 +138,7 @@ User's message: ${userMessageContent}
         }),
       });
 
-      if (resp.status === 429) {
-        const fallback = getLocalFallback(userMessageContent);
-        return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
-      }
-
-      if (!resp.ok) {
-        // Try to read error body
-        let errorBody = '';
-        try { errorBody = await resp.text(); } catch {}
-
-        // Silently fall back
-
-
-        const fallback = getLocalFallback(userMessageContent);
-        return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
-      }
-
-      if (!resp.body) {
+      if (!resp.ok || !resp.body) {
         const fallback = getLocalFallback(userMessageContent);
         return { content: fallback.content, restaurants: fallback.restaurants, quickFilters: fallback.quickFilters };
       }
@@ -215,6 +203,7 @@ User's message: ${userMessageContent}
     const userMessage: ChatMessage = { id: generateMessageId(), type: 'user', content, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
+    setInputValue('');
 
     const streamingId = `streaming-${generateMessageId()}`;
     const placeholderMessage: ChatMessage = { id: streamingId, type: 'outa', content: '', timestamp: new Date() };
@@ -239,31 +228,53 @@ User's message: ${userMessageContent}
     navigate(`/restaurant/${restaurant.id}`);
   }, [navigate, addRestaurantVisit]);
 
-  // Only show quick action pills on the initial message
+  const handleReset = () => {
+    setMessages([getInitialMessage(profile)]);
+    setInputValue('');
+  };
+
+  const handleSubmit = () => {
+    if (inputValue.trim() && !isTyping) {
+      handleSendMessage(inputValue.trim());
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   const hasUserSentMessage = messages.some(m => m.type === 'user');
 
   return (
-    <div className="flex flex-col h-[100dvh]">
+    <div className="flex flex-col h-[100dvh] bg-background">
       {/* Header */}
-      <div className="flex-shrink-0 bg-background/80 backdrop-blur-xl border-b border-border/50 z-50">
-        <div className="px-4 py-3">
+      <div className="flex-shrink-0 border-b border-border/40 bg-background/90 backdrop-blur-xl z-50">
+        <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple/30 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple via-neon-pink to-purple animate-[spin_4s_linear_infinite] bg-[length:200%_200%]" />
-              <Sparkles className="h-5 w-5 text-white relative z-10" />
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center shadow-md shadow-purple/20">
+              <span className="text-white font-bold text-sm">O</span>
             </div>
-            <div className="flex-1">
-              <h1 className="font-bold text-foreground text-lg leading-tight">Ask Outa 💜</h1>
-              <p className="text-[11px] text-muted-foreground">Your personal dining guide</p>
+            <div>
+              <h1 className="font-bold text-foreground text-[17px] leading-tight">Outa</h1>
+              <p className="text-[11px] text-muted-foreground leading-tight">Your dining guide 💜</p>
             </div>
           </div>
+          <button
+            onClick={handleReset}
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors text-muted-foreground hover:text-foreground"
+            aria-label="Reset conversation"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-32">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-36">
         {messages.map((message, index) => {
-          // For outa messages after user has sent something, strip quickFilters
           const shouldShowQuickFilters = !hasUserSentMessage || index === messages.length - 1;
           const adjustedMessage = (!shouldShowQuickFilters && message.type === 'outa' && message.data?.quickFilters)
             ? { ...message, data: { ...message.data, quickFilters: undefined } }
@@ -283,18 +294,18 @@ User's message: ${userMessageContent}
         })}
         {isTyping && <TypingIndicator />}
 
-        {/* Initial quick prompts */}
-        {messages.length <= 1 && !isTyping && (
-          <div className="px-4 pb-4">
-            <p className="text-xs text-muted-foreground/60 mb-3 px-1">Try asking…</p>
+        {/* Quick action pills — initial state only */}
+        {!hasUserSentMessage && messages.length <= 1 && !isTyping && (
+          <div className="px-4 pt-2 pb-4">
+            <p className="text-xs text-muted-foreground/50 mb-3 px-1">Try asking…</p>
             <div className="flex flex-wrap gap-2">
-              {["Easy dinner tonight", "£20–£30, good vibes", "Something new but safe", "Date night spot nearby"].map(prompt => (
+              {QUICK_PILLS.map(pill => (
                 <button
-                  key={prompt}
-                  onClick={() => handleSendMessage(prompt)}
-                  className="px-4 py-2.5 rounded-2xl bg-card border border-border/50 text-[13px] font-medium text-foreground hover:border-purple/30 hover:bg-secondary/40 transition-all active:scale-[0.97]"
+                  key={pill}
+                  onClick={() => handleSendMessage(pill)}
+                  className="px-4 py-2.5 rounded-full bg-purple/5 border border-purple/15 text-[13px] font-medium text-foreground hover:bg-purple/10 hover:border-purple/30 transition-all active:scale-[0.97]"
                 >
-                  {prompt}
+                  {pill}
                 </button>
               ))}
             </div>
@@ -302,9 +313,39 @@ User's message: ${userMessageContent}
         )}
       </div>
 
-      {/* Input — sticky at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pb-16">
-        <ChatInput onSend={handleSendMessage} disabled={isTyping} />
+      {/* Input bar — fixed at bottom, above bottom nav */}
+      <div className="fixed bottom-16 left-0 right-0 z-40 px-4 py-3 bg-background/90 backdrop-blur-xl border-t border-border/40">
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={inputRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask Outa anything..."
+            disabled={isTyping}
+            rows={1}
+            className={cn(
+              "flex-1 px-4 py-3 rounded-full resize-none",
+              "bg-secondary/50 border border-border/50",
+              "focus:outline-none focus:ring-2 focus:ring-purple/30 focus:border-purple/40",
+              "placeholder:text-muted-foreground/40 text-sm",
+              "transition-all disabled:opacity-50",
+              "max-h-[120px]"
+            )}
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={!inputValue.trim() || isTyping}
+            className={cn(
+              "h-11 w-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all",
+              inputValue.trim()
+                ? "bg-purple text-white shadow-md shadow-purple/25"
+                : "bg-secondary text-muted-foreground/40"
+            )}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
 import ChatRestaurantCard from './ChatRestaurantCard';
 import ItineraryCard from './ItineraryCard';
 import QuickActions from './QuickActions';
@@ -23,24 +22,23 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick 
       )}
     >
       <div className="max-w-[85%]">
-        {/* Avatar */}
-        <div className="flex items-start gap-2">
-          <div className="relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple/30 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple via-neon-pink to-purple animate-[spin_4s_linear_infinite] bg-[length:200%_200%]" />
-            <Sparkles className="h-4 w-4 text-white relative z-10" />
+        <div className="flex items-start gap-2.5">
+          {/* Avatar */}
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm shadow-purple/20">
+            <span className="text-white font-bold text-[11px]">O</span>
           </div>
           
-          <div className="flex-1 space-y-3">
-            {/* Main message bubble */}
-            <div className="bg-purple/8 border border-purple/10 px-4 py-3 rounded-2xl rounded-tl-md shadow-sm">
+          <div className="flex-1 space-y-2.5">
+            {/* Message bubble */}
+            <div className="bg-[hsl(265,60%,97%)] dark:bg-purple/10 border border-purple/8 px-4 py-3 rounded-2xl rounded-bl-md">
               <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
                 {content}
               </p>
             </div>
             
-            {/* Restaurant recommendations */}
+            {/* Restaurant cards */}
             {data?.restaurants && data.restaurants.length > 0 && (
-              <div className="space-y-2 animate-slide-up" style={{ animationDelay: '200ms' }}>
+              <div className="space-y-2" style={{ animationDelay: '200ms' }}>
                 {data.restaurants.map((restaurant, index) => (
                   <ChatRestaurantCard 
                     key={restaurant.id || index}
@@ -57,7 +55,7 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick 
               <ItineraryCard steps={data.itinerary} />
             )}
             
-            {/* Quick action chips */}
+            {/* Quick actions */}
             {data?.quickFilters && data.quickFilters.length > 0 && (
               <QuickActions 
                 actions={data.quickFilters} 
@@ -67,7 +65,7 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick 
           </div>
         </div>
         
-        <p className="text-[10px] text-muted-foreground/50 mt-1 ml-10">
+        <p className="text-[10px] text-muted-foreground/40 mt-1 ml-10">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
