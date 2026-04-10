@@ -114,16 +114,15 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       try {
         await supabase.functions.invoke('send-booking-confirmation', {
           body: {
-            experienceName,
-            categoryTitle: 'Dine-In Reservation',
+            restaurantName: restaurantName || location,
+            restaurantAddress: restaurantAddress || undefined,
+            name,
+            email,
             date: format(date, "PPP"),
             timeSlot,
             partySize,
-            name,
-            email,
-            phone: phone || undefined,
-            specialRequests: specialRequests || undefined,
-            pricing: 'No charge for reservation',
+            phone: phone || null,
+            specialRequests: specialRequests || null,
           },
         });
       } catch (emailErr) {
