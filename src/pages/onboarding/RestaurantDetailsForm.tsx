@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { BIRMINGHAM_REGIONS } from '@/utils/mockLocations';
 import { generateRestaurantTags } from '@/utils/aiTagging';
 import { cn } from '@/lib/utils';
@@ -95,8 +95,9 @@ const RestaurantDetailsForm = () => {
   const handleSave = useCallback(() => {
     if (!validate()) return;
     
-    saveRestaurantDraft('profile', profile);
+    const updated = saveRestaurantDraft('profile', profile);
     updateDraftStep(3, true);
+    saveDraftToSupabase(updated);
     navigate('/restaurant/onboarding/menu');
   }, [profile, navigate, validate]);
 

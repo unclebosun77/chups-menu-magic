@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, OpeningHoursDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, OpeningHoursDraft, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -29,8 +29,9 @@ const OpeningHoursEditor = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    saveRestaurantDraft('hours', hours);
+    const updated = saveRestaurantDraft('hours', hours);
     updateDraftStep(6, true);
+    saveDraftToSupabase(updated);
     navigate('/restaurant/onboarding/review');
   }, [hours, navigate]);
 

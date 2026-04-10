@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { loadRestaurantDraft, saveRestaurantDraft, generateId, MenuItemDraft, MenuCategoryDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, generateId, MenuItemDraft, MenuCategoryDraft, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -120,7 +120,8 @@ const MenuItemEditor = () => {
     const updatedCategories = allCategories.map(cat =>
       cat.id === category.id ? category : cat
     );
-    saveRestaurantDraft('menu', updatedCategories);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
   }, [category, allCategories]);
 
   const addItem = useCallback(() => {
