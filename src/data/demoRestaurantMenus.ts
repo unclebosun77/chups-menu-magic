@@ -55,6 +55,7 @@ export interface DemoRestaurant {
   menu: DemoMenuItem[];
   crowdLevel?: string | null;
   crowdUpdatedAt?: string | null;
+  phone?: string | null;
 }
 
 // Using Supabase UUIDs as keys for direct lookup
