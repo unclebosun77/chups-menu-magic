@@ -78,8 +78,26 @@ const Auth = () => {
         message = "Invalid email or password. Please try again.";
       }
       toast({ title: "Error signing in", description: message, variant: "destructive" });
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: { user: signedInUser } } = await supabase.auth.getUser();
+    const userRole = signedInUser?.user_metadata?.role;
+    toast({ title: "Welcome back!" });
+
+    const from = (location.state as any)?.from?.pathname;
+    if (from) {
+      navigate(from, { replace: true });
+    } else if (userRole === 'restaurant' && signedInUser) {
+      const { data: restaurant } = await supabase
+        .from('restaurants')
+        .select('id')
+        .eq('user_id', signedInUser.id)
+        .maybeSingle();
+      navigate(restaurant ? '/restaurant/dashboard' : '/restaurant/onboarding');
     } else {
-      toast({ title: "Welcome back!" });
+      navigate('/');
     }
     setIsLoading(false);
   };
@@ -122,13 +140,33 @@ const Auth = () => {
         message = "This email is already registered. Please sign in instead.";
       }
       toast({ title: "Error signing up", description: message, variant: "destructive" });
+      setIsLoading(false);
+      return;
+    }
+
+    toast({ title: "Welcome to CHUPS!", description: "Setting up your account..." });
+
+    // Wait for session to be fully active before navigating
+    await new Promise<void>((resolve) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          resolve();
+          return;
+        }
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_IN' && session) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        });
+        setTimeout(() => { subscription.unsubscribe(); resolve(); }, 5000);
+      });
+    });
+
+    if (role === "restaurant") {
+      navigate("/restaurant/onboarding");
     } else {
-      toast({ title: "Welcome to CHUPS!", description: "Your account has been created." });
-      if (role === "restaurant") {
-        navigate("/restaurant/onboarding");
-      } else {
-        navigate("/");
-      }
+      navigate("/");
     }
     setIsLoading(false);
   };
