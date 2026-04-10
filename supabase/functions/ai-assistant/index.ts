@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -13,11 +12,11 @@ serve(async (req) => {
 
   try {
     const { messages, restaurantContext } = await req.json();
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!OPENAI_API_KEY) {
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'OPENAI_API_KEY is not configured' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY is not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -44,14 +43,14 @@ When recommending restaurants, always use the EXACT name from the list so the ap
 
 Available restaurants on Chups: ${restaurantContext || 'No restaurants loaded yet.'}`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.lovable.dev/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages
@@ -61,17 +60,11 @@ Available restaurants on Chups: ${restaurantContext || 'No restaurants loaded ye
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Rate limits exceeded' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
+      console.error('AI Gateway error:', response.status, errorText);
       return new Response(
         JSON.stringify({ error: 'AI API error' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
