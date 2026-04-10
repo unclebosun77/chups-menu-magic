@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { DemoMenuItem } from "@/data/demoRestaurantMenus";
+import { Badge } from "@/components/ui/badge";
 
 interface DishCardProps {
   dish: DemoMenuItem;
@@ -20,20 +21,38 @@ const getTagEmoji = (tag: string): string => {
 };
 
 const DishCard = ({ dish, onSelect }: DishCardProps) => {
+  const isUnavailable = dish.available === false;
+  const isSoldOut = dish.sold_out_today === true && !isUnavailable;
+  const isDisabled = isUnavailable || isSoldOut;
+
   return (
     <div 
-      className="bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-lg hover:border-purple/30 transition-all duration-200 cursor-pointer overflow-hidden group"
-      onClick={() => onSelect(dish)}
+      className={`bg-card rounded-2xl border border-border/40 shadow-sm transition-all duration-200 overflow-hidden group ${
+        isUnavailable ? "opacity-40" : isSoldOut ? "opacity-60" : "hover:shadow-lg hover:border-purple/30 cursor-pointer"
+      }`}
+      onClick={() => !isDisabled && onSelect(dish)}
     >
       <div className="flex gap-3 p-4">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="font-semibold text-[15px] text-foreground leading-tight group-hover:text-purple transition-colors">
-              {dish.name}
-            </h3>
-            <span className="font-semibold text-base text-purple flex-shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className={`font-semibold text-[15px] leading-tight truncate ${
+                isDisabled ? "text-muted-foreground" : "text-foreground group-hover:text-purple transition-colors"
+              }`}>
+                {dish.name}
+              </h3>
+              {isUnavailable && (
+                <Badge variant="destructive" className="text-[10px] px-1.5 py-0 flex-shrink-0">Unavailable</Badge>
+              )}
+              {isSoldOut && (
+                <Badge className="text-[10px] px-1.5 py-0 flex-shrink-0 bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20">
+                  Sold out today
+                </Badge>
+              )}
+            </div>
+            <span className={`font-semibold text-base flex-shrink-0 ${isDisabled ? "text-muted-foreground" : "text-purple"}`}>
               £{Number(dish.price).toFixed(2)}
             </span>
           </div>
@@ -63,25 +82,27 @@ const DishCard = ({ dish, onSelect }: DishCardProps) => {
         {/* Image + Add button */}
         <div className="relative flex-shrink-0">
           {dish.image && (
-            <div className="w-24 h-24 rounded-xl overflow-hidden ring-1 ring-border/30">
+            <div className={`w-24 h-24 rounded-xl overflow-hidden ring-1 ring-border/30 ${isUnavailable ? "grayscale" : ""}`}>
               <img 
                 src={dish.image} 
                 alt={dish.name} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className={`w-full h-full object-cover ${isDisabled ? "" : "group-hover:scale-105"} transition-transform duration-300`}
                 loading="lazy"
               />
             </div>
           )}
           {/* Floating Add button */}
-          <button
-            className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-purple text-white shadow-sm flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(dish);
-            }}
-          >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-          </button>
+          {!isDisabled && (
+            <button
+              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-purple text-white shadow-sm flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(dish);
+              }}
+            >
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            </button>
+          )}
         </div>
       </div>
     </div>

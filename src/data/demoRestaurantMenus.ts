@@ -32,6 +32,8 @@ export interface DemoMenuItem {
   category: "starters" | "mains" | "sides" | "desserts" | "drinks" | "specials";
   image?: string;
   tags: DietaryTag[];
+  available?: boolean;
+  sold_out_today?: boolean;
 }
 
 export interface DemoRestaurant {
