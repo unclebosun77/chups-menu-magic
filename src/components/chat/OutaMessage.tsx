@@ -11,6 +11,17 @@ interface OutaMessageProps {
   onRestaurantClick?: (restaurant: any) => void;
 }
 
+const formatMarkdown = (text: string): string => {
+  let html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Convert lines starting with - or • into list items
+  html = html.replace(/^([•\-])\s+(.+)$/gm, '<li class="ml-4 list-disc">$2</li>');
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li[^>]*>.*?<\/li>\n?)+)/g, '<ul class="my-1">$1</ul>');
+  return html;
+};
+
 const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick }: OutaMessageProps) => {
   const { content, data } = message;
   
@@ -31,9 +42,9 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick 
           <div className="flex-1 space-y-2.5">
             {/* Message bubble */}
             <div className="bg-[hsl(265,60%,97%)] dark:bg-purple/10 border border-purple/8 px-4 py-3 rounded-2xl rounded-bl-md">
-              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                {content}
-              </p>
+              <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}
+              />
             </div>
             
             {/* Restaurant cards */}

@@ -9,11 +9,14 @@ interface ChatRestaurantCardProps {
 }
 
 const ChatRestaurantCard = ({ restaurant, onClick, delay = 0 }: ChatRestaurantCardProps) => {
+  const handleClick = () => onClick?.();
   const matchScore = restaurant.tasteScore || restaurant.combinedScore || 85;
   
   return (
     <div 
-      onClick={onClick}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
       className={cn(
         "flex gap-3 p-3 rounded-xl cursor-pointer",
         "bg-background/50 border border-border/50",
