@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Clock, ChefHat, Package, Utensils, XCircle, RefreshCw, Sparkles } from "lucide-react";
 import { vibrate } from "@/utils/haptics";
+import { useToast } from "@/hooks/use-toast";
 
 type OrderStatus = "pending" | "accepted" | "preparing" | "ready" | "completed" | "cancelled";
 
