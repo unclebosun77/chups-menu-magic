@@ -4,9 +4,11 @@ import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight,
-  Calendar, ShoppingBag, Gift, Heart, Settings, Bell, Shield,
+  Calendar, ShoppingBag, Gift, Heart, Settings, Bell, Shield, ChefHat,
+  LayoutDashboard, Utensils, Users, Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +17,6 @@ import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import LocationPreferencesCard from "@/components/LocationPreferencesCard";
 import SavedRestaurantsPreview from "@/components/profile/SavedRestaurantsPreview";
 import ActivitySummaryCard from "@/components/profile/ActivitySummaryCard";
-import RestaurantOwnerCard from "@/components/profile/RestaurantOwnerCard";
 import PreferencesSheet from "@/components/profile/PreferencesSheet";
 import HelpSheet from "@/components/profile/HelpSheet";
 
@@ -26,6 +27,13 @@ const tierColors: Record<string, string> = {
   platinum: "text-purple",
 };
 
+interface UserRestaurant {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  status: string;
+}
+
 const Account = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,12 +43,16 @@ const Account = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [upcomingBookings, setUpcomingBookings] = useState(0);
   const [rewardsData, setRewardsData] = useState<{ tier: string; points_balance: number } | null>(null);
+  const [userRestaurant, setUserRestaurant] = useState<UserRestaurant | null>(null);
+  const [isLoadingRole, setIsLoadingRole] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setIsLoadingRole(false);
+      return;
+    }
     const today = new Date().toISOString().split("T")[0];
 
-    // Fetch bookings count and rewards in parallel
     Promise.all([
       supabase
         .from("bookings")
@@ -53,9 +65,16 @@ const Account = () => {
         .select("tier, points_balance")
         .eq("user_id", user.id)
         .maybeSingle(),
-    ]).then(([bookingsRes, rewardsRes]) => {
+      supabase
+        .from("restaurants")
+        .select("id, name, logo_url, status")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]).then(([bookingsRes, rewardsRes, restaurantRes]) => {
       setUpcomingBookings(bookingsRes.count || 0);
       setRewardsData(rewardsRes.data);
+      setUserRestaurant(restaurantRes.data);
+      setIsLoadingRole(false);
     });
   }, [user]);
 
@@ -68,6 +87,7 @@ const Account = () => {
   const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
   const tier = rewardsData?.tier || "bronze";
   const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1) + " Member";
+  const isRestaurantOwner = !!userRestaurant;
 
   if (!user) {
     return (
@@ -106,7 +126,7 @@ const Account = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
-      {/* Premium Header */}
+      {/* Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-purple/10 via-purple/5 to-transparent" />
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-radial from-neon-pink/10 to-transparent rounded-full blur-3xl" />
@@ -117,29 +137,64 @@ const Account = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">Your Profile</h1>
+              <h1 className="text-xl font-bold text-foreground">
+                {isRestaurantOwner ? "My Restaurant" : "Your Profile"}
+              </h1>
             </div>
           </div>
+
+          {/* Restaurant Owner Banner */}
+          {isRestaurantOwner && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple/10 border border-purple/20 mb-4 animate-slide-up">
+              <ChefHat className="h-4 w-4 text-purple flex-shrink-0" />
+              <p className="text-xs font-medium text-purple">You're signed in as a restaurant owner</p>
+            </div>
+          )}
 
           {/* Profile Card */}
           <Card className="glass-card-strong animate-slide-up">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
-                    <AvatarFallback className="text-xl bg-gradient-to-br from-purple to-neon-pink text-white font-bold">
-                      {displayName[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  {isRestaurantOwner && userRestaurant.logo_url ? (
+                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
+                      <img src={userRestaurant.logo_url} alt={userRestaurant.name} className="h-full w-full object-cover" />
+                    </Avatar>
+                  ) : (
+                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
+                      <AvatarFallback className="text-xl bg-gradient-to-br from-purple to-neon-pink text-white font-bold">
+                        {isRestaurantOwner ? userRestaurant.name[0].toUpperCase() : displayName[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-purple to-neon-pink flex items-center justify-center shadow-lg">
-                    <Crown className="h-3 w-3 text-white" />
+                    {isRestaurantOwner ? <ChefHat className="h-3 w-3 text-white" /> : <Crown className="h-3 w-3 text-white" />}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-bold text-lg text-foreground truncate">{displayName}</h2>
-                  <p className={`text-sm font-medium ${tierColors[tier]}`}>{tierLabel}</p>
-                  {rewardsData && (
-                    <p className="text-xs text-muted-foreground mt-0.5">✦ {rewardsData.points_balance} pts</p>
+                  <h2 className="font-bold text-lg text-foreground truncate">
+                    {isRestaurantOwner ? userRestaurant.name : displayName}
+                  </h2>
+                  {isRestaurantOwner ? (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Badge
+                        variant="secondary"
+                        className={userRestaurant.status === "active"
+                          ? "bg-green-500/10 text-green-600 border-green-500/20"
+                          : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                        }
+                      >
+                        {userRestaurant.status === "active" ? "Active" : "Pending"}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">{displayName}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <p className={`text-sm font-medium ${tierColors[tier]}`}>{tierLabel}</p>
+                      {rewardsData && (
+                        <p className="text-xs text-muted-foreground mt-0.5">✦ {rewardsData.points_balance} pts</p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -149,6 +204,69 @@ const Account = () => {
       </div>
 
       <div className="px-4 space-y-4">
+        {/* ===== RESTAURANT OWNER PRIMARY SECTION ===== */}
+        {isRestaurantOwner && (
+          <>
+            {/* Go to Dashboard — Primary CTA */}
+            <Button
+              onClick={() => navigate("/restaurant/dashboard")}
+              className="w-full h-14 bg-gradient-to-r from-purple to-purple/90 hover:from-purple/90 hover:to-purple/80 text-white font-semibold text-base rounded-xl shadow-lg shadow-purple/30 animate-slide-up"
+            >
+              <LayoutDashboard className="h-5 w-5 mr-2" />
+              Go to Dashboard
+              <ChevronRight className="h-5 w-5 ml-auto" />
+            </Button>
+
+            {/* Quick Links for restaurant owners */}
+            <div className="grid grid-cols-3 gap-3 animate-slide-up">
+              {[
+                { icon: ShoppingBag, label: "Orders", action: () => navigate("/restaurant/dashboard") },
+                { icon: Utensils, label: "Menu", action: () => navigate("/restaurant/dashboard") },
+                { icon: Users, label: "Crowd Level", action: () => navigate("/restaurant/dashboard") },
+              ].map(({ icon: Icon, label, action }) => (
+                <Card
+                  key={label}
+                  className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+                  onClick={action}
+                >
+                  <CardContent className="flex flex-col items-center gap-2 p-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
+                      <Icon className="h-5 w-5 text-purple" />
+                    </div>
+                    <p className="font-semibold text-xs text-foreground">{label}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* View as customer */}
+            <Card
+              className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98] animate-slide-up"
+              onClick={() => navigate(`/restaurant/${userRestaurant.id}`)}
+            >
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
+                  <Eye className="h-5 w-5 text-purple" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-foreground">View as customer</p>
+                  <p className="text-xs text-muted-foreground">See your restaurant profile</p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+              </CardContent>
+            </Card>
+
+            {/* Separator for dining profile */}
+            <div className="pt-4 pb-1">
+              <h3 className="text-sm font-medium text-muted-foreground px-1 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Your dining profile
+              </h3>
+            </div>
+          </>
+        )}
+
+        {/* ===== CONSUMER SECTION (shown for everyone) ===== */}
         {/* Quick Links — 2×2 */}
         <div className="grid grid-cols-2 gap-3 animate-slide-up">
           {[
@@ -188,9 +306,6 @@ const Account = () => {
 
         {/* Activity Summary */}
         <ActivitySummaryCard className="animate-slide-up" />
-
-        {/* Restaurant Owner */}
-        <RestaurantOwnerCard userId={user.id} className="animate-slide-up" />
 
         {/* Settings */}
         <div className="pt-2">

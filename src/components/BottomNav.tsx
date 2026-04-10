@@ -1,19 +1,43 @@
-import { Compass, Sparkles, Bookmark, User } from "lucide-react";
+import { Compass, Sparkles, Bookmark, User, ChefHat } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { savedRestaurants } = useSavedRestaurants();
+  const { user } = useAuth();
   const savedCount = savedRestaurants.length;
+  const [isRestaurantOwner, setIsRestaurantOwner] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsRestaurantOwner(false);
+      return;
+    }
+    supabase
+      .from("restaurants")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setIsRestaurantOwner(!!data);
+      });
+  }, [user]);
+
+  const profileTab = isRestaurantOwner
+    ? { icon: ChefHat, label: "My Restaurant", path: "/account", badge: 0 }
+    : { icon: User, label: "Profile", path: "/account", badge: 0 };
 
   const tabs = [
     { icon: Compass, label: "Discover", path: "/", badge: 0 },
     { icon: Bookmark, label: "Saved", path: "/saved", badge: savedCount },
     { icon: Sparkles, label: "Ask CHUPS", path: "/outa-chat", primary: true, badge: 0 },
-    { icon: User, label: "Profile", path: "/account", badge: 0 },
+    profileTab,
   ];
 
   return (
@@ -22,6 +46,7 @@ const BottomNav = () => {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = location.pathname === tab.path;
+          const isPrimary = 'primary' in tab && tab.primary;
           
           return (
             <button
@@ -29,11 +54,11 @@ const BottomNav = () => {
               onClick={() => navigate(tab.path)}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative",
-                tab.primary && !isActive && "text-purple",
-                isActive ? "text-purple" : !tab.primary ? "text-muted-foreground hover:text-foreground" : ""
+                isPrimary && !isActive && "text-purple",
+                isActive ? "text-purple" : !isPrimary ? "text-muted-foreground hover:text-foreground" : ""
               )}
             >
-              {tab.primary ? (
+              {isPrimary ? (
                 <div className={cn(
                   "w-11 h-11 -mt-5 rounded-2xl flex items-center justify-center shadow-lg transition-transform",
                   isActive
@@ -52,8 +77,8 @@ const BottomNav = () => {
                   )}
                 </div>
               )}
-              <span className={cn("text-[10px] font-medium", tab.primary && "-mt-0.5")}>{tab.label}</span>
-              {isActive && !tab.primary && (
+              <span className={cn("text-[10px] font-medium", isPrimary && "-mt-0.5")}>{tab.label}</span>
+              {isActive && !isPrimary && (
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-warm rounded-full shadow-glow" />
               )}
             </button>
