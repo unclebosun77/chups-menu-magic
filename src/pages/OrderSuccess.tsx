@@ -102,12 +102,22 @@ const OrderSuccess = () => {
             </div>
           </div>
 
+          {/* Order Reference */}
+          {orderId && (
+            <div className="space-y-1">
+              <p className="text-4xl font-black text-purple tracking-tight">
+                Order #{orderId.slice(-6).toUpperCase()}
+              </p>
+              <p className="text-xs text-muted-foreground">Reference number</p>
+            </div>
+          )}
+
           {/* Main Message */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">
-              ✅ Order sent to restaurant.
+            <h1 className="text-2xl font-bold text-foreground">
+              ✅ Order sent to restaurant
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-base">
               They're cooking it up. You'll eat good soon.
             </p>
             {paymentMethod === "pos" && (

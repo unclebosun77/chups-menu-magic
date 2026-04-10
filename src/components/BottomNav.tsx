@@ -1,16 +1,19 @@
 import { Compass, Sparkles, Bookmark, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { savedRestaurants } = useSavedRestaurants();
+  const savedCount = savedRestaurants.length;
 
   const tabs = [
-    { icon: Compass, label: "Discover", path: "/" },
-    { icon: Bookmark, label: "Saved", path: "/saved" },
-    { icon: Sparkles, label: "Ask CHUPS", path: "/outa-chat", primary: true },
-    { icon: User, label: "Profile", path: "/account" },
+    { icon: Compass, label: "Discover", path: "/", badge: 0 },
+    { icon: Bookmark, label: "Saved", path: "/saved", badge: savedCount },
+    { icon: Sparkles, label: "Ask CHUPS", path: "/outa-chat", primary: true, badge: 0 },
+    { icon: User, label: "Profile", path: "/account", badge: 0 },
   ];
 
   return (
@@ -40,7 +43,14 @@ const BottomNav = () => {
                   <Icon className="h-5 w-5 text-white" />
                 </div>
               ) : (
-                <Icon className={cn("h-6 w-6 transition-transform", isActive && "scale-110")} />
+                <div className="relative">
+                  <Icon className={cn("h-6 w-6 transition-transform", isActive && "scale-110")} />
+                  {tab.badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-purple text-white text-[9px] font-bold flex items-center justify-center">
+                      {tab.badge}
+                    </span>
+                  )}
+                </div>
               )}
               <span className={cn("text-[10px] font-medium", tab.primary && "-mt-0.5")}>{tab.label}</span>
               {isActive && !tab.primary && (
