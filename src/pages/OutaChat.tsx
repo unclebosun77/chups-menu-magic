@@ -275,20 +275,21 @@ const OutaChat = () => {
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-36">
         {messages.map((message, index) => {
-          const shouldShowQuickFilters = !hasUserSentMessage || index === messages.length - 1;
-          const adjustedMessage = (!shouldShowQuickFilters && message.type === 'outa' && message.data?.quickFilters)
-            ? { ...message, data: { ...message.data, quickFilters: undefined } }
-            : message;
+          // Find the user message that preceded this outa message
+          const precedingUserMessage = message.type === 'outa' && index > 0
+            ? messages.slice(0, index).reverse().find(m => m.type === 'user')
+            : undefined;
 
           return message.type === 'user' ? (
             <UserMessage key={message.id} content={message.content} timestamp={message.timestamp} isNew={index === messages.length - 2} />
           ) : (
             <OutaMessage
               key={message.id}
-              message={adjustedMessage}
+              message={message}
               isNew={index === messages.length - 1}
               onQuickAction={handleQuickAction}
               onRestaurantClick={handleRestaurantClick}
+              userMessageContent={precedingUserMessage?.content}
             />
           );
         })}
