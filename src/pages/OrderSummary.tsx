@@ -107,9 +107,11 @@ const OrderSummary = () => {
         state: {
           orderId: data?.id,
           restaurantName,
+          restaurantId,
           totalAmount: orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
           itemCount: orderItems.reduce((sum, item) => sum + item.quantity, 0),
           paymentMethod: "pos",
+          tableNumber,
         },
       });
     } catch (error: any) {
@@ -165,9 +167,11 @@ const OrderSummary = () => {
           state: {
             orderId,
             restaurantName,
+            restaurantId,
             totalAmount,
             itemCount: totalItems,
             paymentMethod: "stripe",
+            tableNumber,
           },
         });
       }
