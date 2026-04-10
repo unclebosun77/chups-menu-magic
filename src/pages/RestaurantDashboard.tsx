@@ -489,7 +489,7 @@ const RestaurantDashboard = () => {
 
           <TabsContent value="menu">
         {/* Menu Summary Cards */}
-        <div className="grid gap-6 mb-8 md:grid-cols-3">
+        <div className="grid gap-4 mb-6 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Items</CardTitle>
@@ -518,32 +518,33 @@ const RestaurantDashboard = () => {
           </Card>
         </div>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Menu Items</h2>
-          <Button onClick={() => setShowForm(true)}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Menu Items</h2>
+          <Button onClick={() => { setEditingItem(null); setAddToCategoryName(null); setShowForm(true); }}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Menu Item
+            Add Item
           </Button>
         </div>
 
-        {showForm && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>{editingItem ? "Edit Menu Item" : "Add New Menu Item"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MenuItemForm
-                restaurantId={restaurant.id}
-                item={editingItem}
-                onSuccess={handleFormSuccess}
-                onCancel={() => {
-                  setShowForm(false);
-                  setEditingItem(null);
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
+        <div className="flex items-center gap-2 mb-6 p-3 rounded-lg bg-muted/50 border">
+          <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <p className="text-xs text-muted-foreground">Changes go live instantly for customers browsing your menu</p>
+        </div>
+
+        {/* Edit dialog */}
+        <Dialog open={showForm} onOpenChange={(open) => { if (!open) { setShowForm(false); setEditingItem(null); setAddToCategoryName(null); } }}>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingItem ? "Edit Menu Item" : "Add New Menu Item"}</DialogTitle>
+            </DialogHeader>
+            <MenuItemForm
+              restaurantId={restaurant.id}
+              item={editingItem ? editingItem : addToCategoryName ? { id: '', name: '', description: null, price: 0, category: addToCategoryName, image_url: null, available: true } as any : null}
+              onSuccess={handleFormSuccess}
+              onCancel={() => { setShowForm(false); setEditingItem(null); setAddToCategoryName(null); }}
+            />
+          </DialogContent>
+        </Dialog>
 
         {Object.keys(groupedItems).length === 0 ? (
           <Card className="p-12 text-center">
@@ -552,22 +553,87 @@ const RestaurantDashboard = () => {
             </CardDescription>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-3">
             {Object.entries(groupedItems).map(([category, items]) => (
-              <div key={category}>
-                <h3 className="text-2xl font-semibold mb-4 capitalize">{category}</h3>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {items.map((item) => (
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      isOwner
-                    />
-                  ))}
-                </div>
-              </div>
+              <Collapsible key={category} defaultOpen>
+                <Card>
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=closed]_&]:rotate-[-90deg]" />
+                        <CardTitle className="text-lg capitalize">{category}</CardTitle>
+                        <Badge variant="secondary" className="text-xs">{items.length} items</Badge>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="pt-0 px-4 pb-4 space-y-2">
+                      {items.map((item) => (
+                        <MenuItemCard
+                          key={item.id}
+                          item={item}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          onItemUpdate={handleItemUpdate}
+                          isOwner
+                        />
+                      ))}
+
+                      {/* Quick add inline */}
+                      {quickAddCategory === category ? (
+                        <div className="flex items-center gap-2 p-2 rounded-lg border border-dashed bg-muted/30">
+                          <Input
+                            placeholder="Item name"
+                            value={quickAddName}
+                            onChange={e => setQuickAddName(e.target.value)}
+                            className="h-8 text-sm flex-1"
+                            onKeyDown={e => { if (e.key === "Enter") handleQuickAdd(category); }}
+                            autoFocus
+                          />
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm text-muted-foreground">£</span>
+                            <Input
+                              placeholder="0.00"
+                              value={quickAddPrice}
+                              onChange={e => setQuickAddPrice(e.target.value)}
+                              className="h-8 text-sm w-20"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              onKeyDown={e => { if (e.key === "Enter") handleQuickAdd(category); }}
+                            />
+                          </div>
+                          <Button size="sm" className="h-8" onClick={() => handleQuickAdd(category)} disabled={isQuickAdding}>
+                            {isQuickAdding ? <Loader2 className="h-3 w-3 animate-spin" /> : "Add"}
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-8" onClick={() => { setQuickAddCategory(null); setQuickAddName(""); setQuickAddPrice(""); }}>
+                            ✕
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs text-muted-foreground h-7"
+                            onClick={() => setQuickAddCategory(category)}
+                          >
+                            <Plus className="h-3 w-3 mr-1" /> Quick add
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs text-muted-foreground h-7"
+                            onClick={() => { setAddToCategoryName(category); setEditingItem(null); setShowForm(true); }}
+                          >
+                            <Plus className="h-3 w-3 mr-1" /> Full add
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             ))}
           </div>
         )}
