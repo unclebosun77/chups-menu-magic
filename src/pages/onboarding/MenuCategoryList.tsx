@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, generateId, MenuCategoryDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, generateId, MenuCategoryDraft, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 
 const MenuCategoryList = () => {
@@ -21,8 +21,9 @@ const MenuCategoryList = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    saveRestaurantDraft('menu', categories);
+    const updated = saveRestaurantDraft('menu', categories);
     updateDraftStep(4, true);
+    saveDraftToSupabase(updated);
     navigate('/restaurant/onboarding/gallery');
   }, [categories, navigate]);
 
@@ -56,7 +57,8 @@ const MenuCategoryList = () => {
 
   const navigateToItems = useCallback((category: MenuCategoryDraft) => {
     // Save current state before navigating
-    saveRestaurantDraft('menu', categories);
+    const updated = saveRestaurantDraft('menu', categories);
+    saveDraftToSupabase(updated);
     navigate(`/restaurant/onboarding/menu/${category.id}`);
   }, [categories, navigate]);
 

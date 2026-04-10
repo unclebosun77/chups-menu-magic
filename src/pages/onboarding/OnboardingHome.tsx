@@ -4,7 +4,7 @@ import { Check, Image, Utensils, Clock, FileText, Sparkles, ChevronRight, ArrowL
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { loadRestaurantDraft, clearDraft, RestaurantDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, clearDraft, RestaurantDraft, loadDraftFromSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 
 interface OnboardingStep {
@@ -30,9 +30,18 @@ const OnboardingHome = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedDraft = loadRestaurantDraft();
-    setDraft(savedDraft);
-    setIsLoading(false);
+    const loadDraft = async () => {
+      const supabaseDraft = await loadDraftFromSupabase();
+      if (supabaseDraft) {
+        localStorage.setItem('outa_restaurant_onboarding_draft', JSON.stringify(supabaseDraft));
+        setDraft(supabaseDraft);
+      } else {
+        const localDraft = loadRestaurantDraft();
+        setDraft(localDraft);
+      }
+      setIsLoading(false);
+    };
+    loadDraft();
   }, []);
 
   const handleStartOver = useCallback(() => {

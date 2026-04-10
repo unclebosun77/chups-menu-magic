@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Camera, Upload, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -52,7 +52,8 @@ const BrandingStep = () => {
     const url = await uploadFile(file, 'restaurant-logos', 'logo');
     if (url) {
       setLogo(url);
-      saveRestaurantDraft('branding', { logo: url, coverPhoto });
+      const updated = saveRestaurantDraft('branding', { logo: url, coverPhoto });
+      saveDraftToSupabase(updated);
     }
     setLogoUploading(false);
     if (logoInputRef.current) logoInputRef.current.value = '';
@@ -65,15 +66,17 @@ const BrandingStep = () => {
     const url = await uploadFile(file, 'restaurant-gallery', 'cover');
     if (url) {
       setCoverPhoto(url);
-      saveRestaurantDraft('branding', { logo, coverPhoto: url });
+      const updated = saveRestaurantDraft('branding', { logo, coverPhoto: url });
+      saveDraftToSupabase(updated);
     }
     setCoverUploading(false);
     if (coverInputRef.current) coverInputRef.current.value = '';
   };
 
   const handleSave = useCallback(() => {
-    saveRestaurantDraft('branding', { logo, coverPhoto });
+    const updated = saveRestaurantDraft('branding', { logo, coverPhoto });
     updateDraftStep(2, true);
+    saveDraftToSupabase(updated);
     navigate('/restaurant/onboarding/details');
   }, [logo, coverPhoto, navigate]);
 

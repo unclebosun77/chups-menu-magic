@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, generateId, GalleryImageDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, updateDraftStep, generateId, GalleryImageDraft, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -36,8 +36,9 @@ const GalleryUploader = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    saveRestaurantDraft('gallery', images);
+    const updated = saveRestaurantDraft('gallery', images);
     updateDraftStep(5, true);
+    saveDraftToSupabase(updated);
     navigate('/restaurant/onboarding/hours');
   }, [images, navigate]);
 

@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { loadRestaurantDraft, saveRestaurantDraft, generateId, MenuItemDraft, MenuCategoryDraft } from '@/utils/onboardingStore';
+import { loadRestaurantDraft, saveRestaurantDraft, generateId, MenuItemDraft, MenuCategoryDraft, saveDraftToSupabase } from '@/utils/onboardingStore';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -120,7 +120,8 @@ const MenuItemEditor = () => {
     const updatedCategories = allCategories.map(cat =>
       cat.id === category.id ? category : cat
     );
-    saveRestaurantDraft('menu', updatedCategories);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
   }, [category, allCategories]);
 
   const addItem = useCallback(() => {
@@ -134,26 +135,42 @@ const MenuItemEditor = () => {
       tags: newItem.tags || [],
       image: newItem.image,
     };
-    setCategory(prev => prev ? { ...prev, items: [...prev.items, item] } : null);
+    const updatedCategory = { ...category, items: [...category.items, item] };
+    setCategory(updatedCategory);
+    // Auto-save after adding
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
     setNewItem({ name: '', description: '', price: 0, tags: [], image: '' });
     setShowAddDialog(false);
-  }, [newItem, category]);
+  }, [newItem, category, allCategories]);
 
   const updateItem = useCallback(() => {
     if (!editingItem || !category) return;
-    setCategory(prev => prev ? {
-      ...prev,
-      items: prev.items.map(item => item.id === editingItem.id ? editingItem : item)
-    } : null);
+    const updatedCategory = {
+      ...category,
+      items: category.items.map(item => item.id === editingItem.id ? editingItem : item)
+    };
+    setCategory(updatedCategory);
+    // Auto-save after editing
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
     setEditingItem(null);
-  }, [editingItem, category]);
+  }, [editingItem, category, allCategories]);
 
   const deleteItem = useCallback((id: string) => {
-    setCategory(prev => prev ? {
-      ...prev,
-      items: prev.items.filter(item => item.id !== id)
-    } : null);
-  }, []);
+    if (!category) return;
+    const updatedCategory = {
+      ...category,
+      items: category.items.filter(item => item.id !== id)
+    };
+    setCategory(updatedCategory);
+    // Auto-save after deleting
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
+  }, [category, allCategories]);
 
   const toggleTag = (tag: string, isEditing: boolean) => {
     if (isEditing && editingItem) {
