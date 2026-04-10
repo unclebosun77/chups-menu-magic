@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
 import PickedForYouSection from "@/components/home/PickedForYouSection";
 import ExploreDishesRow from "@/components/home/ExploreDishesRow";
-import FloatingAIButton from "@/components/FloatingAIButton";
+
 import LiveSearchOverlay from "@/components/search/LiveSearchOverlay";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
@@ -71,7 +71,7 @@ const Index = () => {
       </div>
 
       <LiveSearchOverlay />
-      <FloatingAIButton />
+      
 
       <style>{`
         @keyframes fadeIn {
