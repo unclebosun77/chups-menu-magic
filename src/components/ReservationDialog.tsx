@@ -134,8 +134,8 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       setCalendarLink(icsUri);
 
       toast({
-        title: "Reservation Confirmed! 🎉",
-        description: `Your table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot} has been reserved.`,
+        title: "Booking confirmed! 📧",
+        description: `Check your email for details. Table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot}.`,
       });
 
       // Reset form
