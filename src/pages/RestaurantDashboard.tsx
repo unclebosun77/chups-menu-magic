@@ -527,11 +527,11 @@ const RestaurantDashboard = () => {
                 size="sm"
                 onClick={async () => {
                   if (!restaurant) return;
-                  const { error } = await supabase
+                  const { error } = await (supabase
                     .from("menu_items")
                     .update({ sold_out_today: false } as any)
-                    .eq("restaurant_id", restaurant.id)
-                    .eq("sold_out_today" as any, true);
+                    .eq("restaurant_id", restaurant.id) as any)
+                    .eq("sold_out_today", true);
                   if (error) {
                     toast({ title: "Error resetting", description: error.message, variant: "destructive" });
                   } else {
