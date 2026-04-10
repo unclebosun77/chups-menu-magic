@@ -42,6 +42,7 @@ type MenuItem = {
   category: string;
   image_url: string | null;
   available: boolean;
+  sold_out_today?: boolean;
 };
 
 type Order = {
