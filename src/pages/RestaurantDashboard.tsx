@@ -27,6 +27,7 @@ type Restaurant = {
   is_temporarily_closed?: boolean;
   crowd_level?: string | null;
   crowd_updated_at?: string | null;
+  vibes?: string[];
 };
 
 type MenuItem = {
