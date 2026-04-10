@@ -61,7 +61,7 @@ const TasteProfileCard = ({ onEditProfile, className }: TasteProfileCardProps) =
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={resetProfile}
+            onClick={onEditProfile}
             className="text-white/50 hover:text-white/80 hover:bg-white/10"
           >
             <RefreshCw className="w-4 h-4" />
@@ -130,6 +130,18 @@ const TasteProfileCard = ({ onEditProfile, className }: TasteProfileCardProps) =
             </div>
           </div>
         )}
+
+        {/* Update button */}
+        <div className="pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onEditProfile}
+            className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
+          >
+            Update preferences
+          </Button>
+        </div>
 
         {/* Learning indicator */}
         <div className="pt-2 border-t border-white/10">
