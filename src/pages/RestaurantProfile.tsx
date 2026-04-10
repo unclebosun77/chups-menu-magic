@@ -232,9 +232,8 @@ const RestaurantProfile = () => {
         } else {
           const { data: menuData } = await supabase
             .from("menu_items")
-            .select("*")
-            .eq("restaurant_id", data.id)
-            .eq("available", true);
+            .select("id, name, description, price, category, image_url, available, sold_out_today")
+            .eq("restaurant_id", data.id);
 
           const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
             id: item.id,
@@ -244,6 +243,8 @@ const RestaurantProfile = () => {
             category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
             image: item.image_url || undefined,
             tags: [],
+            available: item.available,
+            sold_out_today: (item as any).sold_out_today ?? false,
           }));
 
           const galleryRaw = data.gallery_images as any[];
@@ -321,6 +322,34 @@ const RestaurantProfile = () => {
     };
     fetchRecentOrders();
   }, [supabaseId, restaurant?.crowdLevel, restaurant?.crowdUpdatedAt]);
+
+  // Real-time menu updates — refresh menu when owner changes availability/sold_out
+  useEffect(() => {
+    if (!supabaseId) return;
+    const channel = supabase
+      .channel(`menu-updates-${supabaseId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'menu_items',
+        filter: `restaurant_id=eq.${supabaseId}`,
+      }, (payload) => {
+        const updated = payload.new as any;
+        setRestaurant(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            menu: prev.menu.map(item =>
+              item.id === updated.id
+                ? { ...item, available: updated.available, sold_out_today: updated.sold_out_today, price: Number(updated.price), name: updated.name }
+                : item
+            ),
+          };
+        });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [supabaseId]);
 
   const effectiveCrowdLevel = useMemo(() => {
     if (restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000) {
