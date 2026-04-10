@@ -135,26 +135,42 @@ const MenuItemEditor = () => {
       tags: newItem.tags || [],
       image: newItem.image,
     };
-    setCategory(prev => prev ? { ...prev, items: [...prev.items, item] } : null);
+    const updatedCategory = { ...category, items: [...category.items, item] };
+    setCategory(updatedCategory);
+    // Auto-save after adding
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
     setNewItem({ name: '', description: '', price: 0, tags: [], image: '' });
     setShowAddDialog(false);
-  }, [newItem, category]);
+  }, [newItem, category, allCategories]);
 
   const updateItem = useCallback(() => {
     if (!editingItem || !category) return;
-    setCategory(prev => prev ? {
-      ...prev,
-      items: prev.items.map(item => item.id === editingItem.id ? editingItem : item)
-    } : null);
+    const updatedCategory = {
+      ...category,
+      items: category.items.map(item => item.id === editingItem.id ? editingItem : item)
+    };
+    setCategory(updatedCategory);
+    // Auto-save after editing
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
     setEditingItem(null);
-  }, [editingItem, category]);
+  }, [editingItem, category, allCategories]);
 
   const deleteItem = useCallback((id: string) => {
-    setCategory(prev => prev ? {
-      ...prev,
-      items: prev.items.filter(item => item.id !== id)
-    } : null);
-  }, []);
+    if (!category) return;
+    const updatedCategory = {
+      ...category,
+      items: category.items.filter(item => item.id !== id)
+    };
+    setCategory(updatedCategory);
+    // Auto-save after deleting
+    const updatedCategories = allCategories.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+    const updated = saveRestaurantDraft('menu', updatedCategories);
+    saveDraftToSupabase(updated);
+  }, [category, allCategories]);
 
   const toggleTag = (tag: string, isEditing: boolean) => {
     if (isEditing && editingItem) {
