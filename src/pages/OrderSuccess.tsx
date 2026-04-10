@@ -182,11 +182,11 @@ const OrderSuccess = () => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-3xl font-bold text-purple">£{totalAmount?.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-purple">£{((totalAmount && totalAmount > 0) ? totalAmount : fetchedTotal)?.toFixed(2) ?? '—'}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Items</p>
-                <p className="text-2xl font-bold text-foreground">{itemCount}</p>
+                <p className="text-2xl font-bold text-foreground">{itemCount || fetchedItemCount || '—'}</p>
               </div>
             </div>
           </div>
