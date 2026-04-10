@@ -122,16 +122,18 @@ const QuickInfoSection = ({ restaurant }: { restaurant: DemoRestaurant }) => {
             </a>
           )}
 
-          <a
-            href="tel:+441234567890"
-            className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
-          >
-            <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-              <Phone className="h-4 w-4 text-purple" strokeWidth={1.5} />
-            </div>
-            <p className="text-[13px] text-foreground flex-1">+44 1234 567 890</p>
-            <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
-          </a>
+          {restaurant.phone && (
+            <a
+              href={`tel:${restaurant.phone}`}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+            >
+              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+                <Phone className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              </div>
+              <p className="text-[13px] text-foreground flex-1">{restaurant.phone}</p>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+            </a>
+          )}
 
           <QuickInfoHoursRow status={status} todayDisplay={todayDisplay} openingHours={restaurant.openingHours} />
 
