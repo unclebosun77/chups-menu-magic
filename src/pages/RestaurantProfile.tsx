@@ -278,6 +278,22 @@ const RestaurantProfile = () => {
       } else if (demoData) {
         setRestaurant(demoData);
       }
+      // Fetch price stats
+      const { data: priceData } = await supabase
+        .from('menu_items')
+        .select('price')
+        .eq('restaurant_id', supabaseId)
+        .eq('available', true);
+
+      if (priceData && priceData.length > 0) {
+        const prices = priceData.map(i => Number(i.price));
+        setPriceStats({
+          min: Math.min(...prices),
+          avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
+          max: Math.max(...prices),
+        });
+      }
+
       setIsLoading(false);
     };
     loadRestaurant();
@@ -474,7 +490,7 @@ const RestaurantProfile = () => {
       </div>
 
       {/* ─── 3. QUICK INFO ─── */}
-      <QuickInfoSection restaurant={restaurant} />
+      <QuickInfoSection restaurant={restaurant} priceStats={priceStats} />
 
       {/* ─── 4. ACTION BUTTONS ─── */}
       <div className="px-5 pb-5 animate-[sectionSlide_0.45s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '380ms' }}>
