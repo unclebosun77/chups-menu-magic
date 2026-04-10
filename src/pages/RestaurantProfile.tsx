@@ -232,9 +232,8 @@ const RestaurantProfile = () => {
         } else {
           const { data: menuData } = await supabase
             .from("menu_items")
-            .select("*")
-            .eq("restaurant_id", data.id)
-            .eq("available", true);
+            .select("id, name, description, price, category, image_url, available, sold_out_today")
+            .eq("restaurant_id", data.id);
 
           const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
             id: item.id,
@@ -244,6 +243,8 @@ const RestaurantProfile = () => {
             category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
             image: item.image_url || undefined,
             tags: [],
+            available: item.available,
+            sold_out_today: (item as any).sold_out_today ?? false,
           }));
 
           const galleryRaw = data.gallery_images as any[];
