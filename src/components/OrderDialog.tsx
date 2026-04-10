@@ -110,7 +110,8 @@ const OrderDialog = ({
       navigate("/order-success", { 
         state: { 
           orderId: data?.id,
-          restaurantName, 
+          restaurantName,
+          restaurantId,
           totalAmount, 
           itemCount: order.reduce((sum, item) => sum + item.quantity, 0) 
         } 
