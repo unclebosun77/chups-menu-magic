@@ -93,8 +93,7 @@ const ReviewAndSubmit = () => {
           .insert(allMenuItems);
 
         if (menuError) {
-          console.error('Menu insert error:', menuError);
-          // Don't fail the whole publish if menu fails
+          throw new Error(`Menu failed to save: ${menuError.message}`);
         }
       }
 
