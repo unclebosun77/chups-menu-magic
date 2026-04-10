@@ -1,16 +1,21 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import HomeHeader from "@/components/home/HomeHeader";
+import QuickActionPills from "@/components/home/QuickActionPills";
+import TonightsPickHero from "@/components/home/TonightsPickHero";
+import NearbyOpenSection from "@/components/home/NearbyOpenSection";
 import PickedForYouSection from "@/components/home/PickedForYouSection";
-import ExploreDishesRow from "@/components/home/ExploreDishesRow";
-
+import ExploreCuisineRow from "@/components/home/ExploreCuisineRow";
+import OutaBanner from "@/components/home/OutaBanner";
 import LiveSearchOverlay from "@/components/search/LiveSearchOverlay";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
 
-const Index = () => {
-  const navigate = useNavigate();
+const sectionAnim = (delay: number) => ({
+  opacity: 0 as number,
+  animationDelay: `${delay}ms`,
+});
 
+const Index = () => {
   const handleRefresh = useCallback(async () => {
     await new Promise(resolve => setTimeout(resolve, 400));
   }, []);
@@ -21,57 +26,52 @@ const Index = () => {
 
   return (
     <div
-      className="relative min-h-screen bg-gradient-to-b from-background via-background/95 to-secondary/30"
+      className="relative min-h-screen bg-background"
       {...handlers}
     >
-      <PullToRefreshIndicator
-        pullDistance={pullDistance}
-        isRefreshing={isRefreshing}
-      />
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
 
       <div
         className="px-4 pb-28 transition-transform duration-100"
         style={{ transform: pullDistance > 0 ? `translateY(${pullDistance * 0.3}px)` : undefined }}
       >
-        {/* Header */}
-        <div className="pt-6 pb-4">
-          <h1
-            className="text-[22px] font-bold text-foreground leading-tight tracking-tight animate-[fadeIn_0.4s_ease-out_forwards]"
-            style={{ opacity: 0, animationDelay: '80ms' }}
-          >
-            Good for tonight
-          </h1>
+        {/* Section 1 — Header & Greeting */}
+        <div className="animate-[fadeIn_0.4s_ease-out_forwards]" style={sectionAnim(50)}>
+          <HomeHeader />
         </div>
 
-        {/* Section 1 — Picked for you */}
-        <div className="animate-[fadeIn_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '150ms' }}>
+        {/* Section 2 — Quick Action Pills */}
+        <div className="mt-4 animate-[fadeIn_0.4s_ease-out_forwards]" style={sectionAnim(120)}>
+          <QuickActionPills />
+        </div>
+
+        {/* Section 3 — Tonight's Pick */}
+        <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(200)}>
+          <TonightsPickHero />
+        </div>
+
+        {/* Section 4 — Nearby & Open Now */}
+        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(300)}>
+          <NearbyOpenSection />
+        </div>
+
+        {/* Section 5 — Picked For You */}
+        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(400)}>
           <PickedForYouSection />
         </div>
 
-        {/* Section 2 — Explore dishes */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '300ms' }}>
-          <ExploreDishesRow />
+        {/* Section 6 — Explore by Cuisine */}
+        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(500)}>
+          <ExploreCuisineRow />
         </div>
 
-        {/* Ask CHUPS nudge */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '400ms' }}>
-          <button
-            onClick={() => navigate("/outa")}
-            className="w-full flex items-center gap-3 bg-card border border-border/40 rounded-2xl p-4 text-left hover:border-purple/20 transition-all active:scale-[0.98]"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/15 to-purple/5 flex items-center justify-center flex-shrink-0">
-              <MessageCircle className="h-5 w-5 text-purple" strokeWidth={1.5} />
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">Need a hand choosing?</p>
-              <p className="text-[11px] text-muted-foreground/50 mt-0.5">Tell me who's coming — I'll pick the right spot</p>
-            </div>
-          </button>
+        {/* Section 7 — Ask Outa Banner */}
+        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(600)}>
+          <OutaBanner />
         </div>
       </div>
 
       <LiveSearchOverlay />
-      
 
       <style>{`
         @keyframes fadeIn {
