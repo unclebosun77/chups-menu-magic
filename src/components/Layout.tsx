@@ -9,14 +9,20 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const isChatPage = location.pathname === '/outa-chat';
+
+  const hideFloatingButton =
+    ['/outa-chat', '/order-summary', '/order-success', '/auth'].some(path =>
+      location.pathname.startsWith(path)
+    ) ||
+    location.pathname.startsWith('/restaurant/onboarding') ||
+    location.pathname.startsWith('/restaurant/dashboard');
 
   return (
     <div className="min-h-screen bg-background pb-16">
       <main className="max-w-lg mx-auto">
         {children}
       </main>
-      {!isChatPage && <FloatingAIButton />}
+      {!hideFloatingButton && <FloatingAIButton />}
       <BottomNav />
     </div>
   );
