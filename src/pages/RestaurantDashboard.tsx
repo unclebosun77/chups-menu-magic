@@ -520,10 +520,35 @@ const RestaurantDashboard = () => {
 
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Menu Items</h2>
-          <Button onClick={() => { setEditingItem(null); setAddToCategoryName(null); setShowForm(true); }}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Item
-          </Button>
+          <div className="flex gap-2">
+            {menuItems.some(i => (i as any).sold_out_today) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  if (!restaurant) return;
+                  const { error } = await supabase
+                    .from("menu_items")
+                    .update({ sold_out_today: false } as any)
+                    .eq("restaurant_id", restaurant.id)
+                    .eq("sold_out_today" as any, true);
+                  if (error) {
+                    toast({ title: "Error resetting", description: error.message, variant: "destructive" });
+                  } else {
+                    toast({ title: "All items restocked ✓" });
+                    loadMenuItems(restaurant.id);
+                  }
+                }}
+                className="text-xs"
+              >
+                Reset all sold out
+              </Button>
+            )}
+            <Button onClick={() => { setEditingItem(null); setAddToCategoryName(null); setShowForm(true); }}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Item
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 mb-6 p-3 rounded-lg bg-muted/50 border">
