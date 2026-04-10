@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import FloatingAIButton from "./FloatingAIButton";
 
@@ -7,12 +8,15 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const location = useLocation();
+  const isChatPage = location.pathname === '/outa-chat';
+
   return (
     <div className="min-h-screen bg-background pb-16">
       <main className="max-w-lg mx-auto">
         {children}
       </main>
-      <FloatingAIButton />
+      {!isChatPage && <FloatingAIButton />}
       <BottomNav />
     </div>
   );
