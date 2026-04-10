@@ -279,6 +279,30 @@ export type Database = {
           },
         ]
       }
+      onboarding_drafts: {
+        Row: {
+          current_step: number | null
+          draft: Json
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          current_step?: number | null
+          draft?: Json
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          current_step?: number | null
+          draft?: Json
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
