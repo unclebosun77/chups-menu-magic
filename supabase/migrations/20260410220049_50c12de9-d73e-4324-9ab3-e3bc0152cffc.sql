@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_items ADD COLUMN IF NOT EXISTS sold_out_today boolean NOT NULL DEFAULT false;

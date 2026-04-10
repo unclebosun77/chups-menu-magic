@@ -243,6 +243,7 @@ export type Database = {
           name: string
           price: number
           restaurant_id: string
+          sold_out_today: boolean
           updated_at: string
         }
         Insert: {
@@ -255,6 +256,7 @@ export type Database = {
           name: string
           price: number
           restaurant_id: string
+          sold_out_today?: boolean
           updated_at?: string
         }
         Update: {
@@ -267,6 +269,7 @@ export type Database = {
           name?: string
           price?: number
           restaurant_id?: string
+          sold_out_today?: boolean
           updated_at?: string
         }
         Relationships: [
