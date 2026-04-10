@@ -385,6 +385,7 @@ export type Database = {
           tags: string[] | null
           updated_at: string
           user_id: string
+          vibes: string[] | null
         }
         Insert: {
           address?: string | null
@@ -411,6 +412,7 @@ export type Database = {
           tags?: string[] | null
           updated_at?: string
           user_id: string
+          vibes?: string[] | null
         }
         Update: {
           address?: string | null
@@ -437,6 +439,7 @@ export type Database = {
           tags?: string[] | null
           updated_at?: string
           user_id?: string
+          vibes?: string[] | null
         }
         Relationships: [
           {

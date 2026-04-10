@@ -21,6 +21,7 @@ interface SupabaseRestaurant {
   address: string | null;
   is_open: boolean;
   description: string | null;
+  vibes: string[] | null;
 }
 
 interface BudgetInfo {
@@ -54,7 +55,7 @@ const OutaChat = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [restaurantRes, menuRes] = await Promise.all([
-        supabase.from('restaurants').select('id, name, cuisine_type, address, is_open, description').eq('status', 'active'),
+        supabase.from('restaurants').select('id, name, cuisine_type, address, is_open, description, vibes').eq('status', 'active'),
         supabase.from('menu_items').select('restaurant_id, price').eq('available', true),
       ]);
 
@@ -105,6 +106,7 @@ const OutaChat = () => {
         address: r.address,
         isOpen: r.is_open,
         description: r.description,
+        vibes: r.vibes || [],
         minDishPrice: budgetMap[r.id]?.minPrice || null,
         avgMealPrice: budgetMap[r.id]?.avgPrice || null,
       }))

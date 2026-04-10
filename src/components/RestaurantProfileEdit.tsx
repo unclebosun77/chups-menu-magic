@@ -18,6 +18,11 @@ const cuisineTypes = [
   "Mediterranean", "Middle Eastern", "Korean", "Vietnamese", "Afro-Caribbean", "Fast Food", "Fusion", "Other"
 ];
 
+const VIBE_OPTIONS = [
+  'chilled', 'lively', 'romantic', 'casual', 'upscale', 'family-friendly',
+  'date-night', 'group-dining', 'outdoor-seating', 'cosy', 'trendy', 'quiet',
+];
+
 interface RestaurantProfileEditProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,6 +35,7 @@ interface RestaurantProfileEditProps {
     phone?: string;
     address?: string;
     city?: string;
+    vibes?: string[];
   };
   onSuccess: () => void;
 }
@@ -48,6 +54,7 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
     phone: restaurant.phone || "",
     address: restaurant.address || "",
     city: restaurant.city || "",
+    vibes: restaurant.vibes || [],
   });
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +121,7 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
           phone: formData.phone,
           address: formData.address,
           city: formData.city,
+          vibes: formData.vibes,
         })
         .eq("id", restaurant.id);
 
@@ -240,6 +248,36 @@ const RestaurantProfileEdit = ({ isOpen, onClose, restaurant, onSuccess }: Resta
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 placeholder="New York"
               />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base font-semibold">Vibes & Atmosphere</Label>
+            <p className="text-sm text-muted-foreground">Select up to 5 that describe your venue</p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {VIBE_OPTIONS.map(vibe => {
+                const selected = formData.vibes.includes(vibe);
+                return (
+                  <button
+                    key={vibe}
+                    type="button"
+                    onClick={() => {
+                      if (selected) {
+                        setFormData(prev => ({ ...prev, vibes: prev.vibes.filter(v => v !== vibe) }));
+                      } else if (formData.vibes.length < 5) {
+                        setFormData(prev => ({ ...prev, vibes: [...prev.vibes, vibe] }));
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                      selected
+                        ? 'bg-purple text-white border-purple'
+                        : 'bg-secondary/50 text-foreground border-border hover:border-purple/40'
+                    } ${!selected && formData.vibes.length >= 5 ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  >
+                    {vibe}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
