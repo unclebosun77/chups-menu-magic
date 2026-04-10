@@ -23,6 +23,12 @@ interface SupabaseRestaurant {
   description: string | null;
 }
 
+interface BudgetInfo {
+  minPrice: number;
+  avgPrice: number;
+  maxPrice: number;
+}
+
 const QUICK_PILLS = [
   "Plan my evening ✨",
   "Romantic dinner 💕",
@@ -42,17 +48,36 @@ const OutaChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
+  const [budgetMap, setBudgetMap] = useState<Record<string, BudgetInfo>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('id, name, cuisine_type, address, is_open, description')
-        .eq('status', 'active');
-      if (!error && data) setSupabaseRestaurants(data);
+    const fetchData = async () => {
+      const [restaurantRes, menuRes] = await Promise.all([
+        supabase.from('restaurants').select('id, name, cuisine_type, address, is_open, description').eq('status', 'active'),
+        supabase.from('menu_items').select('restaurant_id, price').eq('available', true),
+      ]);
+
+      if (!restaurantRes.error && restaurantRes.data) setSupabaseRestaurants(restaurantRes.data);
+
+      if (!menuRes.error && menuRes.data) {
+        const map: Record<string, { prices: number[] }> = {};
+        for (const item of menuRes.data) {
+          if (!map[item.restaurant_id]) map[item.restaurant_id] = { prices: [] };
+          map[item.restaurant_id].prices.push(Number(item.price));
+        }
+        const result: Record<string, BudgetInfo> = {};
+        for (const [rid, { prices }] of Object.entries(map)) {
+          result[rid] = {
+            minPrice: Math.min(...prices),
+            avgPrice: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
+            maxPrice: Math.max(...prices),
+          };
+        }
+        setBudgetMap(result);
+      }
     };
-    fetchRestaurants();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -65,7 +90,6 @@ const OutaChat = () => {
     }
   }, [messages, isTyping]);
 
-  // Auto-resize textarea
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
@@ -76,15 +100,30 @@ const OutaChat = () => {
   const buildRestaurantContext = useCallback(() => {
     return JSON.stringify(
       supabaseRestaurants.map(r => ({
-        name: r.name, cuisine: r.cuisine_type, address: r.address, isOpen: r.is_open, description: r.description,
+        name: r.name,
+        cuisine: r.cuisine_type,
+        address: r.address,
+        isOpen: r.is_open,
+        description: r.description,
+        minDishPrice: budgetMap[r.id]?.minPrice || null,
+        avgMealPrice: budgetMap[r.id]?.avgPrice || null,
       }))
     );
-  }, [supabaseRestaurants]);
+  }, [supabaseRestaurants, budgetMap]);
 
   const buildUserContext = () => {
     const preferredCuisines = profile?.cuisines?.join(', ') || behavior.preferredCuisines.join(', ') || 'no preferences set';
     const recentRestaurants = behavior.visitedRestaurants.slice(0, 3).map(r => r.name).join(', ');
     const recentSearches = behavior.recentSearches.slice(0, 3).join(', ');
+
+    const now = new Date();
+    const timeContext = {
+      dayOfWeek: now.toLocaleDateString('en-GB', { weekday: 'long' }),
+      timeOfDay: now.getHours() < 12 ? 'morning' : now.getHours() < 17 ? 'afternoon' : 'evening',
+      hour: now.getHours(),
+      isWeekend: [0, 6].includes(now.getDay()),
+    };
+
     return {
       location: 'Birmingham city centre',
       cuisines: preferredCuisines,
@@ -93,6 +132,7 @@ const OutaChat = () => {
       recentRestaurants: recentRestaurants || 'none yet',
       recentSearches: recentSearches || 'none yet',
       likesSpicy: behavior.likesSpicy,
+      timeContext,
     };
   };
 
@@ -123,7 +163,8 @@ const OutaChat = () => {
       .map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content }));
 
     const userContext = buildUserContext();
-    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}\n\nUser's message: ${userMessageContent}`;
+    const tc = userContext.timeContext;
+    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.\n\nUser's message: ${userMessageContent}`;
 
     try {
       const resp = await fetch(CHAT_URL, {
@@ -219,7 +260,7 @@ const OutaChat = () => {
           : m
       )
     );
-  }, [messages, profile, userLocation, supabaseRestaurants, addSearch]);
+  }, [messages, profile, userLocation, supabaseRestaurants, addSearch, budgetMap]);
 
   const handleQuickAction = useCallback((action: string) => { handleSendMessage(action); }, [handleSendMessage]);
 
@@ -275,7 +316,6 @@ const OutaChat = () => {
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 pb-36">
         {messages.map((message, index) => {
-          // Find the user message that preceded this outa message
           const precedingUserMessage = message.type === 'outa' && index > 0
             ? messages.slice(0, index).reverse().find(m => m.type === 'user')
             : undefined;
@@ -295,7 +335,6 @@ const OutaChat = () => {
         })}
         {isTyping && <TypingIndicator />}
 
-        {/* Quick action pills — initial state only */}
         {!hasUserSentMessage && messages.length <= 1 && !isTyping && (
           <div className="px-4 pt-2 pb-4">
             <p className="text-xs text-muted-foreground/50 mb-3 px-1">Try asking…</p>
@@ -314,7 +353,7 @@ const OutaChat = () => {
         )}
       </div>
 
-      {/* Input bar — fixed at bottom, above bottom nav */}
+      {/* Input bar */}
       <div className="fixed bottom-16 left-0 right-0 z-40 px-4 py-3 bg-background/90 backdrop-blur-xl border-t border-border/40">
         <div className="flex items-end gap-2">
           <textarea
