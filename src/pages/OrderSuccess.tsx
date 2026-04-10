@@ -86,7 +86,7 @@ const OrderSuccess = () => {
         vibrate(20);
 
         if (newStatus === 'ready') {
-          vibrate([50, 100, 50]);
+          vibrate(50);
           toast({
             title: "Your order is ready! 🎉",
             description: "Head to the counter or a server will bring it to you",
