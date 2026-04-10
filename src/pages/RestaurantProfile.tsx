@@ -203,6 +203,7 @@ const RestaurantProfile = () => {
             openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
             crowdLevel: data.crowd_level,
             crowdUpdatedAt: data.crowd_updated_at,
+            phone: data.phone,
           });
         } else {
           const { data: menuData } = await supabase
@@ -247,6 +248,7 @@ const RestaurantProfile = () => {
             menu: supabaseMenu,
             crowdLevel: data.crowd_level,
             crowdUpdatedAt: data.crowd_updated_at,
+            phone: data.phone,
           });
         }
       } else if (demoData) {
