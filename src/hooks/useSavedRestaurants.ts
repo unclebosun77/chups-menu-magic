@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export const useSavedRestaurants = () => {
   const { user } = useAuth();
@@ -38,7 +39,10 @@ export const useSavedRestaurants = () => {
 
   const saveRestaurant = useCallback(
     async (restaurantId: string) => {
-      if (!user) return { error: "Not authenticated" };
+      if (!user) {
+        toast("Sign in to save restaurants 💜", { action: { label: "Sign in", onClick: () => window.location.href = "/auth" } });
+        return { error: "Not authenticated" };
+      }
 
       const { error } = await supabase.from("saved_restaurants").insert({
         user_id: user.id,
@@ -56,7 +60,10 @@ export const useSavedRestaurants = () => {
 
   const unsaveRestaurant = useCallback(
     async (restaurantId: string) => {
-      if (!user) return { error: "Not authenticated" };
+      if (!user) {
+        toast("Sign in to save restaurants 💜");
+        return { error: "Not authenticated" };
+      }
 
       const { error } = await supabase
         .from("saved_restaurants")

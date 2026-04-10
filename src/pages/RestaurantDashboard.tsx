@@ -314,7 +314,8 @@ const RestaurantDashboard = () => {
           <TabsContent value="orders">
             <OrderManagement 
               orders={orders} 
-              onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)} 
+              onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)}
+              restaurantId={restaurant?.id}
             />
           </TabsContent>
 

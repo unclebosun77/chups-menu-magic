@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { vibrate } from "@/utils/haptics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,12 +44,55 @@ const ORDER_STATUSES = [
 interface OrderManagementProps {
   orders: Order[];
   onOrderUpdate: () => void;
+  restaurantId?: string;
 }
 
-const OrderManagement = ({ orders, onOrderUpdate }: OrderManagementProps) => {
+const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagementProps) => {
   const { toast } = useToast();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Real-time subscription for new orders
+  useEffect(() => {
+    if (!restaurantId) return;
+
+    const channel = supabase
+      .channel(`orders-${restaurantId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'orders',
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        (payload) => {
+          vibrate(30);
+          toast({
+            title: "New order received! 🔔",
+            description: `Table ${(payload.new as any).table_number || 'Walk-in'} — £${Number((payload.new as any).total).toFixed(2)}`,
+          });
+          onOrderUpdate();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        () => {
+          onOrderUpdate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [restaurantId, onOrderUpdate, toast]);
 
   const activeOrders = orders.filter(
     (o) => !["completed", "cancelled"].includes(o.status)
