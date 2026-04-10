@@ -190,6 +190,7 @@ const RestaurantProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
   const [fallbackCrowdLevel, setFallbackCrowdLevel] = useState<string | null>(null);
+  const [priceStats, setPriceStats] = useState<{ min: number; avg: number; max: number } | null>(null);
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get("table");
 
