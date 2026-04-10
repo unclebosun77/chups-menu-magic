@@ -1,21 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { vibrate } from "@/utils/haptics";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Clock, 
-  CheckCircle, 
-  ChefHat, 
-  Package, 
+import {
+  Clock,
+  CheckCircle,
+  ChefHat,
+  Package,
   XCircle,
   RefreshCw,
-  Phone,
-  Mail
+  Loader2,
+  User,
 } from "lucide-react";
-import { format } from "date-fns";
 
 type Order = {
   id: string;
@@ -32,14 +31,83 @@ type Order = {
   payment_method?: string | null;
 };
 
-const ORDER_STATUSES = [
-  { value: "pending", label: "Pending", icon: Clock, color: "bg-yellow-500" },
-  { value: "accepted", label: "Accepted", icon: CheckCircle, color: "bg-blue-500" },
-  { value: "preparing", label: "Preparing", icon: ChefHat, color: "bg-purple" },
-  { value: "ready", label: "Ready", icon: Package, color: "bg-green-500" },
-  { value: "completed", label: "Completed", icon: CheckCircle, color: "bg-green-600" },
-  { value: "cancelled", label: "Cancelled", icon: XCircle, color: "bg-red-500" },
-];
+const STATUS_CONFIG: Record<string, { label: string; icon: typeof Clock; bgClass: string }> = {
+  pending: { label: "Pending", icon: Clock, bgClass: "bg-yellow-500" },
+  accepted: { label: "Accepted", icon: CheckCircle, bgClass: "bg-blue-500" },
+  preparing: { label: "Preparing", icon: ChefHat, bgClass: "bg-purple" },
+  ready: { label: "Ready", icon: Package, bgClass: "bg-green-500" },
+  completed: { label: "Completed", icon: CheckCircle, bgClass: "bg-green-600" },
+  cancelled: { label: "Cancelled", icon: XCircle, bgClass: "bg-red-500" },
+};
+
+const NEXT_STATUS: Record<string, string> = {
+  pending: "accepted",
+  accepted: "preparing",
+  preparing: "ready",
+  ready: "completed",
+};
+
+const ACTION_STYLES: Record<string, string> = {
+  accepted: "bg-blue-500 hover:bg-blue-600 text-white",
+  preparing: "bg-purple hover:bg-purple-hover text-white",
+  ready: "bg-green-500 hover:bg-green-600 text-white",
+  completed: "bg-green-600 hover:bg-green-700 text-white",
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  accepted: "Accept Order",
+  preparing: "Start Preparing",
+  ready: "Mark Ready",
+  completed: "Complete Order",
+};
+
+// --- Helpers ---
+
+function timeAgo(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  const mins = Math.floor(diff / 60);
+  if (mins < 60) return `${mins} min${mins > 1 ? "s" : ""} ago`;
+  const hrs = Math.floor(mins / 60);
+  return `${hrs}h ${mins % 60}m ago`;
+}
+
+function minutesElapsed(dateStr: string): number {
+  return (Date.now() - new Date(dateStr).getTime()) / 60000;
+}
+
+function playNotificationSound() {
+  if (document.visibilityState !== "visible") return;
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.value = 0.15;
+    osc.frequency.value = 880;
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+  } catch {
+    // Web Audio not available
+  }
+}
+
+// --- Subcomponents ---
+
+function LiveTimer({ createdAt }: { createdAt: string }) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 10000);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <span className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+      <Clock className="h-3 w-3" />
+      {timeAgo(createdAt)}
+    </span>
+  );
+}
 
 interface OrderManagementProps {
   orders: Order[];
@@ -51,36 +119,71 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
   const { toast } = useToast();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set());
+  const [banner, setBanner] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const prevOrderIdsRef = useRef<Set<string>>(new Set(orders.map((o) => o.id)));
+  const [, setTick] = useState(0);
 
-  // Real-time subscription for new orders
+  // Tick every 30s to refresh urgency borders
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Real-time subscription
   useEffect(() => {
     if (!restaurantId) return;
 
     const channel = supabase
       .channel(`orders-${restaurantId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'orders',
+          event: "INSERT",
+          schema: "public",
+          table: "orders",
           filter: `restaurant_id=eq.${restaurantId}`,
         },
         (payload) => {
-          vibrate(30);
+          const newOrder = payload.new as any;
+          vibrate(50);
+          playNotificationSound();
+
+          // Flash animation
+          setNewOrderIds((prev) => new Set(prev).add(newOrder.id));
+          setTimeout(() => {
+            setNewOrderIds((prev) => {
+              const next = new Set(prev);
+              next.delete(newOrder.id);
+              return next;
+            });
+          }, 3000);
+
+          // Banner
+          setBanner("1 new order just arrived 🔔");
+          setTimeout(() => setBanner(null), 5000);
+
           toast({
             title: "New order received! 🔔",
-            description: `Table ${(payload.new as any).table_number || 'Walk-in'} — £${Number((payload.new as any).total).toFixed(2)}`,
+            description: `Table ${newOrder.table_number || "Walk-in"} — £${Number(newOrder.total).toFixed(2)}`,
           });
+
           onOrderUpdate();
+
+          // Scroll into view after a short delay so the card is rendered
+          setTimeout(() => {
+            const ref = cardRefs.current[newOrder.id];
+            ref?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }, 300);
         }
       )
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
           filter: `restaurant_id=eq.${restaurantId}`,
         },
         () => {
@@ -94,9 +197,32 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
     };
   }, [restaurantId, onOrderUpdate, toast]);
 
-  const activeOrders = orders.filter(
-    (o) => !["completed", "cancelled"].includes(o.status)
-  );
+  // Detect new orders added to props (from parent re-fetch)
+  useEffect(() => {
+    const currentIds = new Set(orders.map((o) => o.id));
+    const prevIds = prevOrderIdsRef.current;
+    currentIds.forEach((id) => {
+      if (!prevIds.has(id)) {
+        // Already handled via realtime, but mark just in case
+        setNewOrderIds((prev) => {
+          if (prev.has(id)) return prev;
+          const next = new Set(prev);
+          next.add(id);
+          setTimeout(() => {
+            setNewOrderIds((p) => {
+              const n = new Set(p);
+              n.delete(id);
+              return n;
+            });
+          }, 3000);
+          return next;
+        });
+      }
+    });
+    prevOrderIdsRef.current = currentIds;
+  }, [orders]);
+
+  const activeOrders = orders.filter((o) => !["completed", "cancelled"].includes(o.status));
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     setUpdatingOrderId(orderId);
@@ -114,13 +240,13 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
           const points = Math.floor(Number(order.total) * 10);
           toast({
             title: "Order complete",
-            description: `Order completed — customer earned ${points} points 🎉`,
+            description: `Customer earned ${points} points 🎉`,
           });
         }
       } else {
         toast({
-          title: "Order updated",
-          description: `Order status changed to ${newStatus}`,
+          title: "Status updated",
+          description: `Order → ${STATUS_CONFIG[newStatus]?.label || newStatus}`,
         });
       }
       onOrderUpdate();
@@ -141,170 +267,181 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  const getNextStatus = (currentStatus: string): string | null => {
-    const flow = ["pending", "accepted", "preparing", "ready", "completed"];
-    const currentIndex = flow.indexOf(currentStatus);
-    if (currentIndex === -1 || currentIndex === flow.length - 1) return null;
-    return flow[currentIndex + 1];
-  };
-
-  const getStatusConfig = (status: string) => {
-    return ORDER_STATUSES.find((s) => s.value === status) || ORDER_STATUSES[0];
+  const getUrgencyClass = (order: Order): string => {
+    if (order.status !== "pending") return "";
+    const mins = minutesElapsed(order.created_at);
+    if (mins >= 20) return "ring-2 ring-red-500 animate-pulse";
+    if (mins >= 10) return "ring-2 ring-amber-500 animate-pulse";
+    return "";
   };
 
   return (
     <div className="mb-8">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Order Management</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Kitchen Display</h2>
+          <p className="text-sm text-muted-foreground">
+            {activeOrders.length} active order{activeOrders.length !== 1 ? "s" : ""}
+          </p>
+        </div>
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
           <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>
 
+      {/* New order banner */}
+      {banner && (
+        <div className="mb-4 rounded-xl bg-green-500/15 border border-green-500/30 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-300 animate-fade-in">
+          {banner}
+        </div>
+      )}
+
       {activeOrders.length === 0 ? (
         <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground text-center">
-              No active orders. New orders will appear here in real-time.
-            </p>
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-2">
+              <ChefHat className="h-10 w-10 mx-auto text-muted-foreground/40" />
+              <p className="text-muted-foreground">
+                No active orders. New orders will appear here instantly.
+              </p>
+            </div>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {activeOrders.map((order) => {
-            const statusConfig = getStatusConfig(order.status);
-            const StatusIcon = statusConfig.icon;
-            const nextStatus = getNextStatus(order.status);
+            const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+            const StatusIcon = config.icon;
+            const nextStatus = NEXT_STATUS[order.status] || null;
             const isUpdating = updatingOrderId === order.id;
+            const isNew = newOrderIds.has(order.id);
+            const urgency = getUrgencyClass(order);
 
             return (
-              <Card key={order.id} className="relative overflow-hidden">
-                <div className={`absolute top-0 left-0 right-0 h-1 ${statusConfig.color}`} />
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">
-                        Order #{order.id.slice(-6).toUpperCase()}
-                      </CardTitle>
+              <Card
+                key={order.id}
+                ref={(el) => { cardRefs.current[order.id] = el; }}
+                className={`relative overflow-hidden transition-all duration-300 ${urgency} ${
+                  isNew ? "ring-2 ring-green-500 shadow-lg shadow-green-500/20" : ""
+                }`}
+              >
+                {/* Top colour bar */}
+                <div className={`absolute top-0 left-0 right-0 h-1 ${config.bgClass}`} />
+
+                <CardContent className="pt-5 pb-4 space-y-3">
+                  {/* Header row: ref · table · timer */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-bold text-base truncate">
+                        #{order.id.slice(-6).toUpperCase()}
+                      </span>
                       {order.table_number && (
-                        <Badge className="bg-purple/15 text-purple border-purple/30 text-xs">
+                        <Badge className="bg-purple/15 text-purple border-purple/30 text-xs shrink-0">
                           Table {order.table_number}
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      {order.payment_status === "paid" && (
+                    <LiveTimer createdAt={order.created_at} />
+                  </div>
+
+                  {/* Full-width status badge */}
+                  <div className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-white text-sm font-semibold ${config.bgClass}`}>
+                    <StatusIcon className="h-4 w-4" />
+                    {config.label}
+                  </div>
+
+                  {/* Customer + payment */}
+                  <div className="flex items-center justify-between">
+                    {order.customer_name && (
+                      <div className="flex items-center gap-1.5 text-sm font-medium">
+                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                        {order.customer_name}
+                      </div>
+                    )}
+                    <div>
+                      {order.payment_method === "pos" || order.payment_status === "pos_requested" ? (
+                        <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/30 text-xs">
+                          Pay at table
+                        </Badge>
+                      ) : order.payment_status === "paid" ? (
                         <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
                           Paid
                         </Badge>
-                      )}
-                      {order.payment_status === "pos_requested" && (
-                        <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/30 text-xs">
-                          POS Requested
-                        </Badge>
-                      )}
-                      {(!order.payment_status || order.payment_status === "pending") && (
+                      ) : (
                         <Badge className="bg-muted text-muted-foreground text-xs">
                           Pending
                         </Badge>
                       )}
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <StatusIcon className="h-3 w-3" />
-                        {statusConfig.label}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardDescription>
-                    {format(new Date(order.created_at), "MMM d, h:mm a")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Customer Info */}
-                  {(order.customer_name || order.customer_email || order.customer_phone) && (
-                    <div className="space-y-1 text-sm">
-                      {order.customer_name && (
-                        <p className="font-medium">{order.customer_name}</p>
-                      )}
-                      {order.customer_email && (
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          {order.customer_email}
-                        </p>
-                      )}
-                      {order.customer_phone && (
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <Phone className="h-3 w-3" />
-                          {order.customer_phone}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Order Items */}
-                  <div className="border-t pt-3">
-                    <p className="text-xs text-muted-foreground mb-2">Items</p>
-                    <ul className="space-y-1 text-sm">
-                      {Array.isArray(order.items) &&
-                        order.items.map((item: any, i: number) => (
-                          <li key={i} className="flex justify-between">
-                            <span>
-                              {item.quantity}x {item.name}
-                            </span>
-                            <span className="text-muted-foreground">
-                              £{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
-                            </span>
-                          </li>
-                        ))}
-                    </ul>
-                    <div className="flex justify-between font-semibold mt-2 pt-2 border-t">
-                      <span>Total</span>
-                      <span>£{Number(order.total).toFixed(2)}</span>
                     </div>
                   </div>
 
-                  {/* Status Actions */}
-                  <div className="flex gap-2 pt-2">
+                  {/* Items list */}
+                  <div className="border-t pt-3 space-y-1.5">
+                    {Array.isArray(order.items) &&
+                      order.items.map((item: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span>
+                            <span className="font-semibold">{item.quantity}×</span>{" "}
+                            <span className="font-medium">{item.name}</span>
+                          </span>
+                          <span className="text-muted-foreground tabular-nums">
+                            £{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Total */}
+                  <div className="flex justify-end border-t pt-2">
+                    <span className="text-xl font-bold tabular-nums">
+                      £{Number(order.total).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2 pt-1">
                     {nextStatus && (
                       <Button
-                        className="flex-1"
+                        className={`flex-1 h-14 text-base font-semibold ${ACTION_STYLES[nextStatus] || ""}`}
                         onClick={() => handleStatusUpdate(order.id, nextStatus)}
                         disabled={isUpdating}
                       >
                         {isUpdating ? (
-                          <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                          <Loader2 className="h-5 w-5 animate-spin mr-2" />
                         ) : null}
-                        Mark as {getStatusConfig(nextStatus).label}
+                        {ACTION_LABELS[nextStatus] || `Mark ${nextStatus}`}
                       </Button>
                     )}
                     {order.status !== "cancelled" && order.status !== "completed" && (
                       <Button
                         variant="destructive"
                         size="icon"
+                        className="h-14 w-14 shrink-0"
                         onClick={() => handleStatusUpdate(order.id, "cancelled")}
                         disabled={isUpdating}
+                        title="Cancel order"
                       >
-                        <XCircle className="h-4 w-4" />
+                        <XCircle className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="pt-2">
-                    <div className="flex gap-1">
-                      {["pending", "accepted", "preparing", "ready"].map((step, i) => {
-                        const steps = ["pending", "accepted", "preparing", "ready"];
-                        const currentIndex = steps.indexOf(order.status);
-                        return (
-                          <div
-                            key={step}
-                            className={`h-1.5 flex-1 rounded-full transition-colors ${
-                              i <= currentIndex ? "bg-purple" : "bg-secondary"
-                            }`}
-                          />
-                        );
-                      })}
-                    </div>
+                  {/* Progress bar */}
+                  <div className="flex gap-1">
+                    {["pending", "accepted", "preparing", "ready"].map((step, i) => {
+                      const steps = ["pending", "accepted", "preparing", "ready"];
+                      const currentIndex = steps.indexOf(order.status);
+                      return (
+                        <div
+                          key={step}
+                          className={`h-1.5 flex-1 rounded-full transition-colors ${
+                            i <= currentIndex ? "bg-purple" : "bg-secondary"
+                          }`}
+                        />
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
