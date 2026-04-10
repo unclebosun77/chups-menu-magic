@@ -323,6 +323,34 @@ const RestaurantProfile = () => {
     fetchRecentOrders();
   }, [supabaseId, restaurant?.crowdLevel, restaurant?.crowdUpdatedAt]);
 
+  // Real-time menu updates — refresh menu when owner changes availability/sold_out
+  useEffect(() => {
+    if (!supabaseId) return;
+    const channel = supabase
+      .channel(`menu-updates-${supabaseId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'menu_items',
+        filter: `restaurant_id=eq.${supabaseId}`,
+      }, (payload) => {
+        const updated = payload.new as any;
+        setRestaurant(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            menu: prev.menu.map(item =>
+              item.id === updated.id
+                ? { ...item, available: updated.available, sold_out_today: updated.sold_out_today, price: Number(updated.price), name: updated.name }
+                : item
+            ),
+          };
+        });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [supabaseId]);
+
   const effectiveCrowdLevel = useMemo(() => {
     if (restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000) {
       return restaurant.crowdLevel;
