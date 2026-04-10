@@ -201,7 +201,38 @@ const RestaurantDashboard = () => {
   const handleFormSuccess = () => {
     setShowForm(false);
     setEditingItem(null);
+    setAddToCategoryName(null);
     if (restaurant) loadMenuItems(restaurant.id);
+  };
+
+  const handleQuickAdd = async (category: string) => {
+    if (!quickAddName.trim() || !quickAddPrice.trim() || !restaurant) return;
+    const price = parseFloat(quickAddPrice);
+    if (isNaN(price) || price < 0) {
+      toast({ title: "Invalid price", variant: "destructive" });
+      return;
+    }
+    setIsQuickAdding(true);
+    const { error } = await supabase.from("menu_items").insert({
+      restaurant_id: restaurant.id,
+      name: quickAddName.trim(),
+      price,
+      category,
+    });
+    if (error) {
+      toast({ title: "Error adding item", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `${quickAddName.trim()} added` });
+      setQuickAddName("");
+      setQuickAddPrice("");
+      setQuickAddCategory(null);
+      loadMenuItems(restaurant.id);
+    }
+    setIsQuickAdding(false);
+  };
+
+  const handleItemUpdate = (updatedItem: MenuItem) => {
+    setMenuItems(prev => prev.map(i => i.id === updatedItem.id ? { ...i, ...updatedItem } : i));
   };
 
   const handleProfileUpdate = async () => {
