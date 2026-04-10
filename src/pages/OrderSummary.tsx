@@ -107,8 +107,8 @@ const OrderSummary = () => {
         state: {
           orderId: data?.id,
           restaurantName,
-          totalAmount,
-          itemCount: totalItems,
+          totalAmount: orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+          itemCount: orderItems.reduce((sum, item) => sum + item.quantity, 0),
           paymentMethod: "pos",
         },
       });

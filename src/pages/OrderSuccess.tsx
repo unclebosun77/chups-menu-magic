@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Clock, ChefHat, Package, Utensils, XCircle, RefreshCw, Sparkles } from "lucide-react";
 import { vibrate } from "@/utils/haptics";
+import { useToast } from "@/hooks/use-toast";
 
 type OrderStatus = "pending" | "accepted" | "preparing" | "ready" | "completed" | "cancelled";
 
@@ -31,56 +32,81 @@ const STATUS_FLOW: OrderStatus[] = ["pending", "accepted", "preparing", "ready",
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const { orderId, restaurantName, totalAmount, itemCount, paymentMethod, tableNumber } = (location.state || {}) as OrderState;
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>("pending");
   const [isPolling, setIsPolling] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [fetchedTotal, setFetchedTotal] = useState<number | null>(null);
+  const [fetchedItemCount, setFetchedItemCount] = useState<number | null>(null);
 
-  const fetchOrderStatus = useCallback(async () => {
+  // Fallback: fetch total from DB if not passed via navigation state
+  useEffect(() => {
+    if (orderId && (!totalAmount || totalAmount === 0)) {
+      supabase.from('orders').select('total, items').eq('id', orderId).single()
+        .then(({ data }) => {
+          if (data) {
+            setFetchedTotal(data.total);
+            setFetchedItemCount(Array.isArray(data.items) ? data.items.length : 0);
+          }
+        });
+    }
+  }, [orderId, totalAmount]);
+
+  // Real-time subscription for order status updates
+  useEffect(() => {
     if (!orderId) return;
-    
-    try {
-      const { data, error } = await supabase
+
+    // Fetch initial status
+    const fetchInitial = async () => {
+      const { data } = await supabase
         .from("orders")
         .select("status")
         .eq("id", orderId)
         .single();
-
-      if (!error && data) {
-        const newStatus = data.status as OrderStatus;
-        if (newStatus !== currentStatus) {
-          vibrate(20);
-          setCurrentStatus(newStatus);
-          setLastUpdate(new Date());
-        }
-        
-        // Stop polling if order is completed or cancelled
-        if (newStatus === "completed" || newStatus === "cancelled") {
-          setIsPolling(false);
-        }
+      if (data) {
+        setCurrentStatus(data.status as OrderStatus);
+        setLastUpdate(new Date());
       }
-    } catch (error) {
-      console.error("Error fetching order status:", error);
-    }
-  }, [orderId, currentStatus]);
+    };
+    fetchInitial();
 
-  useEffect(() => {
-    // Initial haptic feedback
-    vibrate(30);
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel(`order-${orderId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: `id=eq.${orderId}`,
+      }, (payload) => {
+        const newStatus = (payload.new as any).status as OrderStatus;
+        setCurrentStatus(newStatus);
+        setLastUpdate(new Date());
+        vibrate(20);
 
-    // Initial fetch
-    if (orderId) {
-      fetchOrderStatus();
-    }
+        if (newStatus === 'ready') {
+          vibrate(50);
+          toast({
+            title: "Your order is ready! 🎉",
+            description: "Head to the counter or a server will bring it to you",
+          });
+        }
+
+        if (newStatus === 'completed' || newStatus === 'cancelled') {
+          setIsPolling(false);
+          supabase.removeChannel(channel);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [orderId]);
 
-  // Poll for status updates every 15 seconds
+  // Initial haptic feedback
   useEffect(() => {
-    if (!orderId || !isPolling) return;
-
-    const interval = setInterval(fetchOrderStatus, 15000);
-    return () => clearInterval(interval);
-  }, [orderId, isPolling, fetchOrderStatus]);
+    vibrate(30);
+  }, []);
 
   if (!restaurantName) {
     navigate("/");
@@ -156,11 +182,11 @@ const OrderSuccess = () => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-3xl font-bold text-purple">£{totalAmount?.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-purple">£{((totalAmount && totalAmount > 0) ? totalAmount : fetchedTotal)?.toFixed(2) ?? '—'}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Items</p>
-                <p className="text-2xl font-bold text-foreground">{itemCount}</p>
+                <p className="text-2xl font-bold text-foreground">{itemCount || fetchedItemCount || '—'}</p>
               </div>
             </div>
           </div>
