@@ -61,7 +61,7 @@ const TasteProfileCard = ({ onEditProfile, className }: TasteProfileCardProps) =
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={resetProfile}
+            onClick={onEditProfile}
             className="text-white/50 hover:text-white/80 hover:bg-white/10"
           >
             <RefreshCw className="w-4 h-4" />

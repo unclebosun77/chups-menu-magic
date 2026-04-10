@@ -1,42 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight, Calendar, ShoppingBag 
+import {
+  LogOut, User, Sparkles, Crown, ArrowLeft, HelpCircle, ChevronRight,
+  Calendar, ShoppingBag, Gift, Heart, Settings, Bell, Shield,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 import TasteProfileCard from "@/components/TasteProfileCard";
 import TasteProfileDialog from "@/components/taste-profile/TasteProfileDialog";
 import LocationPreferencesCard from "@/components/LocationPreferencesCard";
 import SavedRestaurantsPreview from "@/components/profile/SavedRestaurantsPreview";
 import ActivitySummaryCard from "@/components/profile/ActivitySummaryCard";
-import SettingsStubCard from "@/components/profile/SettingsStubCard";
+import RestaurantOwnerCard from "@/components/profile/RestaurantOwnerCard";
+import PreferencesSheet from "@/components/profile/PreferencesSheet";
+import HelpSheet from "@/components/profile/HelpSheet";
+
+const tierColors: Record<string, string> = {
+  bronze: "text-amber-600",
+  silver: "text-gray-400",
+  gold: "text-yellow-400",
+  platinum: "text-purple",
+};
 
 const Account = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const [showTasteDialog, setShowTasteDialog] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [upcomingBookings, setUpcomingBookings] = useState(0);
+  const [rewardsData, setRewardsData] = useState<{ tier: string; points_balance: number } | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    const fetchBookingCount = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const { count } = await supabase
-        .from('bookings')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('booking_date', today)
-        .neq('status', 'cancelled');
-      setUpcomingBookings(count || 0);
-    };
-    fetchBookingCount();
+    const today = new Date().toISOString().split("T")[0];
+
+    // Fetch bookings count and rewards in parallel
+    Promise.all([
+      supabase
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("booking_date", today)
+        .neq("status", "cancelled"),
+      supabase
+        .from("rewards_accounts")
+        .select("tier, points_balance")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]).then(([bookingsRes, rewardsRes]) => {
+      setUpcomingBookings(bookingsRes.count || 0);
+      setRewardsData(rewardsRes.data);
+    });
   }, [user]);
 
   const handleSignOut = async () => {
@@ -45,10 +65,13 @@ const Account = () => {
     navigate("/");
   };
 
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  const tier = rewardsData?.tier || "bronze";
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1) + " Member";
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
-        {/* Header */}
         <div className="px-4 pt-6 pb-4">
           <div className="flex items-center gap-3 mb-6">
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(-1)}>
@@ -60,41 +83,23 @@ const Account = () => {
             </div>
           </div>
         </div>
-
         <div className="px-4 space-y-4">
-          {/* Sign In Card */}
           <Card className="overflow-hidden glass-card-strong animate-slide-up">
             <div className="p-8 text-center">
               <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple/20 to-neon-pink/10 flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <User className="h-10 w-10 text-purple" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Welcome to Outa</h2>
-              <p className="text-sm text-muted-foreground mb-6">
-                Sign in to access your profile, saved restaurants, and personalized features
-              </p>
-              <Button 
-                onClick={() => navigate("/auth")} 
-                className="bg-gradient-to-r from-purple to-purple/90 hover:from-purple/90 hover:to-purple/80 shadow-lg shadow-purple/30"
-              >
+              <h2 className="text-xl font-bold text-foreground mb-2">Welcome to Chups</h2>
+              <p className="text-sm text-muted-foreground mb-6">Sign in to access your profile, saved restaurants, and personalised features</p>
+              <Button onClick={() => navigate("/auth")} className="bg-gradient-to-r from-purple to-purple/90 hover:from-purple/90 hover:to-purple/80 shadow-lg shadow-purple/30">
                 Sign In
               </Button>
             </div>
           </Card>
-
-          {/* Taste Profile Card - Available for all users */}
-          <TasteProfileCard 
-            onEditProfile={() => setShowTasteDialog(true)}
-            className="animate-slide-up"
-          />
-
-          {/* Saved Restaurants Preview */}
+          <TasteProfileCard onEditProfile={() => setShowTasteDialog(true)} className="animate-slide-up" />
           <SavedRestaurantsPreview className="animate-slide-up" />
         </div>
-
-        <TasteProfileDialog 
-          open={showTasteDialog} 
-          onOpenChange={setShowTasteDialog} 
-        />
+        <TasteProfileDialog open={showTasteDialog} onOpenChange={setShowTasteDialog} />
       </div>
     );
   }
@@ -103,10 +108,9 @@ const Account = () => {
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
       {/* Premium Header */}
       <div className="relative overflow-hidden">
-        {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple/10 via-purple/5 to-transparent" />
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-radial from-neon-pink/10 to-transparent rounded-full blur-3xl" />
-        
+
         <div className="relative px-4 pt-6 pb-8">
           <div className="flex items-center gap-3 mb-6">
             <Button variant="ghost" size="icon" className="rounded-full bg-background/50 backdrop-blur-sm" onClick={() => navigate(-1)}>
@@ -114,10 +118,6 @@ const Account = () => {
             </Button>
             <div className="flex-1">
               <h1 className="text-xl font-bold text-foreground">Your Profile</h1>
-              <p className="text-xs text-muted-foreground">Your dining preferences</p>
-            </div>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/15 to-neon-pink/10 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-purple" />
             </div>
           </div>
 
@@ -128,7 +128,7 @@ const Account = () => {
                 <div className="relative">
                   <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
                     <AvatarFallback className="text-xl bg-gradient-to-br from-purple to-neon-pink text-white font-bold">
-                      {user.email?.[0].toUpperCase()}
+                      {displayName[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-purple to-neon-pink flex items-center justify-center shadow-lg">
@@ -136,9 +136,11 @@ const Account = () => {
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-bold text-lg text-foreground truncate">{user.email}</h2>
-                  <p className="text-sm text-purple font-medium">Outa Member</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Premium features active</p>
+                  <h2 className="font-bold text-lg text-foreground truncate">{displayName}</h2>
+                  <p className={`text-sm font-medium ${tierColors[tier]}`}>{tierLabel}</p>
+                  {rewardsData && (
+                    <p className="text-xs text-muted-foreground mt-0.5">✦ {rewardsData.points_balance} pts</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -147,46 +149,39 @@ const Account = () => {
       </div>
 
       <div className="px-4 space-y-4">
-        {/* Quick Links */}
+        {/* Quick Links — 2×2 */}
         <div className="grid grid-cols-2 gap-3 animate-slide-up">
-          <Card
-            className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
-            onClick={() => navigate('/bookings')}
-          >
-            <CardContent className="flex flex-col items-center gap-2 p-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center relative">
-                <Calendar className="h-5 w-5 text-purple" />
-                {upcomingBookings > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple text-white text-[10px] font-bold flex items-center justify-center">
-                    {upcomingBookings}
-                  </span>
-                )}
-              </div>
-              <p className="font-semibold text-sm text-foreground">My Bookings</p>
-            </CardContent>
-          </Card>
-          <Card
-            className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
-            onClick={() => navigate('/my-orders')}
-          >
-            <CardContent className="flex flex-col items-center gap-2 p-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
-                <ShoppingBag className="h-5 w-5 text-purple" />
-              </div>
-              <p className="font-semibold text-sm text-foreground">My Orders</p>
-            </CardContent>
-          </Card>
+          {[
+            { icon: Calendar, label: "My Bookings", path: "/bookings", badge: upcomingBookings },
+            { icon: ShoppingBag, label: "My Orders", path: "/my-orders" },
+            { icon: Gift, label: "My Rewards", path: "/rewards" },
+            { icon: Heart, label: "Saved Places", path: "/saved" },
+          ].map(({ icon: Icon, label, path, badge }) => (
+            <Card
+              key={label}
+              className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+              onClick={() => navigate(path)}
+            >
+              <CardContent className="flex flex-col items-center gap-2 p-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center relative">
+                  <Icon className="h-5 w-5 text-purple" />
+                  {badge ? (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple text-white text-[10px] font-bold flex items-center justify-center">
+                      {badge}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="font-semibold text-sm text-foreground">{label}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-
-        {/* Location Preferences Section */}
+        {/* Location Preferences */}
         <LocationPreferencesCard className="animate-slide-up" />
 
-        {/* Taste Profile Section */}
-        <TasteProfileCard 
-          onEditProfile={() => setShowTasteDialog(true)}
-          className="animate-slide-up"
-        />
+        {/* Taste Profile */}
+        <TasteProfileCard onEditProfile={() => setShowTasteDialog(true)} className="animate-slide-up" />
 
         {/* Saved Restaurants Preview */}
         <SavedRestaurantsPreview className="animate-slide-up" />
@@ -194,16 +189,45 @@ const Account = () => {
         {/* Activity Summary */}
         <ActivitySummaryCard className="animate-slide-up" />
 
-        {/* Settings Stub */}
+        {/* Restaurant Owner */}
+        <RestaurantOwnerCard userId={user.id} className="animate-slide-up" />
+
+        {/* Settings */}
         <div className="pt-2">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Settings</h3>
-          <SettingsStubCard />
+          <div className="space-y-2">
+            {[
+              { icon: Settings, label: "Preferences", subtitle: "App customisation", action: () => setShowPreferences(true) },
+              { icon: Bell, label: "Notifications", subtitle: "Alerts & updates", action: () => setShowPreferences(true) },
+              { icon: Shield, label: "Privacy & Security", subtitle: "Account protection", comingSoon: true },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Card
+                  key={item.label}
+                  className={`glass-card transition-all ${item.comingSoon ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:shadow-lg hover:border-purple/20 active:scale-[0.98]"}`}
+                  onClick={item.comingSoon ? undefined : item.action}
+                >
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
+                      <Icon className="h-5 w-5 text-purple" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">{item.subtitle}</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
         {/* Help & Support */}
         <Card
           className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all animate-slide-up active:scale-[0.98]"
-          onClick={() => {}}
+          onClick={() => setShowHelp(true)}
         >
           <CardContent className="flex items-center gap-4 p-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
@@ -211,7 +235,7 @@ const Account = () => {
             </div>
             <div className="flex-1">
               <p className="font-semibold text-foreground">Help & Support</p>
-              <p className="text-xs text-muted-foreground">Get assistance</p>
+              <p className="text-xs text-muted-foreground">FAQs & assistance</p>
             </div>
             <ChevronRight className="h-5 w-5 text-muted-foreground/30" />
           </CardContent>
@@ -233,16 +257,14 @@ const Account = () => {
           </CardContent>
         </Card>
 
-        {/* Version Info */}
         <div className="text-center py-4">
-          <p className="text-[10px] text-muted-foreground/40">Outa v1.0.0 • Made with ✨</p>
+          <p className="text-[10px] text-muted-foreground/40">Chups v1.0.0 • Made with ✨</p>
         </div>
       </div>
 
-      <TasteProfileDialog 
-        open={showTasteDialog} 
-        onOpenChange={setShowTasteDialog} 
-      />
+      <TasteProfileDialog open={showTasteDialog} onOpenChange={setShowTasteDialog} />
+      <PreferencesSheet open={showPreferences} onOpenChange={setShowPreferences} />
+      <HelpSheet open={showHelp} onOpenChange={setShowHelp} />
     </div>
   );
 };
