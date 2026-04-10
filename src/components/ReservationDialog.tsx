@@ -114,16 +114,15 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       try {
         await supabase.functions.invoke('send-booking-confirmation', {
           body: {
-            experienceName,
-            categoryTitle: 'Dine-In Reservation',
+            restaurantName: restaurantName || location,
+            restaurantAddress: restaurantAddress || undefined,
+            name,
+            email,
             date: format(date, "PPP"),
             timeSlot,
             partySize,
-            name,
-            email,
-            phone: phone || undefined,
-            specialRequests: specialRequests || undefined,
-            pricing: 'No charge for reservation',
+            phone: phone || null,
+            specialRequests: specialRequests || null,
           },
         });
       } catch (emailErr) {
@@ -135,8 +134,8 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       setCalendarLink(icsUri);
 
       toast({
-        title: "Reservation Confirmed! 🎉",
-        description: `Your table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot} has been reserved.`,
+        title: "Booking confirmed! 📧",
+        description: `Check your email for details. Table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot}.`,
       });
 
       // Reset form
