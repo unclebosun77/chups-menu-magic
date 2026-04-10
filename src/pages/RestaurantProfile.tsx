@@ -85,7 +85,7 @@ const QuickInfoHoursRow = ({ status, todayDisplay, openingHours }: { status: any
 };
 
 /* ─── Quick Info Section ─── */
-const QuickInfoSection = ({ restaurant }: { restaurant: DemoRestaurant }) => {
+const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaurant; priceStats: { min: number; avg: number; max: number } | null }) => {
   const status = getOpeningStatus(restaurant.openingHours as any);
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
   const todayHours = (restaurant.openingHours as any)?.[today];
@@ -94,6 +94,11 @@ const QuickInfoSection = ({ restaurant }: { restaurant: DemoRestaurant }) => {
         ? (todayHours.closed ? 'Closed' : `${todayHours.open} – ${todayHours.close}`)
         : String(todayHours))
     : null;
+
+  const { profile } = useTasteProfile();
+  const budgetPrefMap: Record<string, number> = { budget: 10, mid: 20, premium: 40, luxury: 80 };
+  const userBudget = profile?.pricePreference ? budgetPrefMap[profile.pricePreference] : null;
+  const fitsbudget = priceStats && userBudget ? priceStats.avg <= userBudget : false;
 
   return (
     <div
@@ -143,6 +148,24 @@ const QuickInfoSection = ({ restaurant }: { restaurant: DemoRestaurant }) => {
             </div>
             <p className="text-[13px] text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
           </div>
+
+          {priceStats && (
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-[13px]">💰</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-foreground">
+                  From <span className="font-semibold">£{priceStats.min.toFixed(2)}</span> · Avg <span className="font-semibold">£{priceStats.avg.toFixed(2)}</span> per dish
+                </p>
+              </div>
+              {fitsbudget && (
+                <span className="text-[10px] font-semibold text-green-600 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
+                  Fits your budget ✓
+                </span>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -167,6 +190,7 @@ const RestaurantProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
   const [fallbackCrowdLevel, setFallbackCrowdLevel] = useState<string | null>(null);
+  const [priceStats, setPriceStats] = useState<{ min: number; avg: number; max: number } | null>(null);
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get("table");
 
@@ -254,6 +278,22 @@ const RestaurantProfile = () => {
       } else if (demoData) {
         setRestaurant(demoData);
       }
+      // Fetch price stats
+      const { data: priceData } = await supabase
+        .from('menu_items')
+        .select('price')
+        .eq('restaurant_id', supabaseId)
+        .eq('available', true);
+
+      if (priceData && priceData.length > 0) {
+        const prices = priceData.map(i => Number(i.price));
+        setPriceStats({
+          min: Math.min(...prices),
+          avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
+          max: Math.max(...prices),
+        });
+      }
+
       setIsLoading(false);
     };
     loadRestaurant();
@@ -450,7 +490,7 @@ const RestaurantProfile = () => {
       </div>
 
       {/* ─── 3. QUICK INFO ─── */}
-      <QuickInfoSection restaurant={restaurant} />
+      <QuickInfoSection restaurant={restaurant} priceStats={priceStats} />
 
       {/* ─── 4. ACTION BUTTONS ─── */}
       <div className="px-5 pb-5 animate-[sectionSlide_0.45s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '380ms' }}>

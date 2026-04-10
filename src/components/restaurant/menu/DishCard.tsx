@@ -33,8 +33,8 @@ const DishCard = ({ dish, onSelect }: DishCardProps) => {
             <h3 className="font-semibold text-[15px] text-foreground leading-tight group-hover:text-purple transition-colors">
               {dish.name}
             </h3>
-            <span className="font-bold text-[15px] text-purple flex-shrink-0">
-              £{dish.price}
+            <span className="font-semibold text-base text-purple flex-shrink-0">
+              £{Number(dish.price).toFixed(2)}
             </span>
           </div>
 
