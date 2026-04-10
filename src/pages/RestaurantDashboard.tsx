@@ -77,7 +77,11 @@ const RestaurantDashboard = () => {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [activeTab, setActiveTab] = useState("orders");
-
+  const [quickAddCategory, setQuickAddCategory] = useState<string | null>(null);
+  const [quickAddName, setQuickAddName] = useState("");
+  const [quickAddPrice, setQuickAddPrice] = useState("");
+  const [isQuickAdding, setIsQuickAdding] = useState(false);
+  const [addToCategoryName, setAddToCategoryName] = useState<string | null>(null);
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
