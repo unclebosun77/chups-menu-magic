@@ -1,7 +1,8 @@
 // Restaurant Onboarding Draft Store
-// Persists onboarding progress locally for restoration
+// Persists onboarding progress locally and to Supabase
 
 import { generateRestaurantTags } from './aiTagging';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface MenuItemDraft {
   id: string;
