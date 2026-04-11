@@ -14,6 +14,8 @@ const BrandingStep = () => {
   const [coverPhoto, setCoverPhoto] = useState<string>('');
   const [logoUploading, setLogoUploading] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
+  const [logoSaved, setLogoSaved] = useState(false);
+  const [coverSaved, setCoverSaved] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
