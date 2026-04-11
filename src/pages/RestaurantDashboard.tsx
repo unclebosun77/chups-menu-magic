@@ -407,15 +407,29 @@ const RestaurantDashboard = () => {
 
         {/* Order Management Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="mb-4">
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="menu">Menu</TabsTrigger>
-            <TabsTrigger value="tables" className="flex items-center gap-1.5">
-              <QrCode className="h-3.5 w-3.5" />
-              Tables
-            </TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="mb-4 inline-flex w-auto min-w-full sm:min-w-0">
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="bookings" className="flex items-center gap-1.5">
+                Bookings
+                {pendingBookingsCount > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">{pendingBookingsCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex items-center gap-1.5">
+                Reviews
+                {unansweredReviewsCount > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{unansweredReviewsCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="menu">Menu</TabsTrigger>
+              <TabsTrigger value="tables" className="flex items-center gap-1.5">
+                <QrCode className="h-3.5 w-3.5" />
+                Tables
+              </TabsTrigger>
+              <TabsTrigger value="insights">Insights</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="orders">
             <OrderManagement 
