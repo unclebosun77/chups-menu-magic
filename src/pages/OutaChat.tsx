@@ -308,8 +308,8 @@ const OutaChat = () => {
       <div className="flex-shrink-0 border-b border-border/40 bg-background/90 backdrop-blur-xl z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center shadow-md shadow-purple/20">
-              <span className="text-white font-bold text-sm">O</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center shadow-md shadow-purple/20 animate-pulse">
+              <span className="text-white font-bold text-xs">O</span>
             </div>
             <div>
               <h1 className="font-bold text-foreground text-[17px] leading-tight">Outa</h1>
