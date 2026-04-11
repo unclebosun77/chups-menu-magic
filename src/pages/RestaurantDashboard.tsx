@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle, QrCode, ArrowLeft, ChevronDown, Loader2, Info, BarChart3 } from "lucide-react";
+import { Plus, LogOut, Eye, Settings, TrendingUp, DollarSign, ShoppingBag, AlertTriangle, QrCode, ArrowLeft, ChevronDown, Loader2, Info, BarChart3, User } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -312,6 +312,10 @@ const RestaurantDashboard = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => navigate('/account')}>
+              <User className="mr-2 h-4 w-4" />
+              My Profile
+            </Button>
             <Button variant="outline" onClick={() => setShowProfileEdit(true)}>
               <Settings className="mr-2 h-4 w-4" />
               Edit Profile
