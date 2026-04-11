@@ -209,7 +209,7 @@ const RestaurantProfile = () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
+          .select("*, is_temporarily_closed, crowd_level, crowd_updated_at, vibes")
           .eq("id", supabaseId)
           .maybeSingle();
 
@@ -261,7 +261,7 @@ const RestaurantProfile = () => {
               city: data.city || "",
               priceLevel: "££",
               description: data.description || "",
-              vibe: ["Modern", "Cozy"],
+              vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : ["Modern", "Cozy"],
               openingHours: (data.hours as Record<string, string>) || {},
               signatureDishes: [],
               logoUrl: data.logo_url || "",
