@@ -50,6 +50,7 @@ const OutaChat = () => {
   const [inputValue, setInputValue] = useState('');
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
   const [budgetMap, setBudgetMap] = useState<Record<string, BudgetInfo>>({});
+  const [lastMentionedRestaurant, setLastMentionedRestaurant] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -126,7 +127,16 @@ const OutaChat = () => {
       isWeekend: [0, 6].includes(now.getDay()),
     };
 
-    return {
+    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
+
+    return contextMessage;
+  };
+
+  const buildContextMessage = (userMessageContent: string) => {
+    const userContext = buildUserContext();
+    const tc = userContext.timeContext;
+    const contextMessage2 = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
+    return contextMessage2;
       location: 'Birmingham city centre',
       cuisines: preferredCuisines,
       spiceLevel: profile?.spiceLevel || 'medium',

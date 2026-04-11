@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import TasteMatchBadge from '@/components/TasteMatchBadge';
@@ -6,12 +7,31 @@ interface ChatRestaurantCardProps {
   restaurant: any;
   onClick?: () => void;
   delay?: number;
+  supabaseRestaurants?: { id: string; name: string }[];
 }
 
-const ChatRestaurantCard = ({ restaurant, onClick, delay = 0 }: ChatRestaurantCardProps) => {
-  const handleClick = () => onClick?.();
+const ChatRestaurantCard = ({ restaurant, onClick, delay = 0, supabaseRestaurants = [] }: ChatRestaurantCardProps) => {
+  const navigate = useNavigate();
   const matchScore = restaurant.tasteScore || restaurant.combinedScore || 85;
-  
+
+  const resolveId = (): string | null => {
+    if (restaurant.id) return restaurant.id;
+    if (!restaurant.name) return null;
+    const match = supabaseRestaurants.find(
+      r => r.name.toLowerCase() === restaurant.name.toLowerCase()
+    );
+    return match?.id || null;
+  };
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    const resolvedId = resolveId();
+    if (resolvedId) navigate(`/restaurant/${resolvedId}`);
+  };
+
   return (
     <div 
       onClick={handleClick}
