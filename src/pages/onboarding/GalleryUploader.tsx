@@ -74,7 +74,15 @@ const GalleryUploader = () => {
           .upload(path, file, { upsert: true });
 
         if (error) {
-          toast({ title: "Upload failed", description: `${file.name}: ${error.message}`, variant: "destructive" });
+          const msg = error.message.toLowerCase();
+          const desc = msg.includes('row-level security') || msg.includes('policy')
+            ? 'Upload permissions not set up — please contact support'
+            : msg.includes('not found') || msg.includes('bucket')
+            ? 'Storage not configured — please try again'
+            : msg.includes('size')
+            ? 'File too large — please use an image under 10MB'
+            : `${file.name}: ${error.message}`;
+          toast({ title: "Upload failed", description: desc, variant: "destructive" });
           setUploadProgress(prev => { const n = { ...prev }; delete n[tempId]; return n; });
           continue;
         }
