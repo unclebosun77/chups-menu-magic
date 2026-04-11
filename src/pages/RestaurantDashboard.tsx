@@ -19,6 +19,9 @@ import RestaurantProfileEdit from "@/components/RestaurantProfileEdit";
 import OrderManagement from "@/components/dashboard/OrderManagement";
 import TableQRManager from "@/components/dashboard/TableQRManager";
 import CrowdLevelControl from "@/components/dashboard/CrowdLevelControl";
+import BookingsTab from "@/components/dashboard/BookingsTab";
+import ReviewsSection from "@/components/ReviewsSection";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Restaurant = {
   id: string;
