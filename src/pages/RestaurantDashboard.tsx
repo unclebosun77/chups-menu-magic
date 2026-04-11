@@ -66,6 +66,8 @@ type Insights = {
   topDishes: { name: string; count: number }[];
 };
 
+type WeeklyDay = { day: string; orders: number; revenue: number };
+
 const RestaurantDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -78,6 +80,7 @@ const RestaurantDashboard = () => {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [activeTab, setActiveTab] = useState("orders");
+  const [weeklyData, setWeeklyData] = useState<WeeklyDay[]>([]);
   const [quickAddCategory, setQuickAddCategory] = useState<string | null>(null);
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
