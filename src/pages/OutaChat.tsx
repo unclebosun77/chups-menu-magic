@@ -127,16 +127,7 @@ const OutaChat = () => {
       isWeekend: [0, 6].includes(now.getDay()),
     };
 
-    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
-
-    return contextMessage;
-  };
-
-  const buildContextMessage = (userMessageContent: string) => {
-    const userContext = buildUserContext();
-    const tc = userContext.timeContext;
-    const contextMessage2 = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
-    return contextMessage2;
+    return {
       location: 'Birmingham city centre',
       cuisines: preferredCuisines,
       spiceLevel: profile?.spiceLevel || 'medium',
@@ -176,7 +167,7 @@ const OutaChat = () => {
 
     const userContext = buildUserContext();
     const tc = userContext.timeContext;
-    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.\n\nUser's message: ${userMessageContent}`;
+    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
 
     try {
       const resp = await fetch(CHAT_URL, {
