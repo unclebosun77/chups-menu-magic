@@ -7,6 +7,9 @@ const cuisines = [
   { id: "japanese", label: "Japanese", emoji: "🍣" },
   { id: "pizza", label: "Pizza", emoji: "🍕" },
   { id: "indian", label: "Indian", emoji: "🥘" },
+  { id: "caribbean", label: "Caribbean", emoji: "🌴" },
+  { id: "chinese", label: "Chinese", emoji: "🥟" },
+  { id: "burgers", label: "Burgers", emoji: "🍔" },
 ];
 
 const ExploreCuisineRow = () => {

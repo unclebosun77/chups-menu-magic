@@ -25,7 +25,7 @@ type PickItem = {
   imageUrl?: string;
 };
 
-const PickedForYouSection = () => {
+const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const { shouldBoostCuisine, behavior, addRestaurantVisit } = useUserBehavior();
   const { highlightedCuisine } = useSearch();
@@ -38,7 +38,7 @@ const PickedForYouSection = () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, address, city, is_open, latitude, longitude, hours, is_temporarily_closed, crowd_level, crowd_updated_at")
+          .select("id, name, cuisine_type, description, logo_url, gallery_images, address, city, is_open, latitude, longitude, hours, is_temporarily_closed, crowd_level, crowd_updated_at")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
@@ -48,20 +48,25 @@ const PickedForYouSection = () => {
         const demoIds = new Set(personalizedRestaurants.map(r => r.id));
         const newRestaurants: PickItem[] = (data || [])
           .filter(r => !demoIds.has(r.id))
-          .map(r => ({
-            id: r.id,
-            name: r.name,
-            cuisine: r.cuisine_type,
-            address: r.address || r.city || "",
-            description: r.description || "",
-            priceLevel: "££",
-            matchScore: 75 + Math.floor(Math.random() * 15),
-            aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
-            isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
-            distance: "Nearby",
-            rating: 4.5,
-            logoUrl: r.logo_url || "",
-          }));
+          .map(r => {
+            const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+            const heroImage = (galleryImages[0] as string) || (r as any).cover_image_url || r.logo_url || "";
+            return {
+              id: r.id,
+              name: r.name,
+              cuisine: r.cuisine_type,
+              address: r.address || r.city || "",
+              description: r.description || "",
+              priceLevel: "££",
+              matchScore: 75 + Math.floor(Math.random() * 15),
+              aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
+              isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
+              distance: "Nearby",
+              rating: 4.5,
+              logoUrl: r.logo_url || "",
+              imageUrl: heroImage,
+            };
+          });
 
         setSupabaseRestaurants(newRestaurants);
       } catch (err) {
@@ -72,7 +77,7 @@ const PickedForYouSection = () => {
     };
 
     fetchRestaurants();
-  }, []);
+  }, [refreshKey]);
 
   const picks = useMemo(() => {
     const allRestaurants: PickItem[] = [
@@ -155,17 +160,25 @@ const PickedForYouSection = () => {
               onClick={() => handleCardTap(pick)}
               className="flex-shrink-0 w-[75vw] max-w-[310px] snap-start rounded-2xl overflow-hidden bg-card border border-border/40 shadow-sm cursor-pointer active:scale-[0.98] transition-transform"
             >
-              {/* Logo hero */}
-              <div className="relative aspect-[4/3] overflow-hidden bg-muted/30 flex items-center justify-center">
-                {pick.logoUrl ? (
+              {/* Hero image */}
+              <div className="relative aspect-[4/3] overflow-hidden bg-muted/30">
+                {pick.imageUrl ? (
                   <img
-                    src={pick.logoUrl}
-                    alt={`${pick.name} logo`}
-                    className="w-24 h-24 object-contain"
+                    src={pick.imageUrl}
+                    alt={pick.name}
+                    className="w-full h-full object-cover"
                   />
+                ) : pick.logoUrl ? (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
+                    <img
+                      src={pick.logoUrl}
+                      alt={`${pick.name} logo`}
+                      className="w-24 h-24 object-contain"
+                    />
+                  </div>
                 ) : (
-                  <div className="w-24 h-24 rounded-2xl bg-secondary flex items-center justify-center">
-                    <span className="text-2xl font-bold text-muted-foreground">{pick.name[0]}</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
+                    <span className="text-3xl font-bold text-muted-foreground">{pick.name[0]}</span>
                   </div>
                 )}
 
