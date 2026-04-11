@@ -229,6 +229,7 @@ const RestaurantProfile = () => {
               crowdLevel: data.crowd_level,
               crowdUpdatedAt: data.crowd_updated_at,
               phone: data.phone,
+              vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : demoData.vibe,
             });
           } else {
             const { data: menuData } = await supabase
