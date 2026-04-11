@@ -48,20 +48,25 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
         const demoIds = new Set(personalizedRestaurants.map(r => r.id));
         const newRestaurants: PickItem[] = (data || [])
           .filter(r => !demoIds.has(r.id))
-          .map(r => ({
-            id: r.id,
-            name: r.name,
-            cuisine: r.cuisine_type,
-            address: r.address || r.city || "",
-            description: r.description || "",
-            priceLevel: "££",
-            matchScore: 75 + Math.floor(Math.random() * 15),
-            aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
-            isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
-            distance: "Nearby",
-            rating: 4.5,
-            logoUrl: r.logo_url || "",
-          }));
+          .map(r => {
+            const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+            const heroImage = (galleryImages[0] as string) || (r as any).cover_image_url || r.logo_url || "";
+            return {
+              id: r.id,
+              name: r.name,
+              cuisine: r.cuisine_type,
+              address: r.address || r.city || "",
+              description: r.description || "",
+              priceLevel: "££",
+              matchScore: 75 + Math.floor(Math.random() * 15),
+              aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
+              isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
+              distance: "Nearby",
+              rating: 4.5,
+              logoUrl: r.logo_url || "",
+              imageUrl: heroImage,
+            };
+          });
 
         setSupabaseRestaurants(newRestaurants);
       } catch (err) {

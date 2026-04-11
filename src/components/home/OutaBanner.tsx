@@ -4,6 +4,15 @@ import { ArrowRight, Sparkles } from "lucide-react";
 const OutaBanner = () => {
   const navigate = useNavigate();
 
+  const hour = new Date().getHours();
+  const isWeekend = [0, 6].includes(new Date().getDay());
+  const copy = hour < 12
+    ? { title: "Perfect brunch spot?", sub: "Let Outa find somewhere great ☀️" }
+    : hour < 17
+    ? { title: "Afternoon plans sorted", sub: "Tell Outa your vibe and budget 🌤️" }
+    : { title: "Where are we going tonight?", sub: "Let Outa plan your perfect evening ✨" };
+  if (isWeekend) copy.title = "Weekend sorted 🎉 — " + copy.title;
+
   return (
     <button
       onClick={() => navigate("/outa-chat")}
@@ -18,8 +27,8 @@ const OutaBanner = () => {
             <Sparkles className="h-5 w-5 text-purple" />
           </div>
           <div>
-            <p className="text-[14px] font-semibold text-foreground">Not sure where to go?</p>
-            <p className="text-[12px] text-muted-foreground mt-0.5">Let Outa plan your perfect evening</p>
+            <p className="text-[14px] font-semibold text-foreground">{copy.title}</p>
+            <p className="text-[12px] text-muted-foreground mt-0.5">{copy.sub}</p>
           </div>
         </div>
         <ArrowRight className="h-4 w-4 text-purple flex-shrink-0" />
