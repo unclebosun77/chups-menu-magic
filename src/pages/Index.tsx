@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import HomeHeader from "@/components/home/HomeHeader";
 import QuickActionPills from "@/components/home/QuickActionPills";
-import TonightsPickHero from "@/components/home/TonightsPickHero";
 import NearbyOpenSection from "@/components/home/NearbyOpenSection";
 import PickedForYouSection from "@/components/home/PickedForYouSection";
 import ExploreCuisineRow from "@/components/home/ExploreCuisineRow";
@@ -47,28 +46,23 @@ const Index = () => {
           <QuickActionPills />
         </div>
 
-        {/* Section 3 — Tonight's Pick */}
-        <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(200)}>
-          <TonightsPickHero refreshKey={refreshKey} />
-        </div>
-
-        {/* Section 4 — Nearby & Open Now */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(300)}>
+        {/* Section 3 — Nearby & Open Now */}
+        <div className="mt-5 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(200)}>
           <NearbyOpenSection refreshKey={refreshKey} />
         </div>
 
-        {/* Section 5 — Picked For You */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(400)}>
+        {/* Section 4 — Picked For You */}
+        <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(300)}>
           <PickedForYouSection refreshKey={refreshKey} />
         </div>
 
-        {/* Section 6 — Explore by Cuisine */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(500)}>
+        {/* Section 5 — Explore by Cuisine */}
+        <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(400)}>
           <ExploreCuisineRow />
         </div>
 
-        {/* Section 7 — Ask Outa Banner */}
-        <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(600)}>
+        {/* Section 6 — Ask Outa Banner */}
+        <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(500)}>
           <OutaBanner />
         </div>
       </div>
