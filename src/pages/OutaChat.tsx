@@ -249,12 +249,22 @@ const OutaChat = () => {
     setIsTyping(true);
     setInputValue('');
 
+    // Human-feeling typing delay
+    await new Promise(r => setTimeout(r, 600 + Math.random() * 600));
+
     const streamingId = `streaming-${generateMessageId()}`;
     const placeholderMessage: ChatMessage = { id: streamingId, type: 'outa', content: '', timestamp: new Date() };
     setMessages(prev => [...prev, placeholderMessage]);
     setIsTyping(false);
 
     const response = await streamAIResponse(content, [...messages, userMessage]);
+
+    // Track last mentioned restaurant
+    if (response.content) {
+      const lower = response.content.toLowerCase();
+      const mentioned = supabaseRestaurants.find(r => lower.includes(r.name.toLowerCase()));
+      if (mentioned) setLastMentionedRestaurant(mentioned.name);
+    }
 
     setMessages(prev =>
       prev.map(m =>
@@ -263,7 +273,7 @@ const OutaChat = () => {
           : m
       )
     );
-  }, [messages, profile, userLocation, supabaseRestaurants, addSearch, budgetMap]);
+  }, [messages, profile, userLocation, supabaseRestaurants, addSearch, budgetMap, lastMentionedRestaurant]);
 
   const handleQuickAction = useCallback((action: string) => { handleSendMessage(action); }, [handleSendMessage]);
 
