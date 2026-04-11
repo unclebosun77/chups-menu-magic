@@ -83,6 +83,8 @@ const RestaurantDashboard = () => {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [activeTab, setActiveTab] = useState("orders");
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
+  const [unansweredReviewsCount, setUnansweredReviewsCount] = useState(0);
   const [weeklyData, setWeeklyData] = useState<WeeklyDay[]>([]);
   const [quickAddCategory, setQuickAddCategory] = useState<string | null>(null);
   const [quickAddName, setQuickAddName] = useState("");
