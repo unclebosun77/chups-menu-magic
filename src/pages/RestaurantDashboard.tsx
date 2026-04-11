@@ -113,6 +113,7 @@ const RestaurantDashboard = () => {
       setRestaurant(restaurantData);
       loadMenuItems(restaurantData.id);
       loadOrdersAndInsights(restaurantData.id);
+      loadBadgeCounts(restaurantData.id);
     };
 
     checkAuth();
