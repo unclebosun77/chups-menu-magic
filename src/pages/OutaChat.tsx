@@ -50,6 +50,7 @@ const OutaChat = () => {
   const [inputValue, setInputValue] = useState('');
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
   const [budgetMap, setBudgetMap] = useState<Record<string, BudgetInfo>>({});
+  const [lastMentionedRestaurant, setLastMentionedRestaurant] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -166,7 +167,7 @@ const OutaChat = () => {
 
     const userContext = buildUserContext();
     const tc = userContext.timeContext;
-    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.\n\nUser's message: ${userMessageContent}`;
+    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
 
     try {
       const resp = await fetch(CHAT_URL, {
@@ -248,12 +249,22 @@ const OutaChat = () => {
     setIsTyping(true);
     setInputValue('');
 
+    // Human-feeling typing delay
+    await new Promise(r => setTimeout(r, 600 + Math.random() * 600));
+
     const streamingId = `streaming-${generateMessageId()}`;
     const placeholderMessage: ChatMessage = { id: streamingId, type: 'outa', content: '', timestamp: new Date() };
     setMessages(prev => [...prev, placeholderMessage]);
     setIsTyping(false);
 
     const response = await streamAIResponse(content, [...messages, userMessage]);
+
+    // Track last mentioned restaurant
+    if (response.content) {
+      const lower = response.content.toLowerCase();
+      const mentioned = supabaseRestaurants.find(r => lower.includes(r.name.toLowerCase()));
+      if (mentioned) setLastMentionedRestaurant(mentioned.name);
+    }
 
     setMessages(prev =>
       prev.map(m =>
@@ -262,7 +273,7 @@ const OutaChat = () => {
           : m
       )
     );
-  }, [messages, profile, userLocation, supabaseRestaurants, addSearch, budgetMap]);
+  }, [messages, profile, userLocation, supabaseRestaurants, addSearch, budgetMap, lastMentionedRestaurant]);
 
   const handleQuickAction = useCallback((action: string) => { handleSendMessage(action); }, [handleSendMessage]);
 
@@ -297,8 +308,8 @@ const OutaChat = () => {
       <div className="flex-shrink-0 border-b border-border/40 bg-background/90 backdrop-blur-xl z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center shadow-md shadow-purple/20">
-              <span className="text-white font-bold text-sm">O</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center shadow-md shadow-purple/20 animate-pulse">
+              <span className="text-white font-bold text-xs">O</span>
             </div>
             <div>
               <h1 className="font-bold text-foreground text-[17px] leading-tight">Outa</h1>

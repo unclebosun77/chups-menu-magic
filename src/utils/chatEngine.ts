@@ -63,14 +63,23 @@ function parseIntent(message: string): ParsedIntent {
 }
 
 function generatePersonalizedGreeting(tasteProfile: TasteProfile | null): string {
-  if (!tasteProfile) {
-    return "Hey! 👋 I'm Outa, your personal dining guide. What kind of experience are you looking for tonight?";
+  const hour = new Date().getHours();
+  const isWeekend = [0, 6].includes(new Date().getDay());
+  const prefix = isWeekend ? "Happy weekend! 🎉 " : "";
+
+  const greeting =
+    hour < 12 ? `${prefix}Morning! ☀️ Looking for a great brunch spot or somewhere to kick off the day?`
+    : hour < 17 ? `${prefix}Hey! 🌤️ Afternoon plans? Tell me your mood and I'll sort you out.`
+    : hour < 22 ? `${prefix}Good evening! ✨ Where are we going tonight? Tell me your vibe and budget.`
+    : `Still out? 🌙 Looking for somewhere still open? Tell me what you need.`;
+
+  if (tasteProfile) {
+    const cuisines = tasteProfile.cuisines?.slice(0, 2).join(' and ') || 'good food';
+    const spice = tasteProfile.spiceLevel === 'hot' ? ' I know you like it spicy! 🌶️' : '';
+    return `${greeting}\n\nI see you're into ${cuisines}.${spice}`;
   }
-  
-  const cuisines = tasteProfile.cuisines?.slice(0, 2).join(' and ') || 'good food';
-  const spice = tasteProfile.spiceLevel === 'hot' ? 'I know you like it spicy! 🌶️' : '';
-  
-  return `Hey! 👋 I see you're into ${cuisines}. ${spice} What are we feeling tonight?`;
+
+  return greeting;
 }
 
 function generateRecommendationResponse(
