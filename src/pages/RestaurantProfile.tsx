@@ -483,6 +483,13 @@ const RestaurantProfile = () => {
                         <p className="text-[14px] text-muted-foreground/70">{restaurant.cuisine}</p>
                         {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                       </div>
+                      {restaurant.vibe?.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {restaurant.vibe.slice(0, 5).map(v => (
+                            <span key={v} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple/10 text-purple border border-purple/20">{v}</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                       <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
@@ -516,6 +523,13 @@ const RestaurantProfile = () => {
                       <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
                       {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                     </div>
+                    {restaurant.vibe?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {restaurant.vibe.slice(0, 5).map(v => (
+                          <span key={v} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple/10 text-purple border border-purple/20">{v}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
                     <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
