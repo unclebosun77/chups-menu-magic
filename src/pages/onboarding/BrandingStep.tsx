@@ -81,6 +81,8 @@ const BrandingStep = () => {
       setCoverPhoto(url);
       const updated = saveRestaurantDraft('branding', { logo, coverPhoto: url });
       saveDraftToSupabase(updated);
+      setCoverSaved(true);
+      setTimeout(() => setCoverSaved(false), 2000);
     }
     setCoverUploading(false);
     if (coverInputRef.current) coverInputRef.current.value = '';
