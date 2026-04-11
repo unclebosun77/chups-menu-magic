@@ -120,7 +120,9 @@ const OnboardingHome = () => {
         <div className="space-y-3">
           {STEPS.map((step, index) => {
             const Icon = step.icon;
-            const isCompleted = draft?.completedSteps.includes(step.id) || false;
+            const isCompleted = draft?.completedSteps.includes(step.id)
+              || (step.id === 1 && !!draft?.branding?.logo && !!draft?.branding?.coverPhoto)
+              || false;
             const isCurrent = draft?.step === step.id;
             
             return (
