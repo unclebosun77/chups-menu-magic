@@ -111,10 +111,10 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             {/* Image */}
             <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-muted/30 border border-border/30">
               {r.imageUrl ? (
-                <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" />
+                <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
               ) : r.logoUrl ? (
                 <div className="w-full h-full flex items-center justify-center bg-secondary/40">
-                  <img src={r.logoUrl} alt="" className="w-14 h-14 object-contain" />
+                  <img src={r.logoUrl} alt="" className="w-14 h-14 object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-secondary">

@@ -206,93 +206,102 @@ const RestaurantProfile = () => {
       const supabaseId = getSupabaseId(restaurantId);
       const demoData = demoRestaurants[supabaseId];
       
-      const { data, error } = await supabase
-        .from("restaurants")
-        .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
-        .eq("id", supabaseId)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from("restaurants")
+          .select("*, is_temporarily_closed, crowd_level, crowd_updated_at")
+          .eq("id", supabaseId)
+          .maybeSingle();
 
-      if (data && !error) {
-        if (demoData) {
-          setRestaurant({
-            ...demoData,
-            id: data.id,
-            name: data.name || demoData.name,
-            cuisine: data.cuisine_type || demoData.cuisine,
-            description: data.description || demoData.description,
-            logoUrl: data.logo_url || demoData.logoUrl,
-            isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
-            address: data.address || demoData.address,
-            city: data.city || demoData.city,
-            openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
-            crowdLevel: data.crowd_level,
-            crowdUpdatedAt: data.crowd_updated_at,
-            phone: data.phone,
-          });
-        } else {
-          const { data: menuData } = await supabase
-            .from("menu_items")
-            .select("id, name, description, price, category, image_url, available, sold_out_today")
-            .eq("restaurant_id", data.id);
+        if (data && !error) {
+          if (demoData) {
+            setRestaurant({
+              ...demoData,
+              id: data.id,
+              name: data.name || demoData.name,
+              cuisine: data.cuisine_type || demoData.cuisine,
+              description: data.description || demoData.description,
+              logoUrl: data.logo_url || demoData.logoUrl,
+              isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
+              address: data.address || demoData.address,
+              city: data.city || demoData.city,
+              openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
+              crowdLevel: data.crowd_level,
+              crowdUpdatedAt: data.crowd_updated_at,
+              phone: data.phone,
+            });
+          } else {
+            const { data: menuData } = await supabase
+              .from("menu_items")
+              .select("id, name, description, price, category, image_url, available, sold_out_today")
+              .eq("restaurant_id", data.id);
 
-          const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
-            id: item.id,
-            name: item.name,
-            description: item.description || "",
-            price: Number(item.price),
-            category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
-            image: item.image_url || undefined,
-            tags: [],
-            available: item.available,
-            sold_out_today: (item as any).sold_out_today ?? false,
-          }));
+            const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
+              id: item.id,
+              name: item.name,
+              description: item.description || "",
+              price: Number(item.price),
+              category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
+              image: item.image_url || undefined,
+              tags: [],
+              available: item.available,
+              sold_out_today: (item as any).sold_out_today ?? false,
+            }));
 
-          const galleryRaw = data.gallery_images as any[];
-          const galleryUrls: string[] = Array.isArray(galleryRaw)
-            ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
-            : [];
+            const galleryRaw = data.gallery_images as any[];
+            const galleryUrls: string[] = Array.isArray(galleryRaw)
+              ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
+              : [];
 
-          setRestaurant({
-            id: data.id,
-            name: data.name,
-            cuisine: data.cuisine_type,
-            address: data.address || "",
-            city: data.city || "",
-            priceLevel: "££",
-            description: data.description || "",
-            vibe: ["Modern", "Cozy"],
-            openingHours: (data.hours as Record<string, string>) || {},
-            signatureDishes: [],
-            logoUrl: data.logo_url || "",
-            heroImage: galleryUrls[0] || data.logo_url || "",
-            galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
-            galleryTheme: "light",
-            rating: 4.5,
-            distance: "1.0 km",
-            isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
-            menu: supabaseMenu,
-            crowdLevel: data.crowd_level,
-            crowdUpdatedAt: data.crowd_updated_at,
-            phone: data.phone,
+            setRestaurant({
+              id: data.id,
+              name: data.name,
+              cuisine: data.cuisine_type,
+              address: data.address || "",
+              city: data.city || "",
+              priceLevel: "££",
+              description: data.description || "",
+              vibe: ["Modern", "Cozy"],
+              openingHours: (data.hours as Record<string, string>) || {},
+              signatureDishes: [],
+              logoUrl: data.logo_url || "",
+              heroImage: galleryUrls[0] || data.logo_url || "",
+              galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
+              galleryTheme: "light",
+              rating: 4.5,
+              distance: "1.0 km",
+              isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
+              menu: supabaseMenu,
+              crowdLevel: data.crowd_level,
+              crowdUpdatedAt: data.crowd_updated_at,
+              phone: data.phone,
+            });
+          }
+        } else if (demoData) {
+          setRestaurant(demoData);
+        }
+
+        // Fetch price stats
+        const { data: priceData } = await supabase
+          .from('menu_items')
+          .select('price')
+          .eq('restaurant_id', supabaseId)
+          .eq('available', true);
+
+        if (priceData && priceData.length > 0) {
+          const prices = priceData.map(i => Number(i.price));
+          setPriceStats({
+            min: Math.min(...prices),
+            avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
+            max: Math.max(...prices),
           });
         }
-      } else if (demoData) {
-        setRestaurant(demoData);
-      }
-      // Fetch price stats
-      const { data: priceData } = await supabase
-        .from('menu_items')
-        .select('price')
-        .eq('restaurant_id', supabaseId)
-        .eq('available', true);
-
-      if (priceData && priceData.length > 0) {
-        const prices = priceData.map(i => Number(i.price));
-        setPriceStats({
-          min: Math.min(...prices),
-          avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
-          max: Math.max(...prices),
-        });
+      } catch (err) {
+        console.error('Failed to load restaurant:', err);
+        if (demoData) {
+          setRestaurant(demoData);
+          toast({ title: "Couldn't load latest data — showing cached results" });
+        }
       }
 
       setIsLoading(false);
@@ -462,7 +471,7 @@ const RestaurantProfile = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(139,92,246,0.08),transparent_60%)]" />
                 <div className="flex flex-col items-center justify-center pt-16 pb-24 px-8">
                   <div className="w-[65%] max-w-[200px] aspect-square rounded-3xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12)] p-4 border border-border/40 animate-[logoFloat_0.6s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '150ms' }}>
-                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain" />
+                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                   </div>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-background via-background/80 to-transparent animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '250ms' }}>
@@ -486,7 +495,7 @@ const RestaurantProfile = () => {
 
           return (
             <div className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
-              <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+              <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
               {restaurant.galleryImages.length > 1 && (
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
@@ -605,7 +614,15 @@ const RestaurantProfile = () => {
 
       {/* ─── 5. MENU ─── */}
       <div className="animate-[sectionSlide_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '640ms' }}>
-        <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+        {restaurant.menu.length > 0 ? (
+          <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+        ) : (
+          <div className="px-5 py-8 text-center">
+            <UtensilsCrossed className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-foreground font-semibold mb-1">Menu coming soon 🍽️</p>
+            <p className="text-sm text-muted-foreground">This restaurant is finishing their setup</p>
+          </div>
+        )}
       </div>
 
       {/* ─── 6. GALLERY ─── */}
@@ -616,7 +633,7 @@ const RestaurantProfile = () => {
             <div className="flex gap-2.5 pb-2">
               {restaurant.galleryImages.map((img, idx) => (
                 <button key={idx} onClick={() => { setGalleryIndex(idx); setShowFullGallery(true); }} className={`flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 active:scale-95 ${idx === galleryIndex ? "border-purple shadow-[0_4px_12px_-4px_rgba(139,92,246,0.3)]" : "border-transparent opacity-80 hover:opacity-100"}`}>
-                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                 </button>
               ))}
             </div>
@@ -632,7 +649,7 @@ const RestaurantProfile = () => {
       </div>
 
       {/* Order Bar */}
-      {totalItems > 0 && (
+      {totalItems > 0 && restaurant.menu.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/40 p-4 z-50 animate-[orderBarSlide_0.35s_ease-out_forwards]">
           {tableNumber && (
             <div className="flex justify-center mb-2">

@@ -167,6 +167,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
                     src={pick.imageUrl}
                     alt={pick.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
                   />
                 ) : pick.logoUrl ? (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
@@ -174,6 +175,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
                       src={pick.logoUrl}
                       alt={`${pick.name} logo`}
                       className="w-24 h-24 object-contain"
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
                     />
                   </div>
                 ) : (

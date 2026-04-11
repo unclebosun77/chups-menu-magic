@@ -174,11 +174,13 @@ const MyOrders = () => {
       <div className="px-4 py-4">
         {orders.length === 0 ? (
           <Card className="p-12 text-center">
-            <Package className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-foreground font-medium mb-1">No orders yet</p>
-            <p className="text-sm text-muted-foreground mb-4">Your order history will appear here</p>
-            <Button onClick={() => navigate("/discover")} variant="outline">
-              Discover Restaurants
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple/20 to-purple/10 flex items-center justify-center mx-auto mb-4">
+              <Package className="h-8 w-8 text-purple" />
+            </div>
+            <p className="text-foreground font-semibold mb-1">No orders yet</p>
+            <p className="text-sm text-muted-foreground mb-6">Scan a QR code at your table or browse a restaurant menu to place your first order 🍽️</p>
+            <Button onClick={() => navigate("/")} className="bg-purple hover:bg-purple/90 text-primary-foreground">
+              Browse restaurants
             </Button>
           </Card>
         ) : (

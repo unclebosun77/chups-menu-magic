@@ -113,7 +113,7 @@ const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       >
         <div className="relative aspect-[16/9] overflow-hidden">
           {hasImage ? (
-            <img src={pick.imageUrl} alt={pick.name} className="w-full h-full object-cover" />
+            <img src={pick.imageUrl} alt={pick.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-purple/80 to-purple/40 flex items-center justify-center">
               <span className="text-5xl font-bold text-white/80">{pick.name[0]}</span>
