@@ -149,12 +149,16 @@ const BrandingStep = () => {
               <Upload className="h-4 w-4" />
               {logoUploading ? 'Uploading…' : 'Upload Logo'}
             </Button>
+            {logoSaved && <span className="text-xs text-green-600 animate-fade-in">Saved ✓</span>}
           </div>
         </Card>
 
         {/* Cover Photo Upload */}
         <Card className="p-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
-          <h3 className="font-semibold text-foreground mb-2">Cover Photo</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold text-foreground">Cover Photo</h3>
+            {coverSaved && <span className="text-xs text-green-600 animate-fade-in">Saved ✓</span>}
+          </div>
           <p className="text-sm text-muted-foreground mb-4">A stunning hero image for your profile</p>
           <div
             onClick={() => !coverUploading && coverInputRef.current?.click()}
