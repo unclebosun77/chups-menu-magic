@@ -170,8 +170,6 @@ const RestaurantDashboard = () => {
         totalRevenue,
         mostPopularDish,
         topDishes,
-      });
-
       // Build weekly chart data from completed orders in last 7 days
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const now = new Date();
