@@ -171,6 +171,28 @@ const RestaurantDashboard = () => {
         mostPopularDish,
         topDishes,
       });
+
+      // Build weekly chart data from completed orders in last 7 days
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const now = new Date();
+      const weekly: WeeklyDay[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+        const dayOrders = ordersData.filter(o => {
+          const t = new Date(o.created_at);
+          return t >= dayStart && t < dayEnd && o.status === 'completed';
+        });
+        weekly.push({
+          day: dayNames[dayStart.getDay()],
+          orders: dayOrders.length,
+          revenue: dayOrders.reduce((s, o) => s + Number(o.total), 0),
+        });
+      }
+      setWeeklyData(weekly);
     } catch (error: any) {
       toast({
         title: "Error loading insights",
