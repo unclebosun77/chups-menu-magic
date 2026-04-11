@@ -21,6 +21,7 @@ import TableQRManager from "@/components/dashboard/TableQRManager";
 import CrowdLevelControl from "@/components/dashboard/CrowdLevelControl";
 import BookingsTab from "@/components/dashboard/BookingsTab";
 import ReviewsSection from "@/components/ReviewsSection";
+import RestaurantActivityFeed from "@/components/dashboard/RestaurantActivityFeed";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Restaurant = {
@@ -404,6 +405,9 @@ const RestaurantDashboard = () => {
             }}
           />
         </div>
+
+        {/* Activity Feed */}
+        <RestaurantActivityFeed restaurantId={restaurant.id} onSwitchTab={setActiveTab} />
 
         {/* Order Management Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
