@@ -221,6 +221,24 @@ const RestaurantDashboard = () => {
     }
   };
 
+  const loadBadgeCounts = async (restaurantId: string) => {
+    // Pending bookings count
+    const { count: bookingsCount } = await supabase
+      .from("bookings")
+      .select("*", { count: "exact", head: true })
+      .eq("restaurant_id", restaurantId)
+      .eq("status", "pending");
+    setPendingBookingsCount(bookingsCount || 0);
+
+    // Unanswered reviews count
+    const { count: reviewsCount } = await supabase
+      .from("reviews")
+      .select("*", { count: "exact", head: true })
+      .eq("restaurant_id", restaurantId)
+      .is("restaurant_response", null);
+    setUnansweredReviewsCount(reviewsCount || 0);
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/");
