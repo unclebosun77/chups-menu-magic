@@ -37,7 +37,16 @@ const BrandingStep = () => {
 
     const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
     if (error) {
-      toast.error(`Upload failed: ${error.message}`);
+      const msg = error.message.toLowerCase();
+      if (msg.includes('row-level security') || msg.includes('policy')) {
+        toast.error('Upload permissions not set up — please contact support');
+      } else if (msg.includes('not found') || msg.includes('bucket')) {
+        toast.error('Storage not configured — please try again');
+      } else if (msg.includes('size')) {
+        toast.error('File too large — please use an image under 5MB');
+      } else {
+        toast.error(`Upload failed: ${error.message}`);
+      }
       return null;
     }
 
