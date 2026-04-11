@@ -60,6 +60,15 @@ const HomeHeader = () => {
           Where are we going tonight?
         </p>
       </div>
+
+      {/* Search bar */}
+      <button
+        onClick={() => setQuery(' ')}
+        className="w-full flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-secondary/60 border border-border/40 text-[13px] text-muted-foreground mt-3 active:scale-[0.98] transition-transform"
+      >
+        <Search className="h-4 w-4" />
+        Search restaurants, dishes, cuisines...
+      </button>
     </div>
   );
 };
