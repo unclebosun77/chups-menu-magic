@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import HomeHeader from "@/components/home/HomeHeader";
 import QuickActionPills from "@/components/home/QuickActionPills";
 import TonightsPickHero from "@/components/home/TonightsPickHero";
@@ -16,8 +16,10 @@ const sectionAnim = (delay: number) => ({
 });
 
 const Index = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
   const handleRefresh = useCallback(async () => {
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise(resolve => setTimeout(resolve, 600));
+    setRefreshKey(k => k + 1);
   }, []);
 
   const { pullDistance, isRefreshing, handlers } = usePullToRefresh({
@@ -47,17 +49,17 @@ const Index = () => {
 
         {/* Section 3 — Tonight's Pick */}
         <div className="mt-6 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(200)}>
-          <TonightsPickHero />
+          <TonightsPickHero refreshKey={refreshKey} />
         </div>
 
         {/* Section 4 — Nearby & Open Now */}
         <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(300)}>
-          <NearbyOpenSection />
+          <NearbyOpenSection refreshKey={refreshKey} />
         </div>
 
         {/* Section 5 — Picked For You */}
         <div className="mt-8 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(400)}>
-          <PickedForYouSection />
+          <PickedForYouSection refreshKey={refreshKey} />
         </div>
 
         {/* Section 6 — Explore by Cuisine */}

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { MapPin } from "lucide-react";
+import { useSearch } from "@/context/SearchContext";
+import { MapPin, Search } from "lucide-react";
 
 const HomeHeader = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { setQuery } = useSearch();
 
   const getGreeting = () => {
     const hour = new Date().getHours();

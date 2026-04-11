@@ -17,7 +17,7 @@ interface NearbyRestaurant {
   rating: number;
 }
 
-const NearbyOpenSection = () => {
+const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<NearbyRestaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +70,7 @@ const NearbyOpenSection = () => {
       }
     };
     fetch();
-  }, []);
+  }, [refreshKey]);
 
   const handleTap = useCallback((r: NearbyRestaurant) => {
     navigate(`/restaurant/${r.id}`);

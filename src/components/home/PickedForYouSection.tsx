@@ -25,7 +25,7 @@ type PickItem = {
   imageUrl?: string;
 };
 
-const PickedForYouSection = () => {
+const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const { shouldBoostCuisine, behavior, addRestaurantVisit } = useUserBehavior();
   const { highlightedCuisine } = useSearch();
@@ -72,7 +72,7 @@ const PickedForYouSection = () => {
     };
 
     fetchRestaurants();
-  }, []);
+  }, [refreshKey]);
 
   const picks = useMemo(() => {
     const allRestaurants: PickItem[] = [

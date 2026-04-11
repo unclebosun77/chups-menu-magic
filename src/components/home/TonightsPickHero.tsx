@@ -21,7 +21,7 @@ type PickItem = {
   distance: string;
 };
 
-const TonightsPickHero = () => {
+const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const { shouldBoostCuisine, behavior, addRestaurantVisit } = useUserBehavior();
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<PickItem[]>([]);
@@ -59,7 +59,7 @@ const TonightsPickHero = () => {
       }
     };
     fetch();
-  }, []);
+  }, [refreshKey]);
 
   const pick = useMemo(() => {
     const demoIds = new Set(personalizedRestaurants.map((r) => r.id));
