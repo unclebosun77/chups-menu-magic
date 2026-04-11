@@ -307,13 +307,15 @@ const MyBookings = () => {
               ) : upcomingBookings.length === 0 ? (
                 <Card className="text-center py-12">
                   <CardContent>
-                    <CalendarCheck className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">No Upcoming Bookings</h3>
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple/20 to-purple/10 flex items-center justify-center mx-auto mb-4">
+                      <CalendarCheck className="h-8 w-8 text-purple" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">No bookings yet</h3>
                     <p className="text-muted-foreground mb-6">
-                      Start exploring our curated experiences and make your first reservation!
+                      Reserve a table at any restaurant in seconds 📅
                     </p>
-                    <Button onClick={() => navigate("/services")}>
-                      Browse Experiences
+                    <Button onClick={() => navigate("/discover")} className="bg-purple hover:bg-purple/90 text-primary-foreground">
+                      Find a restaurant
                     </Button>
                   </CardContent>
                 </Card>

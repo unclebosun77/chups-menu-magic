@@ -134,11 +134,13 @@ const SavedRestaurants = () => {
       <div className="px-4 py-4">
         {restaurants.length === 0 ? (
           <Card className="p-12 text-center glass-card animate-slide-up">
-            <Heart className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-foreground font-medium mb-1">No saved restaurants yet</p>
-            <p className="text-sm text-muted-foreground mb-4">Tap the heart on any restaurant to save it</p>
-            <Button onClick={() => navigate("/discover")} variant="outline">
-              Discover Restaurants
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Heart className="h-8 w-8 text-red-500" />
+            </div>
+            <p className="text-foreground font-semibold mb-1">No saved restaurants yet</p>
+            <p className="text-sm text-muted-foreground mb-6">Browse restaurants and tap the heart icon to save your favourites</p>
+            <Button onClick={() => navigate("/discover")} className="bg-purple hover:bg-purple/90 text-primary-foreground">
+              Discover restaurants
             </Button>
           </Card>
         ) : (

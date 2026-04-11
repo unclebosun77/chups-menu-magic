@@ -605,7 +605,15 @@ const RestaurantProfile = () => {
 
       {/* ─── 5. MENU ─── */}
       <div className="animate-[sectionSlide_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '640ms' }}>
-        <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+        {restaurant.menu.length > 0 ? (
+          <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+        ) : (
+          <div className="px-5 py-8 text-center">
+            <UtensilsCrossed className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-foreground font-semibold mb-1">Menu coming soon 🍽️</p>
+            <p className="text-sm text-muted-foreground">This restaurant is finishing their setup</p>
+          </div>
+        )}
       </div>
 
       {/* ─── 6. GALLERY ─── */}
@@ -632,7 +640,7 @@ const RestaurantProfile = () => {
       </div>
 
       {/* Order Bar */}
-      {totalItems > 0 && (
+      {totalItems > 0 && restaurant.menu.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/40 p-4 z-50 animate-[orderBarSlide_0.35s_ease-out_forwards]">
           {tableNumber && (
             <div className="flex justify-center mb-2">
