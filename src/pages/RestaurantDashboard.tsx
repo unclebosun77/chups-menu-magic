@@ -391,51 +391,35 @@ const RestaurantDashboard = () => {
           </TabsContent>
 
           <TabsContent value="insights">
-
-        {/* Insights Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Insights</h2>
+        <div className="mb-8 space-y-6">
+          <h2 className="text-2xl font-bold">Insights</h2>
           {isLoadingInsights ? (
-            <div className="grid gap-6 md:grid-cols-3 mb-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-                  <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-20" />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-24" />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Most Popular Dish</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-32" />
-                </CardContent>
-              </Card>
+            <div className="grid gap-6 md:grid-cols-3">
+              {[1, 2, 3].map(i => (
+                <Card key={i}>
+                  <CardHeader className="pb-2"><Skeleton className="h-4 w-24" /></CardHeader>
+                  <CardContent><Skeleton className="h-8 w-20" /></CardContent>
+                </Card>
+              ))}
             </div>
-          ) : orders.length === 0 ? (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground text-center">
-                  No orders yet. Once customers start ordering, you'll see trends here.
-                </p>
+          ) : orders.filter(o => o.status === 'completed').length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent className="flex flex-col items-center gap-4">
+                <BarChart3 className="h-12 w-12 text-muted-foreground" />
+                <div>
+                  <p className="text-lg font-semibold">No completed orders yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Share your table QR codes to start receiving orders</p>
+                </div>
+                <Button onClick={() => setActiveTab('tables')}>
+                  <QrCode className="h-4 w-4 mr-2" />
+                  View QR Codes
+                </Button>
               </CardContent>
             </Card>
           ) : (
             <>
-              <div className="grid gap-6 md:grid-cols-3 mb-6">
+              {/* Stat cards */}
+              <div className="grid gap-6 md:grid-cols-3">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -443,9 +427,7 @@ const RestaurantDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{insights?.totalOrders || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      All-time orders placed through CHUPS
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">All-time completed orders</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -454,12 +436,8 @@ const RestaurantDashboard = () => {
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
-                      £{insights?.totalRevenue.toFixed(2) || "0.00"}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Across all recorded orders
-                    </p>
+                    <div className="text-2xl font-bold">£{insights?.totalRevenue.toFixed(2) || "0.00"}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Across all recorded orders</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -468,16 +446,54 @@ const RestaurantDashboard = () => {
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold truncate">
-                      {insights?.mostPopularDish || "Not enough data yet"}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Based on order frequency
-                    </p>
+                    <div className="text-2xl font-bold truncate">{insights?.mostPopularDish || "—"}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Based on order frequency</p>
                   </CardContent>
                 </Card>
               </div>
 
+              {/* Orders bar chart */}
+              {weeklyData.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Orders this week</CardTitle>
+                    <CardDescription>
+                      {weeklyData.reduce((s, d) => s + d.orders, 0)} orders · £{weeklyData.reduce((s, d) => s + d.revenue, 0).toFixed(2)}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={weeklyData}>
+                        <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={12} />
+                        <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} width={30} />
+                        <Tooltip formatter={(v: number) => [`${v} orders`]} />
+                        <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Revenue area chart */}
+              {weeklyData.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Revenue trend</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <AreaChart data={weeklyData}>
+                        <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={12} />
+                        <YAxis tickLine={false} axisLine={false} fontSize={12} width={50} tickFormatter={(v) => `£${v}`} />
+                        <Tooltip formatter={(v: number) => [`£${Number(v).toFixed(2)}`]} />
+                        <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.15)" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Top dishes ranked */}
               {insights && insights.topDishes.length > 0 && (
                 <Card>
                   <CardHeader>
@@ -485,21 +501,36 @@ const RestaurantDashboard = () => {
                     <CardDescription>Your most ordered items</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {insights.topDishes.map((dish, index) => {
-                        const maxCount = insights.topDishes[0].count;
-                        const percentage = (dish.count / maxCount) * 100;
+                    <div className="space-y-3">
+                      {insights.topDishes.map((dish, i) => {
+                        const pct = Math.round((dish.count / insights.topDishes[0].count) * 100);
                         return (
-                          <div key={index} className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="font-medium">{dish.name}</span>
-                              <span className="text-muted-foreground">{dish.count} orders</span>
+                          <div key={i} className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-muted-foreground w-5 text-center">{i + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-sm font-medium truncate">{dish.name}</span>
+                                <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">{dish.count}×</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-primary transition-all"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
                             </div>
-                            <div className="h-2 rounded-full bg-muted overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-primary transition-all"
-                                style={{ width: `${percentage}%` }}
-                              />
+                            {i === 0 && <span className="text-lg">🏆</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </div>
+          </TabsContent>
                             </div>
                           </div>
                         );
