@@ -462,7 +462,7 @@ const RestaurantProfile = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(139,92,246,0.08),transparent_60%)]" />
                 <div className="flex flex-col items-center justify-center pt-16 pb-24 px-8">
                   <div className="w-[65%] max-w-[200px] aspect-square rounded-3xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12)] p-4 border border-border/40 animate-[logoFloat_0.6s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '150ms' }}>
-                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain" />
+                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                   </div>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-background via-background/80 to-transparent animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '250ms' }}>
@@ -486,7 +486,7 @@ const RestaurantProfile = () => {
 
           return (
             <div className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
-              <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+              <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
               {restaurant.galleryImages.length > 1 && (
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
@@ -624,7 +624,7 @@ const RestaurantProfile = () => {
             <div className="flex gap-2.5 pb-2">
               {restaurant.galleryImages.map((img, idx) => (
                 <button key={idx} onClick={() => { setGalleryIndex(idx); setShowFullGallery(true); }} className={`flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 active:scale-95 ${idx === galleryIndex ? "border-purple shadow-[0_4px_12px_-4px_rgba(139,92,246,0.3)]" : "border-transparent opacity-80 hover:opacity-100"}`}>
-                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                 </button>
               ))}
             </div>
