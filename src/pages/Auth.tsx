@@ -82,8 +82,25 @@ const Auth = () => {
 
   useEffect(() => {
     if (!authLoading && user) {
-      const from = (location.state as { from?: Location })?.from?.pathname || "/";
-      navigate(from, { replace: true });
+      const from = (location.state as { from?: Location })?.from?.pathname;
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        // Role-aware redirect: restaurant owners → dashboard, consumers → home
+        const userRole = user.user_metadata?.role;
+        if (userRole === 'restaurant') {
+          supabase
+            .from('restaurants')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle()
+            .then(({ data }) => {
+              navigate(data ? '/restaurant/dashboard' : '/restaurant/onboarding', { replace: true });
+            });
+        } else {
+          navigate('/', { replace: true });
+        }
+      }
     }
   }, [user, authLoading, navigate, location]);
 
