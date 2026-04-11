@@ -447,6 +447,7 @@ const RestaurantDashboard = () => {
             <ReviewsSection restaurantId={restaurant.id} isOwner={true} />
           </TabsContent>
 
+          <TabsContent value="tables">
             <TableQRManager restaurantId={restaurant.id} restaurantName={restaurant.name} />
           </TabsContent>
 
