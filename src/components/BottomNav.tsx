@@ -30,7 +30,7 @@ const BottomNav = () => {
   }, [user]);
 
   const profileTab = isRestaurantOwner
-    ? { icon: ChefHat, label: "My Restaurant", path: "/account", badge: 0 }
+    ? { icon: ChefHat, label: "My Restaurant", path: "/restaurant/dashboard", badge: 0 }
     : { icon: User, label: "Profile", path: "/account", badge: 0 };
 
   const tabs = [
@@ -45,7 +45,9 @@ const BottomNav = () => {
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = location.pathname === tab.path;
+          const isActive = tab.path === "/restaurant/dashboard"
+            ? location.pathname.startsWith("/restaurant/dashboard")
+            : location.pathname === tab.path;
           const isPrimary = 'primary' in tab && tab.primary;
           
           return (

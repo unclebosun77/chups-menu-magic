@@ -143,12 +143,12 @@ const Account = () => {
             </div>
           </div>
 
-          {/* Restaurant Owner Banner */}
+          {/* Back to Dashboard for restaurant owners */}
           {isRestaurantOwner && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple/10 border border-purple/20 mb-4 animate-slide-up">
-              <ChefHat className="h-4 w-4 text-purple flex-shrink-0" />
-              <p className="text-xs font-medium text-purple">You're signed in as a restaurant owner</p>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/restaurant/dashboard')} className="mb-4 gap-2 animate-slide-up">
+              <LayoutDashboard className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
           )}
 
           {/* Profile Card */}
