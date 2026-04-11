@@ -531,18 +531,6 @@ const RestaurantDashboard = () => {
           )}
         </div>
           </TabsContent>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
-        </div>
-          </TabsContent>
 
           <TabsContent value="menu">
         {/* Menu Summary Cards */}
