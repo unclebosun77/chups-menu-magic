@@ -19,6 +19,9 @@ import RestaurantProfileEdit from "@/components/RestaurantProfileEdit";
 import OrderManagement from "@/components/dashboard/OrderManagement";
 import TableQRManager from "@/components/dashboard/TableQRManager";
 import CrowdLevelControl from "@/components/dashboard/CrowdLevelControl";
+import BookingsTab from "@/components/dashboard/BookingsTab";
+import ReviewsSection from "@/components/ReviewsSection";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Restaurant = {
   id: string;
@@ -80,6 +83,8 @@ const RestaurantDashboard = () => {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [activeTab, setActiveTab] = useState("orders");
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
+  const [unansweredReviewsCount, setUnansweredReviewsCount] = useState(0);
   const [weeklyData, setWeeklyData] = useState<WeeklyDay[]>([]);
   const [quickAddCategory, setQuickAddCategory] = useState<string | null>(null);
   const [quickAddName, setQuickAddName] = useState("");
@@ -108,6 +113,7 @@ const RestaurantDashboard = () => {
       setRestaurant(restaurantData);
       loadMenuItems(restaurantData.id);
       loadOrdersAndInsights(restaurantData.id);
+      loadBadgeCounts(restaurantData.id);
     };
 
     checkAuth();
@@ -213,6 +219,24 @@ const RestaurantDashboard = () => {
     } finally {
       setIsLoadingInsights(false);
     }
+  };
+
+  const loadBadgeCounts = async (restaurantId: string) => {
+    // Pending bookings count
+    const { count: bookingsCount } = await supabase
+      .from("bookings")
+      .select("*", { count: "exact", head: true })
+      .eq("restaurant_id", restaurantId)
+      .eq("status", "pending");
+    setPendingBookingsCount(bookingsCount || 0);
+
+    // Unanswered reviews count
+    const { count: reviewsCount } = await supabase
+      .from("reviews")
+      .select("*", { count: "exact", head: true })
+      .eq("restaurant_id", restaurantId)
+      .is("restaurant_response", null);
+    setUnansweredReviewsCount(reviewsCount || 0);
   };
 
   const handleSignOut = async () => {
@@ -383,15 +407,29 @@ const RestaurantDashboard = () => {
 
         {/* Order Management Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="mb-4">
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="menu">Menu</TabsTrigger>
-            <TabsTrigger value="tables" className="flex items-center gap-1.5">
-              <QrCode className="h-3.5 w-3.5" />
-              Tables
-            </TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="mb-4 inline-flex w-auto min-w-full sm:min-w-0">
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="bookings" className="flex items-center gap-1.5">
+                Bookings
+                {pendingBookingsCount > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">{pendingBookingsCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex items-center gap-1.5">
+                Reviews
+                {unansweredReviewsCount > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{unansweredReviewsCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="menu">Menu</TabsTrigger>
+              <TabsTrigger value="tables" className="flex items-center gap-1.5">
+                <QrCode className="h-3.5 w-3.5" />
+                Tables
+              </TabsTrigger>
+              <TabsTrigger value="insights">Insights</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="orders">
             <OrderManagement 
@@ -399,6 +437,14 @@ const RestaurantDashboard = () => {
               onOrderUpdate={() => restaurant && loadOrdersAndInsights(restaurant.id)}
               restaurantId={restaurant?.id}
             />
+          </TabsContent>
+
+          <TabsContent value="bookings">
+            <BookingsTab restaurantId={restaurant.id} />
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <ReviewsSection restaurantId={restaurant.id} isOwner={true} />
           </TabsContent>
 
           <TabsContent value="tables">
