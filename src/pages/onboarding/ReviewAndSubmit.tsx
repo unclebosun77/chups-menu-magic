@@ -97,13 +97,14 @@ const ReviewAndSubmit = () => {
         }
       }
 
-      setShowConfetti(true);
       clearDraft();
       
       toast({
         title: "🎉 Restaurant Published!",
-        description: "Your restaurant is now live on Outa",
+        description: "Your restaurant is now live on Chups",
       });
+
+      navigate('/restaurant/launch');
 
     } catch (error: any) {
       console.error('Publish error:', error);

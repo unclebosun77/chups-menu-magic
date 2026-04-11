@@ -42,6 +42,7 @@ import MenuItemEditor from "./pages/onboarding/MenuItemEditor";
 import GalleryUploader from "./pages/onboarding/GalleryUploader";
 import OpeningHoursEditor from "./pages/onboarding/OpeningHoursEditor";
 import ReviewAndSubmit from "./pages/onboarding/ReviewAndSubmit";
+import RestaurantLaunch from "./pages/RestaurantLaunch";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const App = () => (
                     <Route path="/restaurant/onboarding/gallery" element={<ProtectedRoute><GalleryUploader /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/hours" element={<ProtectedRoute><OpeningHoursEditor /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><ReviewAndSubmit /></ProtectedRoute>} />
+                    <Route path="/restaurant/launch" element={<ProtectedRoute><RestaurantLaunch /></ProtectedRoute>} />
                     <Route path="/restaurant/dashboard" element={<ProtectedRoute><Layout><RestaurantDashboard /></Layout></ProtectedRoute>} />
                     
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
