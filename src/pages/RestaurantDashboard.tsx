@@ -194,10 +194,22 @@ const RestaurantDashboard = () => {
       }
       setWeeklyData(weekly);
     } catch (error: any) {
-      toast({
-        title: "Error loading insights",
-        description: error.message,
-        variant: "destructive",
+      const msg = (error.message || "Unknown error").toLowerCase();
+      if (msg.includes("permission") || msg.includes("policy") || msg.includes("rls")) {
+        toast({
+          title: "Setting up permissions — please refresh the page",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error loading insights",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      setInsights({ totalOrders: 0, totalRevenue: 0, mostPopularDish: undefined, topDishes: [] });
+      setOrders([]);
+      setWeeklyData([]);
       });
     } finally {
       setIsLoadingInsights(false);
