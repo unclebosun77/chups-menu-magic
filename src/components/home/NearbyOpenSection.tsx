@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isRestaurantOpen } from "@/utils/openingHours";
-import { personalizedRestaurants } from "@/data/personalizedRestaurants";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface NearbyRestaurant {
@@ -27,44 +26,27 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       try {
         const { data } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, logo_url, address, is_open, hours, is_temporarily_closed")
+          .select("id, name, cuisine_type, logo_url, gallery_images, address, is_open, hours, is_temporarily_closed")
           .eq("status", "active");
 
-        const demoIds = new Set(personalizedRestaurants.map(r => r.id));
-        const supaItems: NearbyRestaurant[] = (data || [])
-          .filter(r => !demoIds.has(r.id))
-          .map(r => ({
+        const items: NearbyRestaurant[] = (data || []).map(r => {
+          const gallery = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+          const heroImage = (gallery[0] as string) || "";
+          return {
             id: r.id,
             name: r.name,
             cuisine: r.cuisine_type,
             distance: "Nearby",
             isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
+            imageUrl: heroImage || undefined,
             logoUrl: r.logo_url || undefined,
             rating: 4.5,
-          }));
+          };
+        });
 
-        const demoItems: NearbyRestaurant[] = personalizedRestaurants
-          .filter(r => r.isOpen)
-          .map(r => ({
-            id: r.id,
-            name: r.name,
-            cuisine: r.cuisine,
-            distance: r.distance,
-            isOpen: r.isOpen,
-            imageUrl: r.imageUrl,
-            logoUrl: r.logoUrl,
-            rating: r.rating,
-          }));
-
-        setRestaurants([...demoItems, ...supaItems].filter(r => r.isOpen).slice(0, 8));
+        setRestaurants(items.filter(r => r.isOpen).slice(0, 8));
       } catch {
-        // fallback to demo
-        setRestaurants(
-          personalizedRestaurants.filter(r => r.isOpen).map(r => ({
-            id: r.id, name: r.name, cuisine: r.cuisine, distance: r.distance,
-            isOpen: true, imageUrl: r.imageUrl, logoUrl: r.logoUrl, rating: r.rating,
-          }))
-        );
+        setRestaurants([]);
       } finally {
         setIsLoading(false);
       }
@@ -108,7 +90,6 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             onClick={() => handleTap(r)}
             className="flex-shrink-0 w-32 text-left active:scale-[0.97] transition-transform"
           >
-            {/* Image */}
             <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-muted/30 border border-border/30">
               {r.imageUrl ? (
                 <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
@@ -121,13 +102,11 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
                   <span className="text-xl font-bold text-muted-foreground">{r.name[0]}</span>
                 </div>
               )}
-              {/* Open badge */}
               <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 bg-green-500/90 text-white px-1.5 py-0.5 rounded-full text-[9px] font-semibold">
                 <span className="w-1 h-1 rounded-full bg-white" />
                 Open
               </div>
             </div>
-            {/* Info */}
             <p className="text-[12px] font-semibold text-foreground mt-1.5 leading-tight truncate">{r.name}</p>
             <div className="flex items-center gap-1 mt-0.5">
               <span className="text-[10px] text-muted-foreground truncate">{r.cuisine}</span>

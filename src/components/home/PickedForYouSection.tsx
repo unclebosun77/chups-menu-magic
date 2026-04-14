@@ -3,7 +3,6 @@ import { isRestaurantOpen } from "@/utils/openingHours";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Star, MapPin, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { personalizedRestaurants } from "@/data/personalizedRestaurants";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 import { useSearch } from "@/context/SearchContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,46 +28,41 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const { shouldBoostCuisine, behavior, addRestaurantVisit } = useUserBehavior();
   const { highlightedCuisine } = useSearch();
-  const [supabaseRestaurants, setSupabaseRestaurants] = useState<PickItem[]>([]);
+  const [restaurants, setRestaurants] = useState<PickItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch restaurants from Supabase and merge with demo data
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, gallery_images, address, city, is_open, latitude, longitude, hours, is_temporarily_closed, crowd_level, crowd_updated_at")
+          .select("id, name, cuisine_type, description, logo_url, gallery_images, address, city, is_open, hours, is_temporarily_closed")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        // Convert Supabase restaurants to PickItem format, excluding those already in demo data
-        const demoIds = new Set(personalizedRestaurants.map(r => r.id));
-        const newRestaurants: PickItem[] = (data || [])
-          .filter(r => !demoIds.has(r.id))
-          .map(r => {
-            const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
-            const heroImage = (galleryImages[0] as string) || (r as any).cover_image_url || r.logo_url || "";
-            return {
-              id: r.id,
-              name: r.name,
-              cuisine: r.cuisine_type,
-              address: r.address || r.city || "",
-              description: r.description || "",
-              priceLevel: "££",
-              matchScore: 75 + Math.floor(Math.random() * 15),
-              aiReason: `Newly added ${r.cuisine_type} spot — check it out.`,
-              isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
-              distance: "Nearby",
-              rating: 4.5,
-              logoUrl: r.logo_url || "",
-              imageUrl: heroImage,
-            };
-          });
+        const items: PickItem[] = (data || []).map(r => {
+          const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+          const heroImage = (galleryImages[0] as string) || r.logo_url || "";
+          return {
+            id: r.id,
+            name: r.name,
+            cuisine: r.cuisine_type,
+            address: r.address || r.city || "",
+            description: r.description || "",
+            priceLevel: "££",
+            matchScore: 75 + Math.floor(Math.random() * 15),
+            aiReason: `Fresh ${r.cuisine_type} spot — check it out.`,
+            isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
+            distance: "Nearby",
+            rating: 4.5,
+            logoUrl: r.logo_url || "",
+            imageUrl: heroImage,
+          };
+        });
 
-        setSupabaseRestaurants(newRestaurants);
+        setRestaurants(items);
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
       } finally {
@@ -80,15 +74,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   }, [refreshKey]);
 
   const picks = useMemo(() => {
-    const allRestaurants: PickItem[] = [
-      ...personalizedRestaurants.map(r => ({
-        ...r,
-        imageUrl: (r as any).imageUrl,
-      })),
-      ...supabaseRestaurants,
-    ];
-
-    return allRestaurants
+    return restaurants
       .map(r => ({
         ...r,
         score:
@@ -99,7 +85,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
-  }, [shouldBoostCuisine, behavior.visitedRestaurants, highlightedCuisine, supabaseRestaurants]);
+  }, [shouldBoostCuisine, behavior.visitedRestaurants, highlightedCuisine, restaurants]);
 
   const handleBook = useCallback(
     (pick: (typeof picks)[0], e: React.MouseEvent) => {
@@ -160,55 +146,33 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
               onClick={() => handleCardTap(pick)}
               className="flex-shrink-0 w-[75vw] max-w-[310px] snap-start rounded-2xl overflow-hidden bg-card border border-border/40 shadow-sm cursor-pointer active:scale-[0.98] transition-transform"
             >
-              {/* Hero image */}
               <div className="relative aspect-[4/3] overflow-hidden bg-muted/30">
                 {pick.imageUrl ? (
-                  <img
-                    src={pick.imageUrl}
-                    alt={pick.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
-                  />
+                  <img src={pick.imageUrl} alt={pick.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                 ) : pick.logoUrl ? (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
-                    <img
-                      src={pick.logoUrl}
-                      alt={`${pick.name} logo`}
-                      className="w-24 h-24 object-contain"
-                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
-                    />
+                    <img src={pick.logoUrl} alt={`${pick.name} logo`} className="w-24 h-24 object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
                   </div>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
                     <span className="text-3xl font-bold text-muted-foreground">{pick.name[0]}</span>
                   </div>
                 )}
-
-                {/* Match badge */}
                 <div className="absolute top-2.5 right-2.5 bg-purple/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold">
                   {pick.matchScore}% match
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-3 space-y-2">
                 <div>
-                  <h3 className="text-[15px] font-bold text-foreground leading-tight">
-                    {pick.name}
-                  </h3>
+                  <h3 className="text-[15px] font-bold text-foreground leading-tight">{pick.name}</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-muted-foreground text-[11px]">{pick.cuisine}</span>
                     <span className="text-muted-foreground/40">·</span>
                     <span className="text-muted-foreground text-[11px]">{pick.priceLevel}</span>
                   </div>
                 </div>
-
-                {/* AI reason */}
-                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
-                  {pick.aiReason}
-                </p>
-
-                {/* Meta row */}
+                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{pick.aiReason}</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                     <div className="flex items-center gap-0.5">
@@ -220,7 +184,6 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
                       <span>{pick.distance}</span>
                     </div>
                   </div>
-
                   <Button
                     size="sm"
                     onClick={(e) => handleBook(pick, e)}
@@ -234,7 +197,6 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             </div>
           ))}
         </div>
-        {/* Fade hint on right edge */}
         <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
       </div>
     </section>
