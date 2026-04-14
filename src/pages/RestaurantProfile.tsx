@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { demoRestaurants, DemoMenuItem, DemoRestaurant } from "@/data/demoRestaurantMenus";
+import type { DemoMenuItem, DemoRestaurant } from "@/data/demoRestaurantMenus";
 import { supabase } from "@/integrations/supabase/client";
 import AskOutaModal from "@/components/AskOutaModal";
 import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
@@ -204,7 +204,6 @@ const RestaurantProfile = () => {
       if (!restaurantId) { setIsLoading(false); return; }
 
       const supabaseId = getSupabaseId(restaurantId);
-      const demoData = demoRestaurants[supabaseId];
       
       try {
         const { data, error } = await supabase
@@ -214,72 +213,51 @@ const RestaurantProfile = () => {
           .maybeSingle();
 
         if (data && !error) {
-          if (demoData) {
-            setRestaurant({
-              ...demoData,
-              id: data.id,
-              name: data.name || demoData.name,
-              cuisine: data.cuisine_type || demoData.cuisine,
-              description: data.description || demoData.description,
-              logoUrl: data.logo_url || demoData.logoUrl,
-              isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
-              address: data.address || demoData.address,
-              city: data.city || demoData.city,
-              openingHours: (data.hours as Record<string, string>) || demoData.openingHours,
-              crowdLevel: data.crowd_level,
-              crowdUpdatedAt: data.crowd_updated_at,
-              phone: data.phone,
-              vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : demoData.vibe,
-            });
-          } else {
-            const { data: menuData } = await supabase
-              .from("menu_items")
-              .select("id, name, description, price, category, image_url, available, sold_out_today")
-              .eq("restaurant_id", data.id);
+          const { data: menuData } = await supabase
+            .from("menu_items")
+            .select("id, name, description, price, category, image_url, available, sold_out_today")
+            .eq("restaurant_id", data.id);
 
-            const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
-              id: item.id,
-              name: item.name,
-              description: item.description || "",
-              price: Number(item.price),
-              category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
-              image: item.image_url || undefined,
-              tags: [],
-              available: item.available,
-              sold_out_today: (item as any).sold_out_today ?? false,
-            }));
+          const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
+            id: item.id,
+            name: item.name,
+            description: item.description || "",
+            price: Number(item.price),
+            category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
+            image: item.image_url || undefined,
+            tags: [],
+            available: item.available,
+            sold_out_today: (item as any).sold_out_today ?? false,
+          }));
 
-            const galleryRaw = data.gallery_images as any[];
-            const galleryUrls: string[] = Array.isArray(galleryRaw)
-              ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
-              : [];
+          const galleryRaw = data.gallery_images as any[];
+          const galleryUrls: string[] = Array.isArray(galleryRaw)
+            ? galleryRaw.map((g: any) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
+            : [];
 
-            setRestaurant({
-              id: data.id,
-              name: data.name,
-              cuisine: data.cuisine_type,
-              address: data.address || "",
-              city: data.city || "",
-              priceLevel: "££",
-              description: data.description || "",
-              vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : ["Modern", "Cozy"],
-              openingHours: (data.hours as Record<string, string>) || {},
-              signatureDishes: [],
-              logoUrl: data.logo_url || "",
-              heroImage: galleryUrls[0] || data.logo_url || "",
-              galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
-              galleryTheme: "light",
-              rating: 4.5,
-              distance: "1.0 km",
-              isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
-              menu: supabaseMenu,
-              crowdLevel: data.crowd_level,
-              crowdUpdatedAt: data.crowd_updated_at,
-              phone: data.phone,
-            });
-          }
-        } else if (demoData) {
-          setRestaurant(demoData);
+          setRestaurant({
+            id: data.id,
+            name: data.name,
+            cuisine: data.cuisine_type,
+            address: data.address || "",
+            city: data.city || "",
+            priceLevel: "££",
+            description: data.description || "",
+            vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : [],
+            openingHours: (data.hours as Record<string, string>) || {},
+            signatureDishes: [],
+            logoUrl: data.logo_url || "",
+            heroImage: galleryUrls[0] || data.logo_url || "",
+            galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
+            galleryTheme: "light",
+            rating: 4.5,
+            distance: "1.0 km",
+            isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
+            menu: supabaseMenu,
+            crowdLevel: data.crowd_level,
+            crowdUpdatedAt: data.crowd_updated_at,
+            phone: data.phone,
+          });
         }
 
         // Fetch price stats
@@ -299,10 +277,7 @@ const RestaurantProfile = () => {
         }
       } catch (err) {
         console.error('Failed to load restaurant:', err);
-        if (demoData) {
-          setRestaurant(demoData);
-          toast({ title: "Couldn't load latest data — showing cached results" });
-        }
+        toast({ title: "Couldn't load restaurant data", variant: "destructive" });
       }
 
       setIsLoading(false);
