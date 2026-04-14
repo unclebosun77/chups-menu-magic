@@ -9,7 +9,7 @@ import { useTasteProfile } from '@/context/TasteProfileContext';
 import { useLocation } from '@/context/LocationContext';
 import { useUserBehavior } from '@/context/UserBehaviorContext';
 import { supabase } from '@/integrations/supabase/client';
-import { personalizedRestaurants } from '@/data/personalizedRestaurants';
+
 import { cn } from '@/lib/utils';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
@@ -140,7 +140,10 @@ const OutaChat = () => {
   };
 
   const getLocalFallback = (userMessageContent: string) => {
-    return processUserMessage(userMessageContent, profile, userLocation, personalizedRestaurants);
+    return processUserMessage(userMessageContent, profile, userLocation, supabaseRestaurants.map(r => ({
+      id: r.id, name: r.name, cuisine: r.cuisine_type, address: r.address || "", isOpen: r.is_open,
+      description: r.description || "", matchScore: 80, rating: 4.5, distance: "Nearby",
+    })));
   };
 
   const extractQuickActions = (content: string): string[] => {

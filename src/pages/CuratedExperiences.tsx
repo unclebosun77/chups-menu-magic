@@ -4,7 +4,13 @@ import Layout from "@/components/Layout";
 import { ArrowLeft, Sparkles, Heart } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
-import { getRestaurantRouteForTheme, getCanonicalRestaurant, CANONICAL_IDS } from "@/data/canonicalRestaurants";
+import { getRestaurantRouteForTheme, CANONICAL_IDS } from "@/data/canonicalRestaurants";
+
+const RESTAURANT_NAMES: Record<string, string> = {
+  [CANONICAL_IDS.YAKOYO]: "Yakoyo",
+  [CANONICAL_IDS.COSBY]: "Cosby",
+  [CANONICAL_IDS.PROX]: "The Prox",
+};
 
 import cosbyPasta from "@/assets/menu/cosby-truffle-tagliatelle.jpg";
 import cosbyBurrata from "@/assets/menu/cosby-burrata-tomato.jpg";
@@ -84,13 +90,12 @@ const CuratedExperiences = () => {
 
   // Handle navigation to canonical restaurant profile
   const handleCollectionClick = (collection: typeof collections[0]) => {
-    const restaurant = getCanonicalRestaurant(collection.restaurantId);
-    if (restaurant) {
-      // Log activity for user behavior tracking
+    const name = RESTAURANT_NAMES[collection.restaurantId];
+    if (name) {
       addRestaurantVisit({
-        id: restaurant.id,
-        name: restaurant.name,
-        cuisine: restaurant.cuisine,
+        id: collection.restaurantId,
+        name,
+        cuisine: 'varied',
       });
     }
     navigate(`/restaurant/${collection.restaurantId}`);
@@ -196,7 +201,7 @@ interface CardProps {
 }
 
 const FeaturedCard = ({ collection, onClick }: CardProps) => {
-  const restaurant = getCanonicalRestaurant(collection.restaurantId);
+  const restaurantName = RESTAURANT_NAMES[collection.restaurantId];
   
   return (
     <button 
@@ -212,9 +217,9 @@ const FeaturedCard = ({ collection, onClick }: CardProps) => {
       <div className="absolute bottom-0 left-0 right-0 p-5">
         <h3 className="text-xl font-bold text-white mb-1">{collection.title}</h3>
         <p className="text-white/70 text-sm">{collection.subtitle}</p>
-        {restaurant && (
+        {restaurantName && (
           <p className="text-white/50 text-xs mt-1">
-            featuring {restaurant.name}
+            featuring {restaurantName}
           </p>
         )}
       </div>
@@ -228,7 +233,7 @@ const FeaturedCard = ({ collection, onClick }: CardProps) => {
 };
 
 const CollectionCard = ({ collection, onClick }: CardProps) => {
-  const restaurant = getCanonicalRestaurant(collection.restaurantId);
+  const restaurantName = RESTAURANT_NAMES[collection.restaurantId];
   
   return (
     <button 
@@ -244,8 +249,8 @@ const CollectionCard = ({ collection, onClick }: CardProps) => {
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <h4 className="font-semibold text-white text-sm mb-0.5">{collection.title}</h4>
         <p className="text-white/60 text-xs">{collection.subtitle}</p>
-        {restaurant && (
-          <p className="text-white/40 text-[10px] mt-1">{restaurant.name}</p>
+        {restaurantName && (
+          <p className="text-white/40 text-[10px] mt-1">{restaurantName}</p>
         )}
       </div>
     </button>

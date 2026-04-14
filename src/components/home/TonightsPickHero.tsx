@@ -1,9 +1,8 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, CalendarCheck, UtensilsCrossed } from "lucide-react";
+import { Star, CalendarCheck, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { personalizedRestaurants } from "@/data/personalizedRestaurants";
 import { useUserBehavior } from "@/context/UserBehaviorContext";
 import { supabase } from "@/integrations/supabase/client";
 import { isRestaurantOpen } from "@/utils/openingHours";
@@ -24,7 +23,7 @@ type PickItem = {
 const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const navigate = useNavigate();
   const { shouldBoostCuisine, behavior, addRestaurantVisit } = useUserBehavior();
-  const [supabaseRestaurants, setSupabaseRestaurants] = useState<PickItem[]>([]);
+  const [restaurants, setRestaurants] = useState<PickItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +31,7 @@ const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       try {
         const { data } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, logo_url, gallery_images, address, is_open, hours, is_temporarily_closed, crowd_level")
+          .select("id, name, cuisine_type, logo_url, gallery_images, address, is_open, hours, is_temporarily_closed")
           .eq("status", "active");
 
         if (data) {
@@ -52,7 +51,7 @@ const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
               distance: "Nearby",
             };
           });
-          setSupabaseRestaurants(mapped);
+          setRestaurants(mapped);
         }
       } finally {
         setLoading(false);
@@ -62,13 +61,7 @@ const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   }, [refreshKey]);
 
   const pick = useMemo(() => {
-    const demoIds = new Set(personalizedRestaurants.map((r) => r.id));
-    const merged: PickItem[] = [
-      ...personalizedRestaurants,
-      ...supabaseRestaurants.filter((r) => !demoIds.has(r.id)),
-    ];
-
-    return merged
+    return restaurants
       .filter((r) => r.isOpen)
       .map((r) => ({
         ...r,
@@ -78,7 +71,7 @@ const TonightsPickHero = ({ refreshKey = 0 }: { refreshKey?: number }) => {
           r.matchScore / 10,
       }))
       .sort((a, b) => b.score - a.score)[0];
-  }, [shouldBoostCuisine, behavior.visitedRestaurants, supabaseRestaurants]);
+  }, [shouldBoostCuisine, behavior.visitedRestaurants, restaurants]);
 
   const handleNavigate = useCallback(() => {
     if (!pick) return;

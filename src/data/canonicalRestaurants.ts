@@ -1,9 +1,7 @@
 // Canonical Restaurant Data - Single source of truth for all restaurant references
-// All features (Curated, Services, AI) must use this data, not define their own
+// All restaurants now come from Supabase. This file provides theme mappings and service routing.
 
-import { personalizedRestaurants } from './personalizedRestaurants';
-
-// Canonical restaurant IDs - Supabase UUIDs
+// Canonical restaurant IDs - Supabase UUIDs (kept for theme mapping / backwards compat)
 export const CANONICAL_IDS = {
   YAKOYO: "8179401a-d2c5-4561-98ae-2010b561d477",
   COSBY: "3a798457-b065-44c9-b7d4-9c05910e8593",
@@ -11,7 +9,6 @@ export const CANONICAL_IDS = {
 } as const;
 
 // Theme-to-restaurant mapping for curated experiences
-// Maps collection themes to appropriate canonical restaurant IDs
 export const THEME_RESTAURANT_MAP: Record<string, string[]> = {
   'Date Night': [CANONICAL_IDS.COSBY],
   'Fine Dining': [CANONICAL_IDS.COSBY],
@@ -30,7 +27,6 @@ export const THEME_RESTAURANT_MAP: Record<string, string[]> = {
   'Premium': [CANONICAL_IDS.COSBY, CANONICAL_IDS.YAKOYO],
 };
 
-// Get restaurant route for a theme/collection
 export function getRestaurantRouteForTheme(theme: string): string {
   const restaurants = THEME_RESTAURANT_MAP[theme];
   if (restaurants && restaurants.length > 0) {
@@ -39,28 +35,10 @@ export function getRestaurantRouteForTheme(theme: string): string {
   return '/discover';
 }
 
-// Get all restaurants for a theme (for lists)
 export function getRestaurantsForTheme(theme: string): string[] {
   return THEME_RESTAURANT_MAP[theme] || [];
 }
 
-// Get canonical restaurant by ID
-export function getCanonicalRestaurant(id: string) {
-  return personalizedRestaurants.find(r => r.id === id);
-}
-
-// Get all canonical restaurants
-export function getAllCanonicalRestaurants() {
-  return personalizedRestaurants;
-}
-
-// Get restaurant by name (for AI mentions)
-export function getRestaurantByName(name: string) {
-  const lower = name.toLowerCase();
-  return personalizedRestaurants.find(r => r.name.toLowerCase() === lower);
-}
-
-// Check if a restaurant ID is canonical
 export function isCanonicalId(id: string): boolean {
   return Object.values(CANONICAL_IDS).includes(id as any);
 }
@@ -82,7 +60,6 @@ export const SERVICE_AVAILABILITY: Record<string, { available: boolean; route: s
   'Gift Cards': { available: false, route: '/services', comingSoon: true },
 };
 
-// Get service info
 export function getServiceInfo(serviceName: string) {
   return SERVICE_AVAILABILITY[serviceName] || { available: false, route: '/services', comingSoon: true };
 }
