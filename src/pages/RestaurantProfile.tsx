@@ -435,7 +435,6 @@ const RestaurantProfile = () => {
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
 
-  const { restaurantId: ownedRestaurantId } = useAuth();
   const isOwnerPreview = !!restaurant && !!ownedRestaurantId && restaurant.id === ownedRestaurantId;
 
   return (
