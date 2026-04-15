@@ -37,7 +37,7 @@ interface UserRestaurant {
 const Account = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
+  const { user, signOut, userRole } = useAuth();
   const [showTasteDialog, setShowTasteDialog] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -45,6 +45,12 @@ const Account = () => {
   const [rewardsData, setRewardsData] = useState<{ tier: string; points_balance: number } | null>(null);
   const [userRestaurant, setUserRestaurant] = useState<UserRestaurant | null>(null);
   const [isLoadingRole, setIsLoadingRole] = useState(true);
+
+  useEffect(() => {
+    if (userRole === 'restaurant') {
+      navigate('/restaurant/dashboard', { replace: true });
+    }
+  }, [userRole, navigate]);
 
   useEffect(() => {
     if (!user) {

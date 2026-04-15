@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info, Share2, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info, Share2, ChevronDown, Eye } from "lucide-react";
 import { useTasteProfile } from "@/context/TasteProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -178,7 +178,7 @@ const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, restaurantId: ownedRestaurantId } = useAuth();
   const { isSaved: checkIsSaved, toggleSave } = useSavedRestaurants();
   
   const [order, setOrder] = useState<OrderItem[]>([]);
@@ -435,8 +435,20 @@ const RestaurantProfile = () => {
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
 
+  const isOwnerPreview = !!restaurant && !!ownedRestaurantId && restaurant.id === ownedRestaurantId;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28 animate-[pageEnter_0.35s_ease-out_forwards]" style={{ opacity: 0 }}>
+      {/* Owner preview banner */}
+      {isOwnerPreview && (
+        <div className="sticky top-0 z-50 bg-primary/90 text-primary-foreground text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2 backdrop-blur-sm">
+          <Eye className="h-4 w-4" />
+          Viewing as customer
+          <Button size="sm" variant="secondary" className="ml-3 h-7 text-xs" onClick={() => navigate('/restaurant/dashboard')}>
+            Back to Dashboard
+          </Button>
+        </div>
+      )}
       {/* ─── HERO SECTION ─── */}
       <div className="relative">
         <div 

@@ -1,6 +1,8 @@
 import { ReactNode, useState, useEffect } from "react";
 import BottomNav from "./BottomNav";
+import RestaurantBottomNav from "./RestaurantBottomNav";
 import { WifiOff } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,6 +10,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const goOffline = () => setIsOffline(true);
@@ -31,7 +34,7 @@ const Layout = ({ children }: LayoutProps) => {
       <main className="max-w-lg mx-auto">
         {children}
       </main>
-      <BottomNav />
+      {userRole === 'restaurant' ? <RestaurantBottomNav /> : <BottomNav />}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HomeHeader from "@/components/home/HomeHeader";
 import QuickActionPills from "@/components/home/QuickActionPills";
 import NearbyOpenSection from "@/components/home/NearbyOpenSection";
@@ -8,6 +9,7 @@ import OutaBanner from "@/components/home/OutaBanner";
 import LiveSearchOverlay from "@/components/search/LiveSearchOverlay";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
+import { useAuth } from "@/context/AuthContext";
 
 const sectionAnim = (delay: number) => ({
   opacity: 0 as number,
@@ -15,6 +17,15 @@ const sectionAnim = (delay: number) => ({
 });
 
 const Index = () => {
+  const { userRole } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userRole === 'restaurant') {
+      navigate('/restaurant/dashboard', { replace: true });
+    }
+  }, [userRole, navigate]);
+
   const [refreshKey, setRefreshKey] = useState(0);
   const handleRefresh = useCallback(async () => {
     await new Promise(resolve => setTimeout(resolve, 600));
