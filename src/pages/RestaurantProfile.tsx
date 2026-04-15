@@ -336,6 +336,29 @@ const RestaurantProfile = () => {
     return () => { supabase.removeChannel(channel); };
   }, [supabaseId]);
 
+  // Real-time crowd level updates
+  useEffect(() => {
+    if (!supabaseId) return;
+    const channel = supabase
+      .channel(`restaurant-${supabaseId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'restaurants',
+        filter: `id=eq.${supabaseId}`,
+      }, (payload) => {
+        const updated = payload.new as any;
+        setRestaurant(prev => prev ? {
+          ...prev,
+          crowdLevel: updated.crowd_level,
+          crowdUpdatedAt: updated.crowd_updated_at,
+          isOpen: isRestaurantOpen(updated.hours, updated.is_temporarily_closed),
+        } : prev);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [supabaseId]);
+
   const effectiveCrowdLevel = useMemo(() => {
     if (restaurant?.crowdLevel && restaurant?.crowdUpdatedAt && (Date.now() - new Date(restaurant.crowdUpdatedAt).getTime()) < 2 * 60 * 60 * 1000) {
       return restaurant.crowdLevel;
