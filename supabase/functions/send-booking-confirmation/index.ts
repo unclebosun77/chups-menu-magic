@@ -115,11 +115,26 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Chups <onboarding@resend.dev>",
+      from: "Chups Bookings <bookings@chups.app>",
       to: [bookingData.email],
       subject: `Your table at ${bookingData.restaurantName} is confirmed! 🎉`,
       html: emailHtml,
     });
+
+    if (emailResponse.error) {
+      console.error("Resend error:", JSON.stringify(emailResponse.error));
+      if (emailResponse.error.message?.includes('domain') || emailResponse.error.message?.includes('verify')) {
+        console.log('Domain not verified — email skipped');
+        return new Response(
+          JSON.stringify({ success: false, reason: 'domain_not_verified' }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+      return new Response(
+        JSON.stringify({ success: false, error: emailResponse.error.message }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log("Email sent successfully:", emailResponse);
 
