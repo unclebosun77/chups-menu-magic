@@ -198,6 +198,10 @@ const Account = () => {
                   )}
                 </div>
               </div>
+              <Button variant="outline" size="sm" onClick={() => navigate("/edit-profile")} className="w-full mt-3 gap-2">
+                <Settings className="h-4 w-4" />
+                Edit Profile
+              </Button>
             </CardContent>
           </Card>
         </div>
