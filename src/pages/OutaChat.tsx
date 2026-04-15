@@ -45,7 +45,16 @@ const OutaChat = () => {
   const { behavior, addRestaurantVisit, addSearch } = useUserBehavior();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('outa_conversation');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
+      }
+    } catch {}
+    return [];
+  });
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [supabaseRestaurants, setSupabaseRestaurants] = useState<SupabaseRestaurant[]>([]);
@@ -82,9 +91,19 @@ const OutaChat = () => {
     fetchData();
   }, []);
 
+  // Initialize with greeting if no saved messages
   useEffect(() => {
-    setMessages([getInitialMessage(profile)]);
+    if (messages.length === 0) {
+      setMessages([getInitialMessage(profile)]);
+    }
   }, []);
+
+  // Persist messages to sessionStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem('outa_conversation', JSON.stringify(messages));
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -286,8 +305,10 @@ const OutaChat = () => {
   }, [navigate, addRestaurantVisit]);
 
   const handleReset = () => {
+    sessionStorage.removeItem('outa_conversation');
     setMessages([getInitialMessage(profile)]);
     setInputValue('');
+    setLastMentionedRestaurant('');
   };
 
   const handleSubmit = () => {
