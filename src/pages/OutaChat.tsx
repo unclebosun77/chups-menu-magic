@@ -189,7 +189,25 @@ const OutaChat = () => {
 
     const userContext = buildUserContext();
     const tc = userContext.timeContext;
-    const contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
+    let contextMessage = `User context: Location: ${userContext.location}, Taste: ${userContext.cuisines}, Spice: ${userContext.spiceLevel}, Price: ${userContext.pricePreference}, Recent visits: ${userContext.recentRestaurants}, Recent searches: ${userContext.recentSearches}${userContext.likesSpicy ? ', Enjoys spicy food' : ''}. Current time context: It is ${tc.dayOfWeek} ${tc.timeOfDay} (${tc.hour}:00). Weekend: ${tc.isWeekend}.${lastMentionedRestaurant ? `\nLast restaurant discussed: ${lastMentionedRestaurant}` : ''}\n\nUser's message: ${userMessageContent}`;
+
+    // If asking about menu/ordering and we know the restaurant, fetch menu items
+    const menuKeywords = ['order', 'eat', 'food', 'menu', 'dish', 'recommend', 'good', 'try', 'get'];
+    const isMenuQuery = menuKeywords.some(kw => userMessageContent.toLowerCase().includes(kw));
+    if (isMenuQuery && lastMentionedRestaurant) {
+      const matchedRestaurant = supabaseRestaurants.find(r => r.name.toLowerCase() === lastMentionedRestaurant.toLowerCase());
+      if (matchedRestaurant) {
+        const { data: menuItems } = await supabase
+          .from('menu_items')
+          .select('name, price, description, category')
+          .eq('restaurant_id', matchedRestaurant.id)
+          .eq('available', true)
+          .limit(15);
+        if (menuItems && menuItems.length > 0) {
+          contextMessage += `\nMenu items at ${lastMentionedRestaurant}: ${JSON.stringify(menuItems)}`;
+        }
+      }
+    }
 
     try {
       const resp = await fetch(CHAT_URL, {
