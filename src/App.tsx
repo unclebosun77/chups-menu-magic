@@ -43,6 +43,8 @@ import GalleryUploader from "./pages/onboarding/GalleryUploader";
 import OpeningHoursEditor from "./pages/onboarding/OpeningHoursEditor";
 import ReviewAndSubmit from "./pages/onboarding/ReviewAndSubmit";
 import RestaurantLaunch from "./pages/RestaurantLaunch";
+import ResetPassword from "./pages/ResetPassword";
+import EditProfile from "./pages/EditProfile";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,7 @@ const App = () => (
                     {/* Public routes with bottom nav */}
                     <Route path="/" element={<Layout><Index /></Layout>} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/auth/reset-password" element={<ResetPassword />} />
                     <Route path="/discover" element={<Layout><Discover /></Layout>} />
                     <Route path="/restaurant/:restaurantId" element={<RestaurantProfile />} />
                     
@@ -99,6 +102,7 @@ const App = () => (
                     <Route path="/restaurant/onboarding/hours" element={<ProtectedRoute><OpeningHoursEditor /></ProtectedRoute>} />
                     <Route path="/restaurant/onboarding/review" element={<ProtectedRoute><ReviewAndSubmit /></ProtectedRoute>} />
                     <Route path="/restaurant/launch" element={<ProtectedRoute><RestaurantLaunch /></ProtectedRoute>} />
+                    <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
                     <Route path="/restaurant/dashboard" element={<ProtectedRoute><Layout><RestaurantDashboard /></Layout></ProtectedRoute>} />
                     
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
