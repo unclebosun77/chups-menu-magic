@@ -74,6 +74,14 @@ When given a budget, always confirm what's realistic for that amount per person.
 If asked to plan an evening, give a structured plan with times.
 When recommending restaurants, always use the EXACT name from the list so the app can link to them.
 
+When a user asks what to order, what's good, what to eat, or similar questions about a specific restaurant:
+- Look up that restaurant's menu items in the context provided
+- Respond with 3-4 specific dish recommendations by name
+- Include the dish name, a one-line description, and the price
+- Format as a clear list, NOT as a restaurant card
+- Example: '🍛 Jollof Risotto — smoky West African twist on a classic, £14\\n🥩 Suya Steak — fire-grilled with authentic spice rub, £18'
+- Never return the restaurant card again when the user is asking about what to eat there — they already know the restaurant.
+
 Available restaurants on Chups: ${restaurantContext || 'No restaurants loaded yet.'}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
