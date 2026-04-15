@@ -42,6 +42,7 @@ const ReviewAndSubmit = () => {
 
       const userId = session.user.id;
       const { restaurant, menu, gallery } = compiled;
+      const coverUrl = restaurant.cover_url || null;
 
       // Insert restaurant into Supabase
       const { data: restaurantData, error: restaurantError } = await supabase
@@ -60,6 +61,7 @@ const ReviewAndSubmit = () => {
           latitude: restaurant.latitude ? Number(restaurant.latitude) : null,
           longitude: restaurant.longitude ? Number(restaurant.longitude) : null,
           logo_url: restaurant.logo_url || null,
+          cover_image_url: coverUrl,
           gallery_images: gallery.length > 0 ? JSON.parse(JSON.stringify(gallery)) : null,
           hours: restaurant.hours as any || null,
           tags: restaurant.tags?.length > 0 ? restaurant.tags : null,
