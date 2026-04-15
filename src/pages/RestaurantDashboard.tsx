@@ -325,31 +325,24 @@ const RestaurantDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full mr-1">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
             {restaurant.logo_url && (
-              <img src={restaurant.logo_url} alt={restaurant.name} className="h-12 w-12 object-contain rounded" />
+              <img src={restaurant.logo_url} alt={restaurant.name} className="h-10 w-10 object-contain rounded" />
             )}
             <div>
-              <h1 className="text-2xl font-bold">{restaurant.name}</h1>
-              <p className="text-sm text-muted-foreground">{restaurant.cuisine_type}</p>
+              <h1 className="text-xl font-bold">{restaurant.name}</h1>
+              <p className="text-xs text-muted-foreground">{restaurant.cuisine_type}</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => navigate('/account')}>
-              <User className="mr-2 h-4 w-4" />
-              My Profile
+            <Button variant="ghost" size="sm" onClick={() => navigate('/edit-profile')}>
+              <Settings className="mr-1.5 h-4 w-4" />
+              Settings
             </Button>
-            <Button variant="outline" onClick={() => setShowProfileEdit(true)}>
-              <Settings className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-            <Button variant="outline" onClick={() => navigate(`/restaurant/${restaurant.id}`)}>
-              <Eye className="mr-2 h-4 w-4" />
-              Preview Menu
+            <Button variant="outline" size="sm" onClick={() => navigate(`/restaurant/${restaurant.id}`)}>
+              <Eye className="mr-1.5 h-4 w-4" />
+              Preview
             </Button>
             <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
