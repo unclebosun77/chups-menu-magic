@@ -111,8 +111,9 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       if (bookingError) throw bookingError;
 
       // Send confirmation email (non-blocking)
+      let emailSkipped = false;
       try {
-        await supabase.functions.invoke('send-booking-confirmation', {
+        const { data: emailResult } = await supabase.functions.invoke('send-booking-confirmation', {
           body: {
             restaurantName: restaurantName || location,
             restaurantAddress: restaurantAddress || undefined,
@@ -125,8 +126,12 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
             specialRequests: specialRequests || null,
           },
         });
+        if (emailResult?.reason === 'domain_not_verified') {
+          emailSkipped = true;
+        }
       } catch (emailErr) {
         console.warn('Confirmation email failed:', emailErr);
+        emailSkipped = true;
       }
 
       // Build calendar link
@@ -134,8 +139,10 @@ export const ReservationDialog = ({ isOpen, onClose, restaurantId, restaurantNam
       setCalendarLink(icsUri);
 
       toast({
-        title: "Booking confirmed! 📧",
-        description: `Check your email for details. Table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot}.`,
+        title: "Booking confirmed! 📅",
+        description: emailSkipped
+          ? `Table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot}. Check the app for your booking details.`
+          : `Check your email for details. Table for ${partySize} at ${restaurantName || location} on ${format(date, "PPP")} at ${timeSlot}.`,
       });
 
       // Reset form
