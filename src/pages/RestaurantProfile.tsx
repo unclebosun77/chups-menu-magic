@@ -435,7 +435,8 @@ const RestaurantProfile = () => {
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
 
-  const isOwnerPreview = user && restaurant && user.id === (restaurant as any).userId;
+  const { restaurantId: ownedRestaurantId } = useAuth();
+  const isOwnerPreview = !!restaurant && !!ownedRestaurantId && restaurant.id === ownedRestaurantId;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28 animate-[pageEnter_0.35s_ease-out_forwards]" style={{ opacity: 0 }}>
