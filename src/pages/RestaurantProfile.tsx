@@ -435,8 +435,20 @@ const RestaurantProfile = () => {
     restaurant.signatureDishes.some(sig => item.name.toLowerCase().includes(sig.toLowerCase().split(" ")[0]))
   );
 
+  const isOwnerPreview = user && restaurant && user.id === (restaurant as any).userId;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10 pb-28 animate-[pageEnter_0.35s_ease-out_forwards]" style={{ opacity: 0 }}>
+      {/* Owner preview banner */}
+      {isOwnerPreview && (
+        <div className="sticky top-0 z-50 bg-primary/90 text-primary-foreground text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2 backdrop-blur-sm">
+          <Eye className="h-4 w-4" />
+          Viewing as customer
+          <Button size="sm" variant="secondary" className="ml-3 h-7 text-xs" onClick={() => navigate('/restaurant/dashboard')}>
+            Back to Dashboard
+          </Button>
+        </div>
+      )}
       {/* ─── HERO SECTION ─── */}
       <div className="relative">
         <div 
