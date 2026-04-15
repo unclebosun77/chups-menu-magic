@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info, Share2, ChevronDown, Eye } from "lucide-react";
@@ -100,6 +100,31 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
   const userBudget = profile?.pricePreference ? budgetPrefMap[profile.pricePreference] : null;
   const fitsbudget = priceStats && userBudget ? priceStats.avg <= userBudget : false;
 
+  const hasCoords = restaurant.latitude != null && restaurant.longitude != null;
+  const lat = restaurant.latitude ?? 0;
+  const lng = restaurant.longitude ?? 0;
+  const directionsUrl = hasCoords
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+    : restaurant.address
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(restaurant.address + (restaurant.city ? ', ' + restaurant.city : ''))}`
+      : null;
+  const mapEmbedUrl = hasCoords
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008},${lat - 0.005},${lng + 0.008},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`
+    : null;
+
+  const [mapVisible, setMapVisible] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mapRef.current || !mapEmbedUrl) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setMapVisible(true); obs.disconnect(); } },
+      { rootMargin: '100px' }
+    );
+    obs.observe(mapRef.current);
+    return () => obs.disconnect();
+  }, [mapEmbedUrl]);
+
   return (
     <div
       className="px-5 pt-4 pb-3 animate-[sectionSlide_0.45s_ease-out_forwards]"
@@ -125,6 +150,37 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
               )}
               <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
             </a>
+          )}
+
+          {/* Map preview */}
+          {(mapEmbedUrl || directionsUrl) && (
+            <div className="px-4 py-3 space-y-2">
+              {mapEmbedUrl && (
+                <div ref={mapRef} className="w-full h-32 rounded-xl overflow-hidden border border-border/40">
+                  {mapVisible ? (
+                    <iframe
+                      src={mapEmbedUrl}
+                      className="w-full h-full"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      title={`Map for ${restaurant.name}`}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-secondary/30 flex items-center justify-center">
+                      <MapPin className="h-5 w-5 text-muted-foreground/40" />
+                    </div>
+                  )}
+                </div>
+              )}
+              {directionsUrl && (
+                <a href={directionsUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="w-full gap-2 text-xs h-8">
+                    <Navigation className="h-3.5 w-3.5" />
+                    Get directions
+                  </Button>
+                </a>
+              )}
+            </div>
           )}
 
           {restaurant.phone && (
@@ -257,6 +313,8 @@ const RestaurantProfile = () => {
             crowdLevel: data.crowd_level,
             crowdUpdatedAt: data.crowd_updated_at,
             phone: data.phone,
+            latitude: data.latitude ? Number(data.latitude) : null,
+            longitude: data.longitude ? Number(data.longitude) : null,
           });
         }
 
