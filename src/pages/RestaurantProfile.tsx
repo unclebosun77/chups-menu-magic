@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { isRestaurantOpen, getOpeningStatus } from "@/utils/openingHours";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Heart, Phone, Navigation, Sparkles, Bookmark, Star, Clock, MapPin, ChevronRight, ShoppingCart, Flame, Award, Zap, Calendar, UtensilsCrossed, MessageCircle, Info, Share2, ChevronDown, Eye } from "lucide-react";
