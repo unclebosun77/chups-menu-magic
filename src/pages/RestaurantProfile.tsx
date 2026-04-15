@@ -178,7 +178,7 @@ const RestaurantProfile = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, restaurantId: ownedRestaurantId } = useAuth();
   const { isSaved: checkIsSaved, toggleSave } = useSavedRestaurants();
   
   const [order, setOrder] = useState<OrderItem[]>([]);
