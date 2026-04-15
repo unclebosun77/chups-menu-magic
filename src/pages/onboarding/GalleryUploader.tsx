@@ -74,6 +74,7 @@ const GalleryUploader = () => {
           .upload(path, file, { upsert: true });
 
         if (error) {
+          console.error('Gallery upload error:', JSON.stringify(error), 'bucket: restaurant-gallery', 'path:', path);
           const msg = error.message.toLowerCase();
           const desc = msg.includes('row-level security') || msg.includes('policy')
             ? 'Upload permissions not set up — please contact support'

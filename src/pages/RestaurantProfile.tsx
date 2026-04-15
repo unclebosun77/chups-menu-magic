@@ -247,7 +247,7 @@ const RestaurantProfile = () => {
             openingHours: (data.hours as Record<string, string>) || {},
             signatureDishes: [],
             logoUrl: data.logo_url || "",
-            heroImage: galleryUrls[0] || data.logo_url || "",
+            heroImage: (data as any).cover_image_url || galleryUrls[0] || data.logo_url || "",
             galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
             galleryTheme: "light",
             rating: 4.5,
