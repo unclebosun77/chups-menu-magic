@@ -36,6 +36,8 @@ export interface DemoRestaurant {
   crowdLevel?: string | null;
   crowdUpdatedAt?: string | null;
   phone?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export const getTagEmoji = (tag: DietaryTag): string => {

@@ -261,6 +261,9 @@ const RestaurantDetailsForm = () => {
             <MapPin className="h-4 w-4" />
             Location Coordinates
           </Label>
+          <p className="text-xs text-muted-foreground">
+            Used to show your restaurant on the map. You can enter coordinates manually or use your current location.
+          </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Latitude</Label>
@@ -281,6 +284,25 @@ const RestaurantDetailsForm = () => {
               />
             </div>
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full gap-2"
+            onClick={() => {
+              if (!navigator.geolocation) return;
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  updateField('latitude', pos.coords.latitude.toFixed(6));
+                  updateField('longitude', pos.coords.longitude.toFixed(6));
+                },
+                () => {}
+              );
+            }}
+          >
+            <MapPin className="h-3.5 w-3.5" />
+            Use my current location
+          </Button>
         </Card>
 
         {/* Contact */}
