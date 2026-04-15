@@ -391,6 +391,7 @@ export type Database = {
           address: string | null
           brand_style: string
           city: string | null
+          cover_image_url: string | null
           created_at: string
           crowd_level: string | null
           crowd_updated_at: string | null
@@ -418,6 +419,7 @@ export type Database = {
           address?: string | null
           brand_style: string
           city?: string | null
+          cover_image_url?: string | null
           created_at?: string
           crowd_level?: string | null
           crowd_updated_at?: string | null
@@ -445,6 +447,7 @@ export type Database = {
           address?: string | null
           brand_style?: string
           city?: string | null
+          cover_image_url?: string | null
           created_at?: string
           crowd_level?: string | null
           crowd_updated_at?: string | null
