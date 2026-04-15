@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Clock, ChefHat, UtensilsCrossed, Sparkles, X, Loader2, MapPin, TrendingUp, Compass } from "lucide-react";
 import { useSearch, SearchResult } from "@/context/SearchContext";
@@ -6,8 +7,18 @@ import { cn } from "@/lib/utils";
 
 const LiveSearchOverlay = () => {
   const navigate = useNavigate();
-  const { query, results, isSearching, isLoading, clearSearch } = useSearch();
+  const { query, setQuery, results, isSearching, isLoading, clearSearch, shouldFocusInput, clearFocusSignal } = useSearch();
   const { behavior, addSearch } = useUserBehavior();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (shouldFocusInput && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+        clearFocusSignal();
+      }, 100);
+    }
+  }, [shouldFocusInput, clearFocusSignal]);
 
   if (!isSearching) return null;
 
@@ -69,28 +80,36 @@ const LiveSearchOverlay = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-b from-background via-background to-secondary/20 backdrop-blur-xl animate-fade-in">
-      {/* Premium Header */}
+      {/* Premium Header with Input */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/30">
-        <div className="px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple/20 to-neon-pink/10 flex items-center justify-center">
-              <Search className="h-5 w-5 text-purple" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">Search</h2>
-              <p className="text-xs text-muted-foreground">Find restaurants, dishes & more</p>
-            </div>
+        <div className="px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 flex items-center gap-3 bg-secondary/60 rounded-2xl px-4 py-2.5">
+            <Search className="h-5 w-5 text-purple flex-shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search restaurants, dishes, cuisines..."
+              className="w-full bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-[15px]"
+              autoComplete="off"
+            />
+            {query && (
+              <button onClick={() => setQuery('')} className="flex-shrink-0">
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
           <button 
             onClick={clearSearch}
-            className="w-10 h-10 rounded-full bg-secondary/80 hover:bg-secondary flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+            className="text-sm font-medium text-purple hover:text-purple/80 transition-colors flex-shrink-0"
           >
-            <X className="h-5 w-5 text-muted-foreground" />
+            Cancel
           </button>
         </div>
       </div>
 
-      <div className="px-4 pt-6 pb-32 overflow-y-auto max-h-[calc(100vh-80px)]">
+      <div className="px-4 pt-6 pb-32 overflow-y-auto max-h-[calc(100vh-64px)]">
         {/* Empty/Initial State */}
         {!query && (
           <div className="space-y-8 animate-slide-up">

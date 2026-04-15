@@ -29,6 +29,8 @@ interface SearchContextValue {
   setActiveFilter: (filter: SearchFilter) => void;
   clearSearch: () => void;
   highlightedCuisine: string | null;
+  shouldFocusInput: boolean;
+  clearFocusSignal: () => void;
 }
 
 const SearchContext = createContext<SearchContextValue | undefined>(undefined);
@@ -39,10 +41,21 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [dbResults, setDbResults] = useState<SearchResult[]>([]);
+  const [shouldFocusInput, setShouldFocusInput] = useState(false);
 
   const setQuery = useCallback((newQuery: string) => {
-    setQueryState(newQuery);
-    setIsSearching(newQuery.length > 0);
+    if (newQuery === ' ') {
+      setQueryState('');
+      setIsSearching(true);
+      setShouldFocusInput(true);
+    } else {
+      setQueryState(newQuery);
+      setIsSearching(newQuery.length > 0);
+    }
+  }, []);
+
+  const clearFocusSignal = useCallback(() => {
+    setShouldFocusInput(false);
   }, []);
 
   // Fetch from Supabase when query changes
@@ -186,6 +199,8 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
       setActiveFilter,
       clearSearch,
       highlightedCuisine,
+      shouldFocusInput,
+      clearFocusSignal,
     }}>
       {children}
     </SearchContext.Provider>
