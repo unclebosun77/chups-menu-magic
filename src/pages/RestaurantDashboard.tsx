@@ -74,6 +74,7 @@ type WeeklyDay = { day: string; orders: number; revenue: number };
 
 const RestaurantDashboard = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -83,7 +84,8 @@ const RestaurantDashboard = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
-  const [activeTab, setActiveTab] = useState("orders");
+  const activeTab = searchParams.get("tab") || "orders";
+  const setActiveTab = (tab: string) => navigate(`/restaurant/dashboard?tab=${tab}`, { replace: true });
   const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
   const [unansweredReviewsCount, setUnansweredReviewsCount] = useState(0);
   const [weeklyData, setWeeklyData] = useState<WeeklyDay[]>([]);
