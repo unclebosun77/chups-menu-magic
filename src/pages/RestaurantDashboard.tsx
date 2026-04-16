@@ -434,6 +434,10 @@ const RestaurantDashboard = () => {
                 Tables
               </TabsTrigger>
               <TabsTrigger value="insights">Insights</TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-1.5">
+                <Settings className="h-3.5 w-3.5" />
+                Settings
+              </TabsTrigger>
             </TabsList>
           </div>
 
