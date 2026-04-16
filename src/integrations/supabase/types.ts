@@ -405,8 +405,10 @@ export type Database = {
           latitude: number | null
           logo_url: string | null
           longitude: number | null
+          mood: string[] | null
           name: string
           phone: string | null
+          price_range: string | null
           primary_color: string
           secondary_color: string
           status: string
@@ -414,6 +416,7 @@ export type Database = {
           updated_at: string
           user_id: string
           vibes: string[] | null
+          website: string | null
         }
         Insert: {
           address?: string | null
@@ -433,8 +436,10 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          mood?: string[] | null
           name: string
           phone?: string | null
+          price_range?: string | null
           primary_color?: string
           secondary_color?: string
           status?: string
@@ -442,6 +447,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           vibes?: string[] | null
+          website?: string | null
         }
         Update: {
           address?: string | null
@@ -461,8 +467,10 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          mood?: string[] | null
           name?: string
           phone?: string | null
+          price_range?: string | null
           primary_color?: string
           secondary_color?: string
           status?: string
@@ -470,6 +478,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vibes?: string[] | null
+          website?: string | null
         }
         Relationships: [
           {
