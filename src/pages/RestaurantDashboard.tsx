@@ -22,6 +22,7 @@ import CrowdLevelControl from "@/components/dashboard/CrowdLevelControl";
 import BookingsTab from "@/components/dashboard/BookingsTab";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantActivityFeed from "@/components/dashboard/RestaurantActivityFeed";
+import SettingsTab from "@/components/dashboard/SettingsTab";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Restaurant = {
@@ -30,6 +31,8 @@ type Restaurant = {
   cuisine_type: string;
   description?: string;
   logo_url?: string;
+  cover_image_url?: string;
+  gallery_images?: string[];
   phone?: string;
   address?: string;
   city?: string;
@@ -37,6 +40,10 @@ type Restaurant = {
   crowd_level?: string | null;
   crowd_updated_at?: string | null;
   vibes?: string[];
+  mood?: string[];
+  price_range?: string;
+  website?: string;
+  hours?: Record<string, string>;
 };
 
 type MenuItem = {
@@ -104,7 +111,7 @@ const RestaurantDashboard = () => {
 
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at")
+        .select("id, name, cuisine_type, description, logo_url, cover_image_url, gallery_images, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at, vibes, mood, price_range, website, hours")
         .eq("user_id", session.user.id)
         .single();
 
@@ -304,12 +311,12 @@ const RestaurantDashboard = () => {
     if (session) {
       const { data: restaurantData } = await supabase
         .from("restaurants")
-        .select("id, name, cuisine_type, description, logo_url, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at")
+        .select("id, name, cuisine_type, description, logo_url, cover_image_url, gallery_images, phone, address, city, is_temporarily_closed, crowd_level, crowd_updated_at, vibes, mood, price_range, website, hours")
         .eq("user_id", session.user.id)
         .single();
       
       if (restaurantData) {
-        setRestaurant(restaurantData);
+        setRestaurant(restaurantData as any);
       }
     }
   };
