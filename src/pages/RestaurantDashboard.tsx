@@ -120,7 +120,7 @@ const RestaurantDashboard = () => {
         return;
       }
 
-      setRestaurant(restaurantData);
+      setRestaurant(restaurantData as any);
       loadMenuItems(restaurantData.id);
       loadOrdersAndInsights(restaurantData.id);
       loadBadgeCounts(restaurantData.id);
