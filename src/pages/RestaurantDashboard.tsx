@@ -779,6 +779,10 @@ const RestaurantDashboard = () => {
           </div>
         )}
           </TabsContent>
+
+          <TabsContent value="settings">
+            <SettingsTab restaurant={restaurant as any} onUpdate={handleProfileUpdate} />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
