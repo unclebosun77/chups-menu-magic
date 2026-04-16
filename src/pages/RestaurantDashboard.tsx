@@ -343,7 +343,7 @@ const RestaurantDashboard = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/edit-profile')}>
+            <Button variant="ghost" size="sm" onClick={() => setActiveTab('settings')}>
               <Settings className="mr-1.5 h-4 w-4" />
               Settings
             </Button>
