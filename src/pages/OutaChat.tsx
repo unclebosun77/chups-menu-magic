@@ -405,7 +405,7 @@ const OutaChat = () => {
                 <button
                   key={pill}
                   onClick={() => handleSendMessage(pill)}
-                  className="px-4 py-2.5 rounded-full bg-purple/5 border border-purple/15 text-[13px] font-medium text-foreground hover:bg-purple/10 hover:border-purple/30 transition-all active:scale-[0.97]"
+                  className="px-4 py-2 rounded-full bg-secondary border border-border text-[13px] font-medium text-foreground hover:bg-secondary/70 transition-all active:scale-[0.97]"
                 >
                   {pill}
                 </button>
