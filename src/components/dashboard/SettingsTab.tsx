@@ -401,79 +401,207 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
       {/* ─── SECTION 2: Branding & Images ─── */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2"><Palette className="h-5 w-5" /> Branding & Images</CardTitle>
-          <CardDescription>Your logo, cover photo, and gallery</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2"><Palette className="h-5 w-5" /> Branding & Images</CardTitle>
+              <CardDescription>Your logo, cover photo, and gallery</CardDescription>
+            </div>
+            {brandingSavedFlash && (
+              <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                <Check className="h-3.5 w-3.5" /> Saved
+              </span>
+            )}
+          </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8">
           {/* Hidden file inputs */}
           <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
           <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
-          <input ref={galleryInputRef} type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="hidden" />
+          <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleGalleryUpload} className="hidden" />
 
-          {/* Logo */}
-          <div className="space-y-2">
+          {/* ─ Logo ─ */}
+          <div className="space-y-3">
             <Label className="font-semibold">Logo</Label>
             <div className="flex items-center gap-4">
-              {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-16 w-16 object-contain rounded-lg border" />
-              ) : (
-                <div className="h-16 w-16 rounded-lg border border-dashed flex items-center justify-center bg-muted"><Upload className="h-5 w-5 text-muted-foreground" /></div>
-              )}
-              <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingTarget === "logo"}>
-                {uploadingTarget === "logo" ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                {logoUrl ? "Change logo" : "Upload logo"}
-              </Button>
-            </div>
-            {uploadingTarget === "logo" && <Progress value={uploadProgress} className="h-1.5" />}
-          </div>
-
-          {/* Cover Photo */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Cover Photo</Label>
-            <div className="space-y-2">
-              {coverUrl ? (
-                <img src={coverUrl} alt="Cover" className="w-full h-32 object-cover rounded-lg border" />
-              ) : (
-                <div className="w-full h-32 rounded-lg border border-dashed flex items-center justify-center bg-muted">
-                  <span className="text-sm text-muted-foreground">No cover photo</span>
-                </div>
-              )}
-              <Button variant="outline" size="sm" onClick={() => coverInputRef.current?.click()} disabled={uploadingTarget === "cover"}>
-                {uploadingTarget === "cover" ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                {coverUrl ? "Change cover" : "Upload cover"}
-              </Button>
-            </div>
-            {uploadingTarget === "cover" && <Progress value={uploadProgress} className="h-1.5" />}
-          </div>
-
-          {/* Gallery */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Gallery</Label>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-              {galleryUrls.map((url, i) => (
-                <div key={i} className="relative group">
-                  <img src={url} alt={`Gallery ${i + 1}`} className="h-24 w-full object-cover rounded-lg border" />
-                  <button
-                    onClick={() => removeGalleryImage(i)}
-                    className="absolute top-1 right-1 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
               <button
-                onClick={() => galleryInputRef.current?.click()}
-                className="h-24 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/40 transition-colors"
-                disabled={uploadingTarget === "gallery"}
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                disabled={logoUploading}
+                className="relative h-20 w-20 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-purple"
               >
-                {uploadingTarget === "gallery" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
-                <span className="text-xs">Add photos</span>
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="h-full w-full bg-purple text-white flex items-center justify-center text-2xl font-bold relative">
+                    {restaurant.name?.charAt(0).toUpperCase() || "?"}
+                    <div className="absolute bottom-0 right-0 h-6 w-6 bg-black/60 rounded-full flex items-center justify-center">
+                      <Camera className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  </div>
+                )}
+                {logoUploading && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )}
               </button>
+              <div className="space-y-1">
+                <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}>
+                  {logoUrl ? "Change logo" : "Upload logo"}
+                </Button>
+                {logoSavedFlash && (
+                  <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                    <Check className="h-3 w-3" /> Logo updated
+                  </p>
+                )}
+              </div>
             </div>
-            {uploadingTarget === "gallery" && <Progress value={uploadProgress} className="h-1.5" />}
+          </div>
+
+          {/* ─ Cover Photo ─ */}
+          <div className="space-y-3">
+            <Label className="font-semibold">Cover photo</Label>
+            {coverUrl ? (
+              <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-border/40">
+                <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={coverUploading}
+                  className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-black/75 transition-colors flex items-center gap-1.5"
+                >
+                  {coverUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
+                  Change cover
+                </button>
+                {coverUploading && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+                    <div className="h-full bg-purple transition-all" style={{ width: `${coverProgress}%` }} />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={coverUploading}
+                className="w-full h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-purple/40 hover:text-purple transition-colors"
+              >
+                {coverUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <ImagePlus className="h-6 w-6" />}
+                <span className="text-sm font-medium">Add cover photo</span>
+              </button>
+            )}
+          </div>
+
+          {/* ─ Gallery ─ */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="font-semibold">Gallery</Label>
+              {galleryItems.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="gap-1"
+                >
+                  <Plus className="h-4 w-4" /> Add photos
+                </Button>
+              )}
+            </div>
+
+            {galleryItems.length === 0 ? (
+              <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center space-y-4">
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                  Add photos of your restaurant, dishes, and atmosphere — customers love seeing the real experience 📸
+                </p>
+                <Button
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="bg-purple hover:bg-purple/90 text-white gap-2"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Add your first photo
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {galleryItems.map((item, i) => {
+                  const isCover = item.status === "ready" && item.url === coverUrl;
+                  return (
+                    <div key={item.id} className="relative group aspect-square rounded-xl overflow-hidden border border-border/40 bg-muted">
+                      <img src={item.url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+
+                      {/* Cover badge */}
+                      {isCover && (
+                        <span className="absolute top-1.5 left-1.5 bg-purple text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Star className="h-2.5 w-2.5 fill-current" /> Cover
+                        </span>
+                      )}
+
+                      {/* Remove */}
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(item.id)}
+                        className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-white/90 text-foreground flex items-center justify-center shadow hover:bg-white"
+                        aria-label="Remove"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+
+                      {/* Hover actions */}
+                      {item.status === "ready" && !isCover && (
+                        <div className="absolute inset-x-1.5 bottom-1.5 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => setGalleryAsCover(item.id)}
+                            className="w-full bg-black/70 backdrop-blur-sm text-white text-[10px] font-semibold py-1 rounded-full hover:bg-black/85"
+                          >
+                            Set as cover
+                          </button>
+                          {i > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => moveGalleryToFirst(item.id)}
+                              className="w-full bg-white/85 backdrop-blur-sm text-foreground text-[10px] font-semibold py-1 rounded-full hover:bg-white"
+                            >
+                              Move to first
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Uploading overlay */}
+                      {item.status === "uploading" && (
+                        <>
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <Loader2 className="h-5 w-5 animate-spin text-white" />
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+                            <div className="h-full bg-purple transition-all" style={{ width: `${item.progress}%` }} />
+                          </div>
+                        </>
+                      )}
+
+                      {/* Error overlay */}
+                      {item.status === "error" && (
+                        <div className="absolute inset-0 bg-red-500/70 flex flex-col items-center justify-center gap-2 text-white">
+                          <X className="h-5 w-5" />
+                          <button
+                            type="button"
+                            onClick={() => retryGalleryItem(item.id)}
+                            className="text-[10px] font-semibold bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded-full flex items-center gap-1"
+                          >
+                            <RotateCw className="h-3 w-3" /> Retry
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+
 
       {/* ─── SECTION 3: Opening Hours ─── */}
       <Card>
