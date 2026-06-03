@@ -255,25 +255,33 @@ const RestaurantProfile = () => {
 
   // Load restaurant data
   useEffect(() => {
+    let cancelled = false;
     const loadRestaurant = async () => {
       setIsLoading(true);
       if (!restaurantId) { setIsLoading(false); return; }
 
       const supabaseId = getSupabaseId(restaurantId);
-      
-      try {
-        const { data, error } = await supabase
-          .from("restaurants")
-          .select("id, name, description, cuisine_type, address, city, phone, website, logo_url, cover_image_url, gallery_images, is_open, is_temporarily_closed, hours, crowd_level, crowd_updated_at, vibes, mood, price_range, latitude, longitude, created_at")
-          .eq("id", supabaseId)
-          .maybeSingle();
 
-        if (data && !error) {
-          const { data: menuData } = await supabase
+      try {
+        // Parallelize: restaurant + menu in one round-trip
+        const [restaurantRes, menuRes] = await Promise.all([
+          supabase
+            .from("restaurants")
+            .select("id, name, description, cuisine_type, address, city, phone, website, logo_url, cover_image_url, gallery_images, is_open, is_temporarily_closed, hours, crowd_level, crowd_updated_at, vibes, mood, price_range, latitude, longitude, created_at")
+            .eq("id", supabaseId)
+            .maybeSingle(),
+          supabase
             .from("menu_items")
             .select("id, name, description, price, category, image_url, available, sold_out_today")
-            .eq("restaurant_id", data.id);
+            .eq("restaurant_id", supabaseId),
+        ]);
 
+        if (cancelled) return;
+
+        const { data, error } = restaurantRes;
+        const menuData = menuRes.data;
+
+        if (data && !error) {
           const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
             id: item.id,
             name: item.name,
@@ -316,32 +324,31 @@ const RestaurantProfile = () => {
             latitude: data.latitude ? Number(data.latitude) : null,
             longitude: data.longitude ? Number(data.longitude) : null,
           });
-        }
 
-        // Fetch price stats
-        const { data: priceData } = await supabase
-          .from('menu_items')
-          .select('price')
-          .eq('restaurant_id', supabaseId)
-          .eq('available', true);
-
-        if (priceData && priceData.length > 0) {
-          const prices = priceData.map(i => Number(i.price));
-          setPriceStats({
-            min: Math.min(...prices),
-            avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
-            max: Math.max(...prices),
-          });
+          // Derive price stats from menuData (no extra round-trip)
+          const availablePrices = (menuData || [])
+            .filter(i => i.available)
+            .map(i => Number(i.price))
+            .filter(p => !isNaN(p));
+          if (availablePrices.length > 0) {
+            setPriceStats({
+              min: Math.min(...availablePrices),
+              avg: Math.round((availablePrices.reduce((a, b) => a + b, 0) / availablePrices.length) * 100) / 100,
+              max: Math.max(...availablePrices),
+            });
+          }
         }
       } catch (err) {
         console.error('Failed to load restaurant:', err);
-        toast({ title: "Couldn't load restaurant data", variant: "destructive" });
+        if (!cancelled) toast({ title: "Couldn't load restaurant data", variant: "destructive" });
       }
 
-      setIsLoading(false);
+      if (!cancelled) setIsLoading(false);
     };
     loadRestaurant();
+    return () => { cancelled = true; };
   }, [restaurantId]);
+
 
   // Fallback crowd level from recent orders when no Supabase crowd data
   useEffect(() => {
