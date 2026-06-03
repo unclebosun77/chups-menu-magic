@@ -333,11 +333,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple/8 via-neon-pink/4 to-background" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-purple/10 via-purple/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-
+    <div className="min-h-screen flex flex-col bg-background">
       <div className="relative p-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
@@ -345,24 +341,27 @@ const Auth = () => {
       </div>
 
       <div className="relative flex-1 flex items-center justify-center px-4 pb-8">
-        <Card className="w-full max-w-md border-0 shadow-xl bg-card/95 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-2">
-            <div className="mx-auto flex items-center justify-center mb-2">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple to-neon-pink rounded-2xl flex items-center justify-center shadow-lg shadow-purple/30">
-                <span className="text-xl font-bold text-white">C</span>
-              </div>
-            </div>
-            <CardTitle className="text-2xl font-bold">
-              Welcome to <span className="bg-gradient-to-r from-purple to-neon-pink bg-clip-text text-transparent">CHUPS</span>
-            </CardTitle>
-            <CardDescription>Sign in to discover amazing dining experiences</CardDescription>
+        <Card className="w-full max-w-md border-0 shadow-none bg-transparent">
+          <CardHeader className="text-center space-y-2 pb-4">
+            <h1 className="text-[32px] font-black tracking-[-1px] text-foreground">chups</h1>
+            <p className="text-[15px] text-muted-foreground">Your city's dining guide</p>
           </CardHeader>
 
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" ref={tabsRef}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 h-11 bg-secondary rounded-full p-1">
+                <TabsTrigger
+                  value="signin"
+                  className="rounded-full data-[state=active]:bg-foreground data-[state=active]:text-white data-[state=inactive]:text-muted-foreground text-[13px] font-semibold shadow-none"
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger
+                  value="signup"
+                  className="rounded-full data-[state=active]:bg-foreground data-[state=active]:text-white data-[state=inactive]:text-muted-foreground text-[13px] font-semibold shadow-none"
+                >
+                  Sign Up
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="signin">
@@ -371,7 +370,7 @@ const Auth = () => {
                     <Label htmlFor="signin-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signin-email" name="signin-email" type="email" placeholder="you@example.com" className="pl-10" required />
+                      <Input id="signin-email" name="signin-email" type="email" placeholder="you@example.com" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -379,11 +378,11 @@ const Auth = () => {
                     <Label htmlFor="signin-password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signin-password" name="signin-password" type="password" placeholder="••••••••" className="pl-10" required />
+                      <Input id="signin-password" name="signin-password" type="password" placeholder="••••••••" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-foreground text-white hover:bg-foreground/90 h-12 rounded-xl font-semibold text-[15px]" disabled={isLoading}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
                   </Button>
 
@@ -413,7 +412,7 @@ const Auth = () => {
                     <Label htmlFor="signup-fullname">Full name</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signup-fullname" name="signup-fullname" type="text" placeholder="Your full name" className="pl-10" required />
+                      <Input id="signup-fullname" name="signup-fullname" type="text" placeholder="Your full name" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -421,7 +420,7 @@ const Auth = () => {
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signup-email" name="signup-email" type="email" placeholder="you@example.com" className="pl-10" required />
+                      <Input id="signup-email" name="signup-email" type="email" placeholder="you@example.com" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -434,7 +433,7 @@ const Auth = () => {
                         name="signup-password"
                         type="password"
                         placeholder="Create a strong password"
-                        className="pl-10"
+                        className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]"
                         required
                         value={signUpPassword}
                         onChange={(e) => setSignUpPassword(e.target.value)}
@@ -449,42 +448,30 @@ const Auth = () => {
                       <div
                         onClick={() => setRole("customer")}
                         className={cn(
-                          "flex items-center space-x-3 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                          "flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all",
                           role === "customer"
-                            ? "border-purple bg-purple/5 shadow-sm"
-                            : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                            ? "border-foreground bg-secondary"
+                            : "border-border hover:bg-secondary/50"
                         )}
                       >
-                        <div className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                          role === "customer" ? "border-purple" : "border-muted-foreground/40"
-                        )}>
-                          {role === "customer" && <div className="w-2.5 h-2.5 rounded-full bg-purple" />}
-                        </div>
-                        <User className={cn("h-4 w-4", role === "customer" ? "text-purple" : "text-muted-foreground")} />
+                        <User className="h-4 w-4 text-foreground" />
                         <div className="flex-1">
-                          <span className={cn("font-medium", role === "customer" && "text-purple")}>Food Lover</span>
+                          <span className="font-semibold text-foreground text-[14px]">Food Lover</span>
                           <p className="text-xs text-muted-foreground">Discover restaurants and order food</p>
                         </div>
                       </div>
                       <div
                         onClick={() => setRole("restaurant")}
                         className={cn(
-                          "flex items-center space-x-3 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                          "flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all",
                           role === "restaurant"
-                            ? "border-purple bg-purple/5 shadow-sm"
-                            : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                            ? "border-foreground bg-secondary"
+                            : "border-border hover:bg-secondary/50"
                         )}
                       >
-                        <div className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                          role === "restaurant" ? "border-purple" : "border-muted-foreground/40"
-                        )}>
-                          {role === "restaurant" && <div className="w-2.5 h-2.5 rounded-full bg-purple" />}
-                        </div>
-                        <ChefHat className={cn("h-4 w-4", role === "restaurant" ? "text-purple" : "text-muted-foreground")} />
+                        <ChefHat className="h-4 w-4 text-foreground" />
                         <div className="flex-1">
-                          <span className={cn("font-medium", role === "restaurant" && "text-purple")}>Restaurant Owner</span>
+                          <span className="font-semibold text-foreground text-[14px]">Restaurant Owner</span>
                           <p className="text-xs text-muted-foreground">Manage your restaurant on CHUPS</p>
                         </div>
                       </div>
@@ -493,15 +480,15 @@ const Auth = () => {
 
                   {/* Restaurant owner info card */}
                   {role === "restaurant" && (
-                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-purple/5 border border-purple/20 animate-slide-up">
-                      <Info className="h-4 w-4 text-purple mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-secondary border-0 animate-slide-up">
+                      <Info className="h-4 w-4 text-foreground mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-muted-foreground leading-relaxed">
                         You'll set up your restaurant profile after creating your account. It takes about 5 minutes.
                       </p>
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-foreground text-white hover:bg-foreground/90 h-12 rounded-xl font-semibold text-[15px]" disabled={isLoading}>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : role === "restaurant" ? (

@@ -80,15 +80,15 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick,
       <div className="max-w-[85%]">
         <div className="flex items-start gap-2.5">
           {/* Avatar */}
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple to-purple/70 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm shadow-purple/20">
+          <div className="w-7 h-7 rounded-2xl bg-purple flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm shadow-purple/20">
             <span className="text-white font-bold text-[11px]">O</span>
           </div>
           
           <div className="flex-1 space-y-2.5">
             {/* Message bubble */}
-            <div className="bg-[hsl(265,60%,97%)] dark:bg-purple/10 border border-purple/8 px-4 py-3 rounded-2xl rounded-bl-md">
+            <div className="bg-white shadow-soft px-4 py-3 rounded-2xl rounded-tl-sm">
               <div
-                className="text-sm leading-relaxed text-foreground [&_ul]:list-disc [&_ul]:pl-4 [&_li]:text-sm [&_p]:mb-1.5 [&_p:last-child]:mb-0"
+                className="text-[14px] leading-relaxed text-foreground [&_ul]:list-disc [&_ul]:pl-4 [&_li]:text-[14px] [&_p]:mb-1.5 [&_p:last-child]:mb-0"
                 dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
               />
             </div>
