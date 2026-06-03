@@ -86,7 +86,7 @@ const OutaMessage = ({ message, isNew = false, onQuickAction, onRestaurantClick,
           
           <div className="flex-1 space-y-2.5">
             {/* Message bubble */}
-            <div className="bg-white shadow-soft px-4 py-3 rounded-2xl rounded-tl-sm">
+            <div className="bg-secondary text-foreground px-4 py-3 rounded-2xl rounded-tl-sm">
               <div
                 className="text-[14px] leading-relaxed text-foreground [&_ul]:list-disc [&_ul]:pl-4 [&_li]:text-[14px] [&_p]:mb-1.5 [&_p:last-child]:mb-0"
                 dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
