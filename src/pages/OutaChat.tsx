@@ -20,8 +20,12 @@ interface SupabaseRestaurant {
   cuisine_type: string;
   address: string | null;
   is_open: boolean;
+  is_temporarily_closed: boolean | null;
   description: string | null;
   vibes: string[] | null;
+  mood: string[] | null;
+  crowd_level: string | null;
+  crowd_updated_at: string | null;
 }
 
 interface BudgetInfo {
@@ -65,7 +69,7 @@ const OutaChat = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [restaurantRes, menuRes] = await Promise.all([
-        supabase.from('restaurants').select('id, name, cuisine_type, address, is_open, description, vibes').eq('status', 'active'),
+        supabase.from('restaurants').select('id, name, cuisine_type, address, is_open, is_temporarily_closed, description, vibes, mood, crowd_level, crowd_updated_at').eq('status', 'active'),
         supabase.from('menu_items').select('restaurant_id, price').eq('available', true),
       ]);
 
@@ -124,9 +128,11 @@ const OutaChat = () => {
         name: r.name,
         cuisine: r.cuisine_type,
         address: r.address,
-        isOpen: r.is_open,
+        isOpen: r.is_open && !r.is_temporarily_closed,
         description: r.description,
         vibes: r.vibes || [],
+        currentMood: r.mood || [],
+        crowdLevel: r.crowd_level || null,
         minDishPrice: budgetMap[r.id]?.minPrice || null,
         avgMealPrice: budgetMap[r.id]?.avgPrice || null,
       }))
@@ -202,6 +208,7 @@ const OutaChat = () => {
           .select('name, price, description, category')
           .eq('restaurant_id', matchedRestaurant.id)
           .eq('available', true)
+          .eq('sold_out_today', false)
           .limit(15);
         if (menuItems && menuItems.length > 0) {
           contextMessage += `\nMenu items at ${lastMentionedRestaurant}: ${JSON.stringify(menuItems)}`;
