@@ -416,7 +416,7 @@ const OutaChat = () => {
       </div>
 
       {/* Input bar */}
-      <div className="fixed bottom-16 left-0 right-0 z-40 px-4 py-3 bg-white border-t border-border/50">
+      <div className="fixed bottom-16 left-0 right-0 z-40 px-4 py-3 bg-background border-t border-border/50">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -428,7 +428,7 @@ const OutaChat = () => {
             rows={1}
             className={cn(
               "flex-1 px-4 py-3 rounded-2xl resize-none",
-              "bg-white border border-border/60",
+              "bg-background border border-border text-foreground",
               "focus:outline-none focus:ring-2 focus:ring-purple/30 focus:border-purple/40",
               "placeholder:text-muted-foreground/50 text-[14px]",
               "transition-all disabled:opacity-50",
@@ -439,7 +439,7 @@ const OutaChat = () => {
             onClick={handleSubmit}
             disabled={!inputValue.trim() || isTyping}
             className={cn(
-              "h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
+              "h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
               inputValue.trim()
                 ? "bg-purple text-white shadow-md shadow-purple/25"
                 : "bg-secondary text-muted-foreground/40"
