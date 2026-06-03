@@ -36,15 +36,15 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, gallery_images, address, city, is_open, hours, is_temporarily_closed")
+          .select("id, name, cuisine_type, description, logo_url, cover_image_url, gallery_images, address, city, is_open, hours, is_temporarily_closed")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        const items: PickItem[] = (data || []).map(r => {
+        const items: PickItem[] = (data || []).map((r: any) => {
           const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
-          const heroImage = (galleryImages[0] as string) || r.logo_url || "";
+          const imageUrl = r.cover_image_url || (galleryImages[0] as string) || "";
           return {
             id: r.id,
             name: r.name,
@@ -58,7 +58,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             distance: "Nearby",
             rating: 4.5,
             logoUrl: r.logo_url || "",
-            imageUrl: heroImage,
+            imageUrl,
           };
         });
 
@@ -149,13 +149,17 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
               <div className="relative aspect-[4/3] overflow-hidden bg-muted/30">
                 {pick.imageUrl ? (
                   <img src={pick.imageUrl} alt={pick.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-                ) : pick.logoUrl ? (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
-                    <img src={pick.logoUrl} alt={`${pick.name} logo`} className="w-24 h-24 object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-                  </div>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary to-muted">
-                    <span className="text-3xl font-bold text-muted-foreground">{pick.name[0]}</span>
+                  <div
+                    className="w-full h-full flex flex-col items-center justify-center gap-2"
+                    style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
+                  >
+                    {pick.logoUrl ? (
+                      <img src={pick.logoUrl} alt={`${pick.name} logo`} className="w-14 h-14 rounded-xl object-contain" />
+                    ) : (
+                      <span className="text-white/80 text-3xl font-bold">{pick.name[0]}</span>
+                    )}
+                    <span className="text-white/60 text-[10px] font-medium tracking-wider uppercase">{pick.cuisine}</span>
                   </div>
                 )}
                 <div className="absolute top-2.5 right-2.5 bg-purple/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold">
