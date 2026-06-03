@@ -151,8 +151,8 @@ const Account = () => {
     <div className="min-h-screen bg-secondary/30 pb-24">
       {/* Header */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple/10 via-purple/5 to-transparent" />
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-radial from-neon-pink/10 to-transparent rounded-full blur-3xl" />
+        
+        
 
         <div className="relative px-4 pt-6 pb-8">
           <div className="flex items-center gap-3 mb-6">
@@ -185,15 +185,15 @@ const Account = () => {
                   aria-label="Edit profile"
                 >
                   {isRestaurantOwner && userRestaurant.logo_url ? (
-                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
+                    <Avatar className="h-16 w-16 rounded-2xl transition-transform group-hover:scale-105">
                       <img src={userRestaurant.logo_url} alt={userRestaurant.name} className="h-full w-full object-cover" />
                     </Avatar>
                   ) : !isRestaurantOwner && avatarUrl ? (
-                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
+                    <Avatar className="h-16 w-16 rounded-2xl transition-transform group-hover:scale-105">
                       <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
                     </Avatar>
                   ) : (
-                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
+                    <Avatar className="h-16 w-16 rounded-2xl transition-transform group-hover:scale-105">
                       <AvatarFallback className="text-xl bg-gradient-to-br from-purple to-neon-pink text-white font-bold">
                         {isRestaurantOwner ? userRestaurant.name[0].toUpperCase() : displayName[0].toUpperCase()}
                       </AvatarFallback>
