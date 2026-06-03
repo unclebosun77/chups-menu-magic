@@ -21,15 +21,15 @@ const HomeHeader = () => {
   return (
     <div className="pt-5 pb-2">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         {/* Logo */}
-        <span className="text-[20px] font-extrabold tracking-tight text-foreground">
+        <span className="text-[22px] font-black tracking-[-0.5px] text-foreground">
           chups
         </span>
 
         {/* Location chip */}
-        <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary/60 border border-border/40 text-[12px] font-medium text-foreground active:scale-95 transition-transform">
-          <MapPin className="h-3 w-3 text-purple" />
+        <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary border-0 text-[11px] font-medium text-muted-foreground active:scale-95 transition-transform">
+          <MapPin className="h-3 w-3" />
           Birmingham
         </button>
 
@@ -37,7 +37,7 @@ const HomeHeader = () => {
         {user ? (
           <button
             onClick={() => navigate("/account")}
-            className="w-8 h-8 rounded-full bg-purple flex items-center justify-center text-primary-foreground text-[13px] font-bold active:scale-95 transition-transform"
+            className="w-9 h-9 rounded-full bg-purple flex items-center justify-center text-primary-foreground text-[14px] font-bold active:scale-95 transition-transform"
           >
             {initial}
           </button>
@@ -53,10 +53,10 @@ const HomeHeader = () => {
 
       {/* Greeting */}
       <div>
-        <h1 className="text-[22px] font-bold text-foreground leading-tight tracking-tight">
+        <h1 className="text-[26px] font-bold text-foreground leading-tight tracking-tight">
           {greeting.text} {greeting.emoji}
         </h1>
-        <p className="text-[14px] text-muted-foreground mt-0.5">
+        <p className="text-[14px] text-muted-foreground font-normal mt-1">
           Where are we going tonight?
         </p>
       </div>
@@ -64,7 +64,7 @@ const HomeHeader = () => {
       {/* Search bar */}
       <button
         onClick={() => setQuery(' ')}
-        className="w-full flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-secondary/60 border border-border/40 text-[13px] text-muted-foreground mt-3 active:scale-[0.98] transition-transform"
+        className="w-full flex items-center gap-2 px-4 rounded-2xl bg-secondary/80 border-0 h-11 text-[13px] text-muted-foreground mt-4 active:scale-[0.98] transition-transform"
       >
         <Search className="h-4 w-4" />
         Search restaurants, dishes, cuisines...
