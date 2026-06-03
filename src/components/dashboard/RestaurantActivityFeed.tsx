@@ -157,7 +157,7 @@ const RestaurantActivityFeed = ({ restaurantId, onSwitchTab }: Props) => {
             <button
               key={item.id}
               onClick={() => onSwitchTab(item.tab)}
-              className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all hover:scale-105 active:scale-95 animate-fade-in ${chipStyles[item.type]}`}
+              className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap border-0 transition-all hover:scale-105 active:scale-95 animate-fade-in ${chipStyles[item.type]}`}
             >
               <span>{icons[item.type]}</span>
               {item.label}
