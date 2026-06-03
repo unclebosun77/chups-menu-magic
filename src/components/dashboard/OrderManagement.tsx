@@ -116,6 +116,7 @@ interface OrderManagementProps {
 }
 
 const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagementProps) => {
+  console.log('[OrderManagement] Props received:', { restaurantId, ordersCount: orders?.length });
   const { toast } = useToast();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
