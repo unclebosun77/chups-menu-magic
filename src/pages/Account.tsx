@@ -178,13 +178,22 @@ const Account = () => {
           <Card className="glass-card-strong animate-slide-up">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => navigate("/edit-profile")}
+                  className="relative shrink-0 group"
+                  aria-label="Edit profile"
+                >
                   {isRestaurantOwner && userRestaurant.logo_url ? (
-                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
+                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
                       <img src={userRestaurant.logo_url} alt={userRestaurant.name} className="h-full w-full object-cover" />
                     </Avatar>
+                  ) : !isRestaurantOwner && avatarUrl ? (
+                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
+                      <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+                    </Avatar>
                   ) : (
-                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background">
+                    <Avatar className="h-16 w-16 ring-2 ring-purple/20 ring-offset-2 ring-offset-background transition-transform group-hover:scale-105">
                       <AvatarFallback className="text-xl bg-gradient-to-br from-purple to-neon-pink text-white font-bold">
                         {isRestaurantOwner ? userRestaurant.name[0].toUpperCase() : displayName[0].toUpperCase()}
                       </AvatarFallback>
@@ -193,27 +202,41 @@ const Account = () => {
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-purple to-neon-pink flex items-center justify-center shadow-lg">
                     {isRestaurantOwner ? <ChefHat className="h-3 w-3 text-white" /> : <Crown className="h-3 w-3 text-white" />}
                   </div>
-                </div>
+                </button>
                 <div className="flex-1 min-w-0">
                   <h2 className="font-bold text-lg text-foreground truncate">
                     {isRestaurantOwner ? userRestaurant.name : displayName}
                   </h2>
                   {isRestaurantOwner ? (
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge
-                        variant="secondary"
-                        className={userRestaurant.status === "active"
-                          ? "bg-green-500/10 text-green-600 border-green-500/20"
-                          : "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                        }
-                      >
-                        {userRestaurant.status === "active" ? "Active" : "Pending"}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{displayName}</span>
-                    </div>
+                    <>
+                      {(userRestaurant.cuisine_type || userRestaurant.city) && (
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {[userRestaurant.cuisine_type, userRestaurant.city].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <Badge
+                          variant="secondary"
+                          className={userRestaurant.status === "active"
+                            ? "bg-green-500/10 text-green-600 border-green-500/20"
+                            : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                          }
+                        >
+                          {userRestaurant.status === "active" ? "Active" : "Pending"}
+                        </Badge>
+                        {rewardsData && (
+                          <Badge variant="secondary" className={tierBadgeStyles[tier]}>
+                            {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                          </Badge>
+                        )}
+                      </div>
+                    </>
                   ) : (
                     <>
                       <p className={`text-sm font-medium ${tierColors[tier]}`}>{tierLabel}</p>
+                      {bio && (
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{bio}</p>
+                      )}
                       {rewardsData && (
                         <p className="text-xs text-muted-foreground mt-0.5">✦ {rewardsData.points_balance} pts</p>
                       )}
