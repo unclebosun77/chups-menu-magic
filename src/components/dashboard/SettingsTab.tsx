@@ -96,8 +96,10 @@ interface SettingsTabProps {
   onUpdate: () => void;
 }
 
-const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
+const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const { toast } = useToast();
+
+  console.error('[SettingsTab] restaurant prop:', JSON.stringify(restaurant));
 
   // Safe view of restaurant — never undefined for downstream hook logic
   const r = restaurant || ({} as SettingsTabProps["restaurant"]);
