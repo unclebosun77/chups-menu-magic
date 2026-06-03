@@ -114,7 +114,7 @@ const Account = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
+      <div className="min-h-screen bg-secondary/30 pb-24">
         <div className="px-4 pt-6 pb-4">
           <div className="flex items-center gap-3 mb-6">
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(-1)}>
@@ -127,7 +127,7 @@ const Account = () => {
           </div>
         </div>
         <div className="px-4 space-y-4">
-          <Card className="overflow-hidden glass-card-strong animate-slide-up">
+          <Card className="overflow-hidden bg-white rounded-3xl shadow-card border-0 animate-slide-up">
             <div className="p-8 text-center">
               <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple/20 to-neon-pink/10 flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <User className="h-10 w-10 text-purple" />
@@ -148,7 +148,7 @@ const Account = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 pb-24">
+    <div className="min-h-screen bg-secondary/30 pb-24">
       {/* Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-purple/10 via-purple/5 to-transparent" />
@@ -175,7 +175,7 @@ const Account = () => {
           )}
 
           {/* Profile Card */}
-          <Card className="glass-card-strong animate-slide-up">
+          <Card className="bg-white rounded-3xl shadow-card border-0 animate-slide-up">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <button
@@ -276,7 +276,7 @@ const Account = () => {
               ].map(({ icon: Icon, label, action }) => (
                 <Card
                   key={label}
-                  className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+                  className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
                   onClick={action}
                 >
                   <CardContent className="flex flex-col items-center gap-2 p-4">
@@ -291,7 +291,7 @@ const Account = () => {
 
             {/* View as customer */}
             <Card
-              className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98] animate-slide-up"
+              className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98] animate-slide-up"
               onClick={() => navigate(`/restaurant/${userRestaurant.id}`)}
             >
               <CardContent className="flex items-center gap-4 p-4">
@@ -327,7 +327,7 @@ const Account = () => {
           ].map(({ icon: Icon, label, path, badge }) => (
             <Card
               key={label}
-              className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
+              className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all active:scale-[0.98]"
               onClick={() => navigate(path)}
             >
               <CardContent className="flex flex-col items-center gap-2 p-4">
@@ -370,7 +370,7 @@ const Account = () => {
               return (
                 <Card
                   key={item.label}
-                  className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 active:scale-[0.98] transition-all"
+                  className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg hover:border-purple/20 active:scale-[0.98] transition-all"
                   onClick={item.action}
                 >
                   <CardContent className="flex items-center gap-4 p-4">
@@ -391,7 +391,7 @@ const Account = () => {
 
         {/* Help & Support */}
         <Card
-          className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all animate-slide-up active:scale-[0.98]"
+          className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg hover:border-purple/20 transition-all animate-slide-up active:scale-[0.98]"
           onClick={() => setShowHelp(true)}
         >
           <CardContent className="flex items-center gap-4 p-4">
@@ -408,7 +408,7 @@ const Account = () => {
 
         {/* Sign Out */}
         <Card
-          className="glass-card cursor-pointer hover:shadow-lg border-destructive/10 hover:border-destructive/20 transition-all animate-slide-up active:scale-[0.98]"
+          className="bg-white rounded-2xl shadow-card border-0 cursor-pointer hover:shadow-lg border-destructive/10 hover:border-destructive/20 transition-all animate-slide-up active:scale-[0.98]"
           onClick={handleSignOut}
         >
           <CardContent className="flex items-center gap-4 p-4">
