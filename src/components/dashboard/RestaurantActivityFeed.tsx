@@ -17,10 +17,10 @@ type Props = {
 };
 
 const chipStyles: Record<string, string> = {
-  order: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  booking: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  review: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  save: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+  order: "bg-secondary text-foreground",
+  booking: "bg-secondary text-foreground",
+  review: "bg-secondary text-foreground",
+  save: "bg-secondary text-foreground",
 };
 
 const icons: Record<string, string> = {
@@ -157,7 +157,7 @@ const RestaurantActivityFeed = ({ restaurantId, onSwitchTab }: Props) => {
             <button
               key={item.id}
               onClick={() => onSwitchTab(item.tab)}
-              className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all hover:scale-105 active:scale-95 animate-fade-in ${chipStyles[item.type]}`}
+              className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap border-0 transition-all hover:scale-105 active:scale-95 animate-fade-in ${chipStyles[item.type]}`}
             >
               <span>{icons[item.type]}</span>
               {item.label}

@@ -337,7 +337,7 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
               <Card
                 key={order.id}
                 ref={(el) => { cardRefs.current[order.id] = el; }}
-                className={`relative overflow-hidden transition-all duration-300 ${urgency} ${
+                className={`relative overflow-hidden bg-card border-0 shadow-card rounded-2xl transition-all duration-300 ${urgency} ${
                   isNew ? "ring-2 ring-green-500 shadow-lg shadow-green-500/20" : ""
                 }`}
               >

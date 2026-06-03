@@ -76,9 +76,11 @@ const CrowdLevelControl = ({ restaurantId, currentLevel, updatedAt, orders, onUp
           {CROWD_LEVELS.map((level) => (
             <Button
               key={level.value}
-              variant={currentLevel === level.value ? "default" : "outline"}
-              className={`h-auto py-3 flex flex-col gap-1.5 ${
-                currentLevel === level.value ? "ring-2 ring-offset-2 ring-primary" : ""
+              variant="ghost"
+              className={`h-auto py-3 flex flex-col gap-1.5 border-0 ${
+                currentLevel === level.value
+                  ? "bg-purple text-white hover:bg-purple/90 hover:text-white"
+                  : "bg-secondary text-foreground hover:bg-secondary/70"
               }`}
               onClick={() => handleSetLevel(level.value)}
               disabled={isUpdating}
