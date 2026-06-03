@@ -370,7 +370,7 @@ const Auth = () => {
                     <Label htmlFor="signin-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signin-email" name="signin-email" type="email" placeholder="you@example.com" className="pl-10" required />
+                      <Input id="signin-email" name="signin-email" type="email" placeholder="you@example.com" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -378,11 +378,11 @@ const Auth = () => {
                     <Label htmlFor="signin-password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signin-password" name="signin-password" type="password" placeholder="••••••••" className="pl-10" required />
+                      <Input id="signin-password" name="signin-password" type="password" placeholder="••••••••" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-foreground text-white hover:bg-foreground/90 h-12 rounded-xl font-semibold text-[15px]" disabled={isLoading}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
                   </Button>
 
@@ -412,7 +412,7 @@ const Auth = () => {
                     <Label htmlFor="signup-fullname">Full name</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signup-fullname" name="signup-fullname" type="text" placeholder="Your full name" className="pl-10" required />
+                      <Input id="signup-fullname" name="signup-fullname" type="text" placeholder="Your full name" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -420,7 +420,7 @@ const Auth = () => {
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="signup-email" name="signup-email" type="email" placeholder="you@example.com" className="pl-10" required />
+                      <Input id="signup-email" name="signup-email" type="email" placeholder="you@example.com" className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]" required />
                     </div>
                   </div>
 
@@ -433,7 +433,7 @@ const Auth = () => {
                         name="signup-password"
                         type="password"
                         placeholder="Create a strong password"
-                        className="pl-10"
+                        className="pl-10 bg-secondary border-0 rounded-xl h-12 text-[14px]"
                         required
                         value={signUpPassword}
                         onChange={(e) => setSignUpPassword(e.target.value)}
@@ -448,42 +448,30 @@ const Auth = () => {
                       <div
                         onClick={() => setRole("customer")}
                         className={cn(
-                          "flex items-center space-x-3 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                          "flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all",
                           role === "customer"
-                            ? "border-purple bg-purple/5 shadow-sm"
-                            : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                            ? "border-foreground bg-secondary"
+                            : "border-border hover:bg-secondary/50"
                         )}
                       >
-                        <div className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                          role === "customer" ? "border-purple" : "border-muted-foreground/40"
-                        )}>
-                          {role === "customer" && <div className="w-2.5 h-2.5 rounded-full bg-purple" />}
-                        </div>
-                        <User className={cn("h-4 w-4", role === "customer" ? "text-purple" : "text-muted-foreground")} />
+                        <User className="h-4 w-4 text-foreground" />
                         <div className="flex-1">
-                          <span className={cn("font-medium", role === "customer" && "text-purple")}>Food Lover</span>
+                          <span className="font-semibold text-foreground text-[14px]">Food Lover</span>
                           <p className="text-xs text-muted-foreground">Discover restaurants and order food</p>
                         </div>
                       </div>
                       <div
                         onClick={() => setRole("restaurant")}
                         className={cn(
-                          "flex items-center space-x-3 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                          "flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all",
                           role === "restaurant"
-                            ? "border-purple bg-purple/5 shadow-sm"
-                            : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                            ? "border-foreground bg-secondary"
+                            : "border-border hover:bg-secondary/50"
                         )}
                       >
-                        <div className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                          role === "restaurant" ? "border-purple" : "border-muted-foreground/40"
-                        )}>
-                          {role === "restaurant" && <div className="w-2.5 h-2.5 rounded-full bg-purple" />}
-                        </div>
-                        <ChefHat className={cn("h-4 w-4", role === "restaurant" ? "text-purple" : "text-muted-foreground")} />
+                        <ChefHat className="h-4 w-4 text-foreground" />
                         <div className="flex-1">
-                          <span className={cn("font-medium", role === "restaurant" && "text-purple")}>Restaurant Owner</span>
+                          <span className="font-semibold text-foreground text-[14px]">Restaurant Owner</span>
                           <p className="text-xs text-muted-foreground">Manage your restaurant on CHUPS</p>
                         </div>
                       </div>
@@ -492,15 +480,15 @@ const Auth = () => {
 
                   {/* Restaurant owner info card */}
                   {role === "restaurant" && (
-                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-purple/5 border border-purple/20 animate-slide-up">
-                      <Info className="h-4 w-4 text-purple mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-secondary border-0 animate-slide-up">
+                      <Info className="h-4 w-4 text-foreground mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-muted-foreground leading-relaxed">
                         You'll set up your restaurant profile after creating your account. It takes about 5 minutes.
                       </p>
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-foreground text-white hover:bg-foreground/90 h-12 rounded-xl font-semibold text-[15px]" disabled={isLoading}>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : role === "restaurant" ? (
