@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import type { DemoMenuItem, DemoRestaurant } from "@/data/demoRestaurantMenus";
 import { supabase } from "@/integrations/supabase/client";
 import AskOutaModal from "@/components/AskOutaModal";
 import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
@@ -20,7 +19,53 @@ import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 import ReviewsSection from "@/components/ReviewsSection";
 import { ReservationDialog } from "@/components/ReservationDialog";
 
-type OrderItem = DemoMenuItem & { quantity: number };
+type MenuItem = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  image?: string;
+  image_url?: string;
+  available?: boolean;
+  sold_out_today?: boolean;
+  tags?: string[];
+  isSpicy?: boolean;
+  isVegetarian?: boolean;
+  isNew?: boolean;
+  isPopular?: boolean;
+};
+
+type RestaurantData = {
+  id: string;
+  name: string;
+  cuisine: string;
+  address: string;
+  city?: string;
+  phone?: string;
+  website?: string;
+  priceLevel: string;
+  description: string;
+  vibe: string[];
+  mood: string[];
+  vibes: string[];
+  openingHours: Record<string, any>;
+  logoUrl: string;
+  heroImage: string;
+  coverImageUrl?: string;
+  galleryImages: string[];
+  rating: number;
+  distance: string;
+  isOpen: boolean;
+  menu: MenuItem[];
+  signatureDishes?: string[];
+  crowdLevel?: string;
+  crowdUpdatedAt?: string;
+  latitude?: number;
+  longitude?: number;
+};
+
+type OrderItem = MenuItem & { quantity: number };
 
 const CROWD_COLORS: Record<string, { dot: string; bg: string; text: string; label: string }> = {
   quiet: { dot: "bg-green-500", bg: "bg-green-100 dark:bg-green-950/40", text: "text-green-700 dark:text-green-300", label: "Quiet" },
