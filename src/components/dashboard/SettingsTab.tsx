@@ -769,6 +769,10 @@ const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
       </Card>
     </div>
   );
-};
+const SettingsTab = (props: SettingsTabProps) => (
+  <SettingsErrorBoundary>
+    <SettingsTabInner {...props} />
+  </SettingsErrorBoundary>
+);
 
 export default SettingsTab;
