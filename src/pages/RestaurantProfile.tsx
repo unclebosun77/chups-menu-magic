@@ -130,7 +130,7 @@ const QuickInfoHoursRow = ({ status, todayDisplay, openingHours }: { status: any
 };
 
 /* ─── Quick Info Section ─── */
-const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaurant; priceStats: { min: number; avg: number; max: number } | null }) => {
+const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: RestaurantData; priceStats: { min: number; avg: number; max: number } | null }) => {
   const status = getOpeningStatus(restaurant.openingHours as any);
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
   const todayHours = (restaurant.openingHours as any)?.[today];
