@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeHeader from "@/components/home/HomeHeader";
-import QuickActionPills from "@/components/home/QuickActionPills";
+
 import NearbyOpenSection from "@/components/home/NearbyOpenSection";
 import PickedForYouSection from "@/components/home/PickedForYouSection";
 import ExploreCuisineRow from "@/components/home/ExploreCuisineRow";
