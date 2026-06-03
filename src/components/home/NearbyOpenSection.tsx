@@ -102,13 +102,17 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-muted/30 shadow-card border-0">
               {r.imageUrl ? (
                 <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-              ) : r.logoUrl ? (
-                <div className="w-full h-full flex items-center justify-center bg-secondary/40">
-                  <img src={r.logoUrl} alt="" className="w-14 h-14 object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-                </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-secondary">
-                  <span className="text-xl font-bold text-muted-foreground">{r.name[0]}</span>
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
+                >
+                  {r.logoUrl ? (
+                    <img src={r.logoUrl} alt="" className="w-14 h-14 rounded-xl object-contain" />
+                  ) : (
+                    <span className="text-white/80 text-xl font-bold">{r.name[0]}</span>
+                  )}
+                  <span className="text-white/60 text-[10px] font-medium tracking-wider uppercase">{r.cuisine}</span>
                 </div>
               )}
               <div className="absolute top-2 left-2 bg-emerald-50 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
