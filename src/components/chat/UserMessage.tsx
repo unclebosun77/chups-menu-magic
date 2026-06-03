@@ -15,7 +15,7 @@ const UserMessage = ({ content, timestamp, isNew = false }: UserMessageProps) =>
       )}
     >
       <div className="max-w-[80%]">
-        <div className="bg-foreground text-white px-4 py-3 rounded-2xl rounded-tr-sm">
+        <div className="bg-foreground text-background px-4 py-3 rounded-2xl rounded-tr-sm">
           <p className="text-[14px] leading-relaxed">{content}</p>
         </div>
         <p className="text-[10px] text-muted-foreground/50 text-right mt-1 mr-2">
