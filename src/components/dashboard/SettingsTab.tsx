@@ -303,7 +303,7 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
     return result;
   };
 
-  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(restaurant.hours));
+  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(r.hours));
   const [isSavingHours, setIsSavingHours] = useState(false);
 
   const saveHours = async () => {
