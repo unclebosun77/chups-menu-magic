@@ -187,7 +187,20 @@ const OrderManagement = ({ orders, onOrderUpdate, restaurantId }: OrderManagemen
           table: "orders",
           filter: `restaurant_id=eq.${restaurantId}`,
         },
-        () => {
+        (payload) => {
+          const newOrder = payload.new as any;
+          const oldOrder = payload.old as any;
+          if (newOrder?.status && newOrder.status !== oldOrder?.status) {
+            vibrate(20);
+            setNewOrderIds((prev) => new Set(prev).add(newOrder.id));
+            setTimeout(() => {
+              setNewOrderIds((prev) => {
+                const next = new Set(prev);
+                next.delete(newOrder.id);
+                return next;
+              });
+            }, 1500);
+          }
           onOrderUpdate();
         }
       )
