@@ -147,21 +147,17 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
               className="flex-shrink-0 w-[75vw] max-w-[310px] snap-start rounded-2xl overflow-hidden bg-card border border-border/40 shadow-sm cursor-pointer active:scale-[0.98] transition-transform"
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-muted/30">
-                {pick.imageUrl ? (
-                  <img src={pick.imageUrl} alt={pick.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-                ) : (
-                  <div
-                    className="w-full h-full flex flex-col items-center justify-center gap-2"
-                    style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
-                  >
-                    {pick.logoUrl ? (
-                      <img src={pick.logoUrl} alt={`${pick.name} logo`} className="w-14 h-14 rounded-xl object-contain" />
-                    ) : (
-                      <span className="text-white/80 text-3xl font-bold">{pick.name[0]}</span>
-                    )}
-                    <span className="text-white/60 text-[10px] font-medium tracking-wider uppercase">{pick.cuisine}</span>
-                  </div>
-                )}
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
+                >
+                  {pick.logoUrl ? (
+                    <img src={pick.logoUrl} alt={`${pick.name} logo`} className="w-20 h-20 rounded-xl object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
+                  ) : (
+                    <span className="text-white/80 text-3xl font-bold">{pick.name[0]}</span>
+                  )}
+                  <span className="text-white/60 text-[10px] font-medium tracking-wider uppercase">{pick.cuisine}</span>
+                </div>
                 <div className="absolute top-2.5 right-2.5 bg-purple/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold">
                   {pick.matchScore}% match
                 </div>
