@@ -15,7 +15,8 @@ const DarkModeToggle = ({ className, description }: DarkModeToggleProps) => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
-    localStorage.setItem("pref:darkMode", String(darkMode));
+    document.documentElement.classList.toggle("light", !darkMode);
+    localStorage.setItem("chups-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
   return (
