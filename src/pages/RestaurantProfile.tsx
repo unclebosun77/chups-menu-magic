@@ -585,38 +585,28 @@ const RestaurantProfile = () => {
           }
 
           return (
-            <div className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
+            <div className="relative h-64 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
               <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               {restaurant.galleryImages.length > 1 && (
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute top-4 right-4 flex gap-1.5">
                   {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
-                    <button key={idx} onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }} className={`h-2 rounded-full transition-all duration-300 ${idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"}`} />
+                    <button key={idx} onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }} className={`h-1.5 rounded-full transition-all duration-300 ${idx === galleryIndex ? "bg-white w-5" : "bg-white/50 w-1.5 hover:bg-white/70"}`} />
                   ))}
                 </div>
               )}
               <div className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '200ms' }}>
-                <div className="flex items-end gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0">
-                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain rounded-xl" />
-                  </div>
-                  <div className="flex-1 pb-1">
-                    <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
+                <div className="flex items-end justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-[24px] font-bold text-white tracking-tight leading-tight drop-shadow-sm">{restaurant.name}</h1>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="bg-white/20 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-full">{restaurant.cuisine}</span>
                       {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                     </div>
-                    {restaurant.vibe?.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {restaurant.vibe.slice(0, 5).map(v => (
-                          <span key={v} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple/10 text-purple border border-purple/20">{v}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                  <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
-                    <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
-                    <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <Star className="h-4 w-4 text-white fill-white" strokeWidth={1.5} />
+                    <span className="text-[14px] font-bold text-white">{restaurant.rating}</span>
                   </div>
                 </div>
               </div>
