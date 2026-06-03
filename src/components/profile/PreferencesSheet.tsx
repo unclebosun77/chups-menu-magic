@@ -18,8 +18,8 @@ const readBool = (key: string, fallback: boolean) => {
 
 const PreferencesSheet = ({ open, onOpenChange }: PreferencesSheetProps) => {
   const { toast } = useToast();
-  const [darkMode, setDarkMode] = useState(() =>
-    readBool("pref:darkMode", document.documentElement.classList.contains("dark"))
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("chups-theme") === "dark"
   );
   const [notifications, setNotifications] = useState(() => readBool("pref:notifications", true));
   const [haptics, setHaptics] = useState(() => readBool("pref:haptics", true));
@@ -27,7 +27,8 @@ const PreferencesSheet = ({ open, onOpenChange }: PreferencesSheetProps) => {
   // Apply dark mode live
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
-    localStorage.setItem("pref:darkMode", String(darkMode));
+    document.documentElement.classList.toggle("light", !darkMode);
+    localStorage.setItem("chups-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
   useEffect(() => {
