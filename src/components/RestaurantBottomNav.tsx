@@ -18,8 +18,8 @@ const RestaurantBottomNav = () => {
   const isOnDashboard = location.pathname.startsWith("/restaurant/dashboard");
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 shadow-lg">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-border/50 z-50">
+      <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = isOnDashboard && currentTab === tab.tab;
@@ -29,14 +29,14 @@ const RestaurantBottomNav = () => {
               key={tab.key}
               onClick={() => navigate(`${tab.path}?tab=${tab.tab}`)}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative",
-                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                "flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all relative",
+                isActive ? "text-foreground" : "text-muted-foreground/60 hover:text-foreground"
               )}
             >
-              <Icon className={cn("h-5 w-5 transition-transform", isActive && "scale-110")} />
-              <span className="text-[10px] font-semibold tracking-wide">{tab.label}</span>
+              <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
+              <span className="text-[10px] font-medium tracking-wide">{tab.label}</span>
               {isActive && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-primary rounded-full" />
+                <div className="w-1 h-1 rounded-full bg-purple mt-0.5" />
               )}
             </button>
           );
