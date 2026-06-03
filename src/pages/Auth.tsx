@@ -333,11 +333,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple/8 via-neon-pink/4 to-background" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-purple/10 via-purple/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-
+    <div className="min-h-screen flex flex-col bg-background">
       <div className="relative p-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
@@ -345,24 +341,27 @@ const Auth = () => {
       </div>
 
       <div className="relative flex-1 flex items-center justify-center px-4 pb-8">
-        <Card className="w-full max-w-md border-0 shadow-xl bg-card/95 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-2">
-            <div className="mx-auto flex items-center justify-center mb-2">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple to-neon-pink rounded-2xl flex items-center justify-center shadow-lg shadow-purple/30">
-                <span className="text-xl font-bold text-white">C</span>
-              </div>
-            </div>
-            <CardTitle className="text-2xl font-bold">
-              Welcome to <span className="bg-gradient-to-r from-purple to-neon-pink bg-clip-text text-transparent">CHUPS</span>
-            </CardTitle>
-            <CardDescription>Sign in to discover amazing dining experiences</CardDescription>
+        <Card className="w-full max-w-md border-0 shadow-none bg-transparent">
+          <CardHeader className="text-center space-y-2 pb-4">
+            <h1 className="text-[32px] font-black tracking-[-1px] text-foreground">chups</h1>
+            <p className="text-[15px] text-muted-foreground">Your city's dining guide</p>
           </CardHeader>
 
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" ref={tabsRef}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 h-11 bg-secondary rounded-full p-1">
+                <TabsTrigger
+                  value="signin"
+                  className="rounded-full data-[state=active]:bg-foreground data-[state=active]:text-white data-[state=inactive]:text-muted-foreground text-[13px] font-semibold shadow-none"
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger
+                  value="signup"
+                  className="rounded-full data-[state=active]:bg-foreground data-[state=active]:text-white data-[state=inactive]:text-muted-foreground text-[13px] font-semibold shadow-none"
+                >
+                  Sign Up
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="signin">
