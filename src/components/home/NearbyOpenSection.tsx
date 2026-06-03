@@ -61,11 +61,13 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   if (isLoading) {
     return (
       <section>
-        <h2 className="text-[13px] font-semibold text-muted-foreground tracking-tight mb-2.5">Open now near you 📍</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-[16px] font-bold text-foreground tracking-tight">Open now near you</h2>
+        </div>
         <div className="flex gap-3 overflow-hidden -mx-4 px-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="flex-shrink-0 w-32">
-              <Skeleton className="w-full aspect-square rounded-2xl" />
+            <div key={i} className="flex-shrink-0 w-40">
+              <Skeleton className="w-full aspect-[4/3] rounded-2xl" />
               <Skeleton className="h-3 w-3/4 mt-2" />
               <Skeleton className="h-2.5 w-1/2 mt-1" />
             </div>
@@ -79,18 +81,26 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
 
   return (
     <section>
-      <h2 className="text-[13px] font-semibold text-muted-foreground tracking-tight mb-2.5">
-        Open now near you 📍
-      </h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-[16px] font-bold text-foreground tracking-tight">
+          Open now near you
+        </h2>
+        <button
+          onClick={() => navigate("/discover")}
+          className="text-[13px] text-muted-foreground font-medium active:opacity-70 transition-opacity"
+        >
+          See all
+        </button>
+      </div>
 
       <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
         {restaurants.map((r) => (
           <button
             key={r.id}
             onClick={() => handleTap(r)}
-            className="flex-shrink-0 w-32 text-left active:scale-[0.97] transition-transform"
+            className="flex-shrink-0 w-40 text-left active:scale-[0.97] transition-transform"
           >
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-muted/30 border border-border/30">
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-muted/30 shadow-card border-0">
               {r.imageUrl ? (
                 <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
               ) : r.logoUrl ? (
@@ -102,17 +112,12 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
                   <span className="text-xl font-bold text-muted-foreground">{r.name[0]}</span>
                 </div>
               )}
-              <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 bg-green-500/90 text-white px-1.5 py-0.5 rounded-full text-[9px] font-semibold">
-                <span className="w-1 h-1 rounded-full bg-white" />
+              <div className="absolute top-2 left-2 bg-emerald-50 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
                 Open
               </div>
             </div>
-            <p className="text-[12px] font-semibold text-foreground mt-1.5 leading-tight truncate">{r.name}</p>
-            <div className="flex items-center gap-1 mt-0.5">
-              <span className="text-[10px] text-muted-foreground truncate">{r.cuisine}</span>
-              <span className="text-muted-foreground/30">·</span>
-              <span className="text-[10px] text-muted-foreground">{r.distance}</span>
-            </div>
+            <p className="text-[14px] font-semibold text-foreground mt-2 leading-tight truncate">{r.name}</p>
+            <p className="text-[12px] text-muted-foreground mt-0.5 truncate">{r.cuisine}</p>
           </button>
         ))}
       </div>
