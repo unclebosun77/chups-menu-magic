@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -81,6 +82,7 @@ type WeeklyDay = { day: string; orders: number; revenue: number };
 
 const RestaurantDashboard = () => {
   const navigate = useNavigate();
+  const { enableConsumerMode } = useAuth();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -350,9 +352,9 @@ const RestaurantDashboard = () => {
               <Settings className="mr-1.5 h-4 w-4" />
               Settings
             </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate(`/restaurant/${restaurant.id}`)}>
+            <Button variant="outline" size="sm" onClick={() => { enableConsumerMode(); navigate('/'); }}>
               <Eye className="mr-1.5 h-4 w-4" />
-              Preview
+              View as customer
             </Button>
             <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
