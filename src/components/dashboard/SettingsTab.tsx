@@ -324,10 +324,24 @@ const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
 
   // ─── Section 3: Opening Hours ───
   type DayHours = { open: string; close: string; closed: boolean };
-  const parseHours = (hours?: Record<string, string>): Record<string, DayHours> => {
+  const safeHours: Record<string, unknown> =
+    typeof r.hours === "object" && r.hours !== null && !Array.isArray(r.hours)
+      ? (r.hours as Record<string, unknown>)
+      : {};
+  const parseHours = (hours: Record<string, unknown>): Record<string, DayHours> => {
     const result: Record<string, DayHours> = {};
     DAY_NAMES.forEach(day => {
-      const val = hours?.[day] || "";
+      const raw = hours?.[day];
+      if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+        const obj = raw as { open?: unknown; close?: unknown; closed?: unknown };
+        result[day] = {
+          open: String(obj.open ?? "09:00"),
+          close: String(obj.close ?? "22:00"),
+          closed: Boolean(obj.closed),
+        };
+        return;
+      }
+      const val = String(raw ?? "");
       if (!val || val.toLowerCase() === "closed") {
         result[day] = { open: "09:00", close: "22:00", closed: true };
       } else {
@@ -338,7 +352,7 @@ const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
     return result;
   };
 
-  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(r.hours));
+  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(safeHours));
   const [isSavingHours, setIsSavingHours] = useState(false);
 
   const saveHours = async () => {
