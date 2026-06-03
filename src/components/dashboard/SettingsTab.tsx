@@ -66,10 +66,15 @@ interface SettingsTabProps {
 const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const { toast } = useToast();
 
+  // Loading guard — render placeholder until full restaurant object is available
+  if (!restaurant || !restaurant.id) {
+    return <div className="p-4 text-muted-foreground">Loading settings...</div>;
+  }
+
   // ─── Section 1: Profile ───
   const [profile, setProfile] = useState({
-    name: restaurant.name,
-    cuisine_type: restaurant.cuisine_type,
+    name: restaurant.name || "",
+    cuisine_type: restaurant.cuisine_type || "",
     description: restaurant.description || "",
     phone: restaurant.phone || "",
     address: restaurant.address || "",
