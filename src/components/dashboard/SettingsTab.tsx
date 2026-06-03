@@ -98,97 +98,189 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   };
 
   // ─── Section 2: Branding & Images ───
+  type GalleryItem = {
+    id: string;
+    url: string;
+    status: "uploading" | "ready" | "error";
+    progress: number;
+    file?: File;
+  };
+
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [logoUrl, setLogoUrl] = useState(restaurant.logo_url || "");
   const [coverUrl, setCoverUrl] = useState(restaurant.cover_image_url || "");
-  const [galleryUrls, setGalleryUrls] = useState<string[]>(restaurant.gallery_images || []);
-  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(
+    (restaurant.gallery_images || []).map((u, i) => ({
+      id: `${i}-${u}`,
+      url: u,
+      status: "ready" as const,
+      progress: 100,
+    }))
+  );
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoSavedFlash, setLogoSavedFlash] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverProgress, setCoverProgress] = useState(0);
+  const [brandingSavedFlash, setBrandingSavedFlash] = useState(false);
+
+  const flashSaved = () => {
+    setBrandingSavedFlash(true);
+    setTimeout(() => setBrandingSavedFlash(false), 1500);
+  };
 
   const uploadImage = async (file: File, bucket: string, path: string): Promise<string | null> => {
     const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
     if (error) { toast({ title: "Upload failed", description: error.message, variant: "destructive" }); return null; }
     const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path);
-    return publicUrl;
+    return `${publicUrl}?t=${Date.now()}`;
+  };
+
+  const persistGallery = async (items: GalleryItem[], newCover?: string) => {
+    const urls = items.filter(i => i.status === "ready").map(i => i.url);
+    const payload: any = { gallery_images: urls };
+    if (newCover !== undefined) payload.cover_image_url = newCover;
+    await supabase.from("restaurants").update(payload).eq("id", restaurant.id);
+    flashSaved();
+    onUpdate();
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploadingTarget("logo");
-    setUploadProgress(30);
+    setLogoUploading(true);
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) { setLogoUploading(false); return; }
     const ext = file.name.split('.').pop() || 'jpg';
     const url = await uploadImage(file, "restaurant-logos", `${session.user.id}/logo.${ext}`);
     if (url) {
-      setUploadProgress(80);
       await supabase.from("restaurants").update({ logo_url: url }).eq("id", restaurant.id);
       setLogoUrl(url);
-      toast({ title: "Logo updated ✓" });
+      setLogoSavedFlash(true);
+      setTimeout(() => setLogoSavedFlash(false), 2000);
       onUpdate();
     }
-    setUploadProgress(100);
-    setTimeout(() => { setUploadingTarget(null); setUploadProgress(0); }, 400);
+    setLogoUploading(false);
     e.target.value = "";
   };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploadingTarget("cover");
-    setUploadProgress(30);
+    setCoverUploading(true);
+    setCoverProgress(15);
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) { setCoverUploading(false); return; }
     const ext = file.name.split('.').pop() || 'jpg';
-    const url = await uploadImage(file, "restaurant-gallery", `${session.user.id}/cover.${ext}`);
+    setCoverProgress(50);
+    const url = await uploadImage(file, "restaurant-gallery", `${session.user.id}/cover_${Date.now()}.${ext}`);
     if (url) {
-      setUploadProgress(80);
+      setCoverProgress(85);
       await supabase.from("restaurants").update({ cover_image_url: url }).eq("id", restaurant.id);
       setCoverUrl(url);
-      toast({ title: "Cover photo updated ✓" });
+      toast({ title: "Cover updated ✓" });
+      flashSaved();
       onUpdate();
     }
-    setUploadProgress(100);
-    setTimeout(() => { setUploadingTarget(null); setUploadProgress(0); }, 400);
+    setCoverProgress(100);
+    setTimeout(() => { setCoverUploading(false); setCoverProgress(0); }, 400);
     e.target.value = "";
+  };
+
+  const uploadGalleryFile = async (item: GalleryItem, session: any): Promise<GalleryItem> => {
+    if (!item.file) return { ...item, status: "error" };
+    const ext = item.file.name.split('.').pop() || 'jpg';
+    const path = `${session.user.id}/gallery_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const url = await uploadImage(item.file, "restaurant-gallery", path);
+    if (!url) return { ...item, status: "error", progress: 0 };
+    return { ...item, url, status: "ready", progress: 100, file: undefined };
   };
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    setUploadingTarget("gallery");
-    setUploadProgress(10);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const allowed = files.filter(f => /image\/(jpeg|png|webp)/.test(f.type)).slice(0, 10);
+    if (allowed.length === 0) {
+      toast({ title: "Use JPEG, PNG or WEBP images", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
-    const newUrls: string[] = [];
-    for (let i = 0; i < Math.min(files.length, 10); i++) {
-      const file = files[i];
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `${session.user.id}/gallery_${Date.now()}_${i}.${ext}`;
-      const url = await uploadImage(file, "restaurant-gallery", path);
-      if (url) newUrls.push(url);
-      setUploadProgress(10 + ((i + 1) / files.length) * 80);
+
+    const placeholders: GalleryItem[] = allowed.map(f => ({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      url: URL.createObjectURL(f),
+      status: "uploading",
+      progress: 10,
+      file: f,
+    }));
+    setGalleryItems(prev => [...prev, ...placeholders]);
+
+    const results: GalleryItem[] = [];
+    for (const p of placeholders) {
+      setGalleryItems(prev => prev.map(it => it.id === p.id ? { ...it, progress: 50 } : it));
+      const finished = await uploadGalleryFile(p, session);
+      results.push(finished);
+      setGalleryItems(prev => prev.map(it => it.id === p.id ? finished : it));
     }
-    const updated = [...galleryUrls, ...newUrls];
-    await supabase.from("restaurants").update({ gallery_images: updated } as any).eq("id", restaurant.id);
-    setGalleryUrls(updated);
-    toast({ title: `${newUrls.length} photo(s) added ✓` });
-    onUpdate();
-    setUploadProgress(100);
-    setTimeout(() => { setUploadingTarget(null); setUploadProgress(0); }, 400);
+
+    setGalleryItems(prev => {
+      const next = prev.map(it => results.find(r => r.id === it.id) || it);
+      persistGallery(next);
+      return next;
+    });
     e.target.value = "";
   };
 
-  const removeGalleryImage = async (index: number) => {
-    const updated = galleryUrls.filter((_, i) => i !== index);
-    await supabase.from("restaurants").update({ gallery_images: updated } as any).eq("id", restaurant.id);
-    setGalleryUrls(updated);
+  const retryGalleryItem = async (id: string) => {
+    const item = galleryItems.find(i => i.id === id);
+    if (!item?.file) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    setGalleryItems(prev => prev.map(it => it.id === id ? { ...it, status: "uploading", progress: 30 } : it));
+    const finished = await uploadGalleryFile(item, session);
+    setGalleryItems(prev => {
+      const next = prev.map(it => it.id === id ? finished : it);
+      if (finished.status === "ready") persistGallery(next);
+      return next;
+    });
+  };
+
+  const removeGalleryImage = async (id: string) => {
+    setGalleryItems(prev => {
+      const next = prev.filter(it => it.id !== id);
+      persistGallery(next);
+      return next;
+    });
     toast({ title: "Photo removed" });
+  };
+
+  const setGalleryAsCover = async (id: string) => {
+    const item = galleryItems.find(i => i.id === id);
+    if (!item || item.status !== "ready") return;
+    await supabase.from("restaurants").update({ cover_image_url: item.url }).eq("id", restaurant.id);
+    setCoverUrl(item.url);
+    toast({ title: "Cover updated ✓" });
+    flashSaved();
     onUpdate();
   };
+
+  const moveGalleryToFirst = async (id: string) => {
+    setGalleryItems(prev => {
+      const idx = prev.findIndex(i => i.id === id);
+      if (idx <= 0) return prev;
+      const next = [...prev];
+      const [item] = next.splice(idx, 1);
+      next.unshift(item);
+      const cover = item.status === "ready" ? item.url : undefined;
+      if (cover) setCoverUrl(cover);
+      persistGallery(next, cover);
+      return next;
+    });
+  };
+
 
   // ─── Section 3: Opening Hours ───
   type DayHours = { open: string; close: string; closed: boolean };
