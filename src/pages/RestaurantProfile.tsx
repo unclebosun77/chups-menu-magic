@@ -327,12 +327,12 @@ const RestaurantProfile = () => {
         const menuData = menuRes.data;
 
         if (data && !error) {
-          const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
+          const supabaseMenu: MenuItem[] = (menuData || []).map(item => ({
             id: item.id,
             name: item.name,
             description: item.description || "",
             price: Number(item.price),
-            category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
+            category: item.category?.toLowerCase() || "mains",
             image: item.image_url || undefined,
             tags: [],
             available: item.available,
