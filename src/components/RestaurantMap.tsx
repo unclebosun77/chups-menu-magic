@@ -1,81 +1,47 @@
-import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { Card } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
-
 interface Restaurant {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   latitude: number | null;
   longitude: number | null;
+  address?: string | null;
+  city?: string | null;
 }
 
 interface RestaurantMapProps {
-  restaurants: Restaurant[];
+  restaurant: Restaurant;
 }
 
-const RestaurantMap = ({ restaurants }: RestaurantMapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [needsToken, setNeedsToken] = useState(false);
+const RestaurantMap = ({ restaurant }: RestaurantMapProps) => {
+  const lat = restaurant.latitude;
+  const lng = restaurant.longitude;
+  const addressQuery = [restaurant.address, restaurant.city].filter(Boolean).join(", ");
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    // For demo purposes, using a placeholder token message
-    // In production, this would come from environment variables
-    const token = import.meta.env.VITE_MAPBOX_TOKEN;
-    
-    if (!token) {
-      setNeedsToken(true);
-      return;
-    }
-
-    mapboxgl.accessToken = token;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: [-74.006, 40.7128], // Default to NYC
-      zoom: 12,
-    });
-
-    // Add markers for restaurants with coordinates
-    restaurants
-      .filter((r) => r.latitude && r.longitude)
-      .forEach((restaurant) => {
-        if (map.current && restaurant.latitude && restaurant.longitude) {
-          const marker = new mapboxgl.Marker({ color: "#FF6B35" })
-            .setLngLat([restaurant.longitude, restaurant.latitude])
-            .setPopup(
-              new mapboxgl.Popup().setHTML(`<h3>${restaurant.name}</h3>`)
-            )
-            .addTo(map.current);
-        }
-      });
-
-    return () => {
-      map.current?.remove();
-    };
-  }, [restaurants]);
-
-  if (needsToken) {
+  if (lat == null || lng == null) {
     return (
-      <Card className="h-64 flex items-center justify-center bg-gradient-to-br from-primary/10 to-purple/5 border-2 border-dashed">
-        <div className="text-center p-6">
-          <MapPin className="h-12 w-12 text-primary mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">
-            Map preview coming soon 🗺️
-          </p>
-        </div>
-      </Card>
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressQuery)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-xs font-semibold px-3 py-1.5 rounded-full shadow border border-border/40"
+      >
+        Get directions →
+      </a>
     );
   }
 
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008},${lat - 0.008},${lng + 0.008},${lat + 0.008}&layer=mapnik&marker=${lat},${lng}`;
+
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-lg">
-      <div ref={mapContainer} className="h-64 w-full" />
+    <div className="relative w-full rounded-2xl overflow-hidden border border-border/40" style={{ height: "160px" }}>
+      <iframe src={mapSrc} className="w-full h-full" style={{ border: 0 }} loading="lazy" title="Map" />
+      <a
+        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addressQuery)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-xs font-semibold px-3 py-1.5 rounded-full shadow flex items-center gap-1.5"
+      >
+        Get directions →
+      </a>
     </div>
   );
 };
