@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Component, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,10 +6,43 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Upload, Loader2, X, Plus, Clock, Palette, Save, Camera, Check, ImagePlus, Star, RotateCw } from "lucide-react";
+import { Upload, Loader2, X, Plus, Clock, Palette, Save, Camera, Check, ImagePlus, Star, RotateCw, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+// Local error boundary — keeps Settings tab crashes from blowing up the whole dashboard
+class SettingsErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("[SettingsTab] render error:", error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="p-6 rounded-lg border border-destructive/40 bg-destructive/5 space-y-3">
+          <div className="flex items-center gap-2 text-destructive font-semibold">
+            <AlertTriangle className="h-5 w-5" /> Settings failed to load
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {this.state.error.message || "Unknown error"}
+          </p>
+          <pre className="text-xs bg-background/60 p-3 rounded overflow-auto max-h-48 whitespace-pre-wrap">
+            {this.state.error.stack || String(this.state.error)}
+          </pre>
+          <Button size="sm" variant="outline" onClick={() => this.setState({ error: null })}>Retry</Button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const CUISINE_TYPES = [
   "Italian", "Mexican", "Chinese", "Japanese", "Indian", "Thai", "French", "American",
