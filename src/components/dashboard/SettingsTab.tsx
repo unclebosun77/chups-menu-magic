@@ -112,16 +112,18 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const [logoUrl, setLogoUrl] = useState(restaurant.logo_url || "");
-  const [coverUrl, setCoverUrl] = useState(restaurant.cover_image_url || "");
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(
-    (restaurant.gallery_images || []).map((u, i) => ({
-      id: `${i}-${u}`,
-      url: u,
-      status: "ready" as const,
-      progress: 100,
-    }))
-  );
+  const [logoUrl, setLogoUrl] = useState(r.logo_url || "");
+  const [coverUrl, setCoverUrl] = useState(r.cover_image_url || "");
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => {
+    const raw = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+    return raw
+      .map((u: any, i: number) => {
+        const url = typeof u === "string" ? u : (u && typeof u === "object" ? (u.url || "") : "");
+        if (!url) return null;
+        return { id: `${i}-${url}`, url, status: "ready" as const, progress: 100 };
+      })
+      .filter(Boolean) as GalleryItem[];
+  });
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoSavedFlash, setLogoSavedFlash] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
