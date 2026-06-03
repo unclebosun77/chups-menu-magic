@@ -82,6 +82,7 @@ type WeeklyDay = { day: string; orders: number; revenue: number };
 
 const RestaurantDashboard = () => {
   const navigate = useNavigate();
+  const { enableConsumerMode } = useAuth();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
