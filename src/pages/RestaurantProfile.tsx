@@ -366,16 +366,15 @@ const RestaurantProfile = () => {
               if (combined.length > 0) return combined;
               return data.logo_url ? [data.logo_url] : [];
             })(),
-            galleryTheme: "light",
             rating: 4.5,
             distance: "1.0 km",
             isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             menu: supabaseMenu,
-            crowdLevel: data.crowd_level,
-            crowdUpdatedAt: data.crowd_updated_at,
-            phone: data.phone,
-            latitude: data.latitude ? Number(data.latitude) : null,
-            longitude: data.longitude ? Number(data.longitude) : null,
+            crowdLevel: data.crowd_level || undefined,
+            crowdUpdatedAt: data.crowd_updated_at || undefined,
+            phone: data.phone || undefined,
+            latitude: data.latitude != null ? Number(data.latitude) : undefined,
+            longitude: data.longitude != null ? Number(data.longitude) : undefined,
           });
 
           // Derive price stats from menuData (no extra round-trip)
