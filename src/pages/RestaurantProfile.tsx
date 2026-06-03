@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import type { DemoMenuItem, DemoRestaurant } from "@/data/demoRestaurantMenus";
 import { supabase } from "@/integrations/supabase/client";
 import AskOutaModal from "@/components/AskOutaModal";
 import FullGalleryModal from "@/components/restaurant/FullGalleryModal";
@@ -20,7 +19,53 @@ import { useSavedRestaurants } from "@/hooks/useSavedRestaurants";
 import ReviewsSection from "@/components/ReviewsSection";
 import { ReservationDialog } from "@/components/ReservationDialog";
 
-type OrderItem = DemoMenuItem & { quantity: number };
+type MenuItem = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  image?: string;
+  image_url?: string;
+  available?: boolean;
+  sold_out_today?: boolean;
+  tags?: string[];
+  isSpicy?: boolean;
+  isVegetarian?: boolean;
+  isNew?: boolean;
+  isPopular?: boolean;
+};
+
+type RestaurantData = {
+  id: string;
+  name: string;
+  cuisine: string;
+  address: string;
+  city?: string;
+  phone?: string;
+  website?: string;
+  priceLevel: string;
+  description: string;
+  vibe: string[];
+  mood: string[];
+  vibes: string[];
+  openingHours: Record<string, any>;
+  logoUrl: string;
+  heroImage: string;
+  coverImageUrl?: string;
+  galleryImages: string[];
+  rating: number;
+  distance: string;
+  isOpen: boolean;
+  menu: MenuItem[];
+  signatureDishes?: string[];
+  crowdLevel?: string;
+  crowdUpdatedAt?: string;
+  latitude?: number;
+  longitude?: number;
+};
+
+type OrderItem = MenuItem & { quantity: number };
 
 const CROWD_COLORS: Record<string, { dot: string; bg: string; text: string; label: string }> = {
   quiet: { dot: "bg-green-500", bg: "bg-green-100 dark:bg-green-950/40", text: "text-green-700 dark:text-green-300", label: "Quiet" },
@@ -85,7 +130,7 @@ const QuickInfoHoursRow = ({ status, todayDisplay, openingHours }: { status: any
 };
 
 /* ─── Quick Info Section ─── */
-const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaurant; priceStats: { min: number; avg: number; max: number } | null }) => {
+const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: RestaurantData; priceStats: { min: number; avg: number; max: number } | null }) => {
   const status = getOpeningStatus(restaurant.openingHours as any);
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
   const todayHours = (restaurant.openingHours as any)?.[today];
@@ -240,7 +285,7 @@ const RestaurantProfile = () => {
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [showAskOuta, setShowAskOuta] = useState(false);
   const [showFullGallery, setShowFullGallery] = useState(false);
-  const [restaurant, setRestaurant] = useState<DemoRestaurant | null>(null);
+  const [restaurant, setRestaurant] = useState<RestaurantData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
@@ -282,12 +327,12 @@ const RestaurantProfile = () => {
         const menuData = menuRes.data;
 
         if (data && !error) {
-          const supabaseMenu: DemoMenuItem[] = (menuData || []).map(item => ({
+          const supabaseMenu: MenuItem[] = (menuData || []).map(item => ({
             id: item.id,
             name: item.name,
             description: item.description || "",
             price: Number(item.price),
-            category: (item.category?.toLowerCase() || "mains") as DemoMenuItem["category"],
+            category: item.category?.toLowerCase() || "mains",
             image: item.image_url || undefined,
             tags: [],
             available: item.available,
@@ -308,7 +353,9 @@ const RestaurantProfile = () => {
             priceLevel: "££",
             description: data.description || "",
             vibe: (data.vibes as string[])?.length ? (data.vibes as string[]) : [],
-            openingHours: (data.hours as Record<string, string>) || {},
+            mood: (data.mood as string[]) || [],
+            vibes: (data.vibes as string[]) || [],
+            openingHours: (data.hours as Record<string, any>) || {},
             signatureDishes: [],
             logoUrl: data.logo_url || "",
             heroImage: (data as any).cover_image_url || galleryUrls[0] || data.logo_url || "",
@@ -321,16 +368,15 @@ const RestaurantProfile = () => {
               if (combined.length > 0) return combined;
               return data.logo_url ? [data.logo_url] : [];
             })(),
-            galleryTheme: "light",
             rating: 4.5,
             distance: "1.0 km",
             isOpen: isRestaurantOpen(data.hours as any, data.is_temporarily_closed),
             menu: supabaseMenu,
-            crowdLevel: data.crowd_level,
-            crowdUpdatedAt: data.crowd_updated_at,
-            phone: data.phone,
-            latitude: data.latitude ? Number(data.latitude) : null,
-            longitude: data.longitude ? Number(data.longitude) : null,
+            crowdLevel: data.crowd_level || undefined,
+            crowdUpdatedAt: data.crowd_updated_at || undefined,
+            phone: data.phone || undefined,
+            latitude: data.latitude != null ? Number(data.latitude) : undefined,
+            longitude: data.longitude != null ? Number(data.longitude) : undefined,
           });
 
           // Derive price stats from menuData (no extra round-trip)
@@ -463,7 +509,7 @@ const RestaurantProfile = () => {
     );
   }
 
-  const handleAddToOrder = (item: DemoMenuItem, quantity: number = 1) => {
+  const handleAddToOrder = (item: MenuItem, quantity: number = 1) => {
     vibrate(20);
     setOrder(prev => {
       const existing = prev.find(i => i.id === item.id);
@@ -703,7 +749,7 @@ const RestaurantProfile = () => {
       {/* ─── 5. MENU ─── */}
       <div className="animate-[sectionSlide_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '640ms' }}>
         {restaurant.menu.length > 0 ? (
-          <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+          <MenuSection menu={restaurant.menu as any} signatureDishes={restaurant.signatureDishes ?? []} onAddToOrder={handleAddToOrder as any} />
         ) : (
           <div className="px-5 py-8 text-center">
             <UtensilsCrossed className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
@@ -753,7 +799,7 @@ const RestaurantProfile = () => {
 
       {/* Modals */}
       <FullGalleryModal images={restaurant.galleryImages} open={showFullGallery} onOpenChange={setShowFullGallery} restaurantName={restaurant.name} initialIndex={galleryIndex} />
-      <AskOutaModal open={showAskOuta} onOpenChange={setShowAskOuta} restaurantName={restaurant.name} menu={restaurant.menu} onAddToOrder={handleAddToOrder} />
+      <AskOutaModal open={showAskOuta} onOpenChange={setShowAskOuta} restaurantName={restaurant.name} menu={restaurant.menu as any} onAddToOrder={handleAddToOrder as any} />
 
       <style>{`
         @keyframes pageEnter { from { opacity: 0; } to { opacity: 1; } }
