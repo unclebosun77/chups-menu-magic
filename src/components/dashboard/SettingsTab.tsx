@@ -10,6 +10,7 @@ import { Upload, Loader2, X, Plus, Clock, Palette, Save, Camera, Check, ImagePlu
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 // Local error boundary — keeps Settings tab crashes from blowing up the whole dashboard
 class SettingsErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -779,6 +780,16 @@ const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
             {isSavingAtmos ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Atmosphere
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Appearance</CardTitle>
+          <CardDescription>Choose how the dashboard looks</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DarkModeToggle description="Switch between light and dark themes" />
         </CardContent>
       </Card>
     </div>
