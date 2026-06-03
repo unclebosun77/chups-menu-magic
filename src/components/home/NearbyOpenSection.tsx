@@ -25,19 +25,19 @@ const NearbyOpenSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       try {
         const { data } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, logo_url, gallery_images, address, is_open, hours, is_temporarily_closed")
+          .select("id, name, cuisine_type, logo_url, cover_image_url, gallery_images, address, is_open, hours, is_temporarily_closed")
           .eq("status", "active");
 
-        const items: NearbyRestaurant[] = (data || []).map(r => {
+        const items: NearbyRestaurant[] = (data || []).map((r: any) => {
           const gallery = Array.isArray(r.gallery_images) ? r.gallery_images : [];
-          const heroImage = (gallery[0] as string) || "";
+          const imageUrl = r.cover_image_url || (gallery[0] as string) || null;
           return {
             id: r.id,
             name: r.name,
             cuisine: r.cuisine_type,
             distance: "Nearby",
             isOpen: isRestaurantOpen(r.hours as any, r.is_temporarily_closed),
-            imageUrl: heroImage || undefined,
+            imageUrl: imageUrl || undefined,
             logoUrl: r.logo_url || undefined,
             rating: 4.5,
           };
