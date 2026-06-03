@@ -509,7 +509,7 @@ const RestaurantProfile = () => {
     );
   }
 
-  const handleAddToOrder = (item: DemoMenuItem, quantity: number = 1) => {
+  const handleAddToOrder = (item: MenuItem, quantity: number = 1) => {
     vibrate(20);
     setOrder(prev => {
       const existing = prev.find(i => i.id === item.id);
