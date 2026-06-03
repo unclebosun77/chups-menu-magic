@@ -66,21 +66,19 @@ interface SettingsTabProps {
 const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const { toast } = useToast();
 
-  // Loading guard — render placeholder until full restaurant object is available
-  if (!restaurant || !restaurant.id) {
-    return <div className="p-4 text-muted-foreground">Loading settings...</div>;
-  }
+  // Safe view of restaurant — never undefined for downstream hook logic
+  const r = restaurant || ({} as SettingsTabProps["restaurant"]);
 
   // ─── Section 1: Profile ───
   const [profile, setProfile] = useState({
-    name: restaurant.name || "",
-    cuisine_type: restaurant.cuisine_type || "",
-    description: restaurant.description || "",
-    phone: restaurant.phone || "",
-    address: restaurant.address || "",
-    city: restaurant.city || "",
-    price_range: restaurant.price_range || "",
-    website: restaurant.website || "",
+    name: r.name || "",
+    cuisine_type: r.cuisine_type || "",
+    description: r.description || "",
+    phone: r.phone || "",
+    address: r.address || "",
+    city: r.city || "",
+    price_range: r.price_range || "",
+    website: r.website || "",
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
