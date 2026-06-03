@@ -334,6 +334,11 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
     onUpdate();
   };
 
+  // Loading guard — render placeholder until full restaurant object is available
+  if (!restaurant || !restaurant.id) {
+    return <div className="p-4 text-muted-foreground">Loading settings...</div>;
+  }
+
   return (
     <div className="space-y-8">
       {/* ─── SECTION 1: Profile ─── */}
