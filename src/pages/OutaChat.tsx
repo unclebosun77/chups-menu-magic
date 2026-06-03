@@ -352,9 +352,9 @@ const OutaChat = () => {
   const hasUserSentMessage = messages.some(m => m.type === 'user');
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-secondary/30">
+    <div className="flex flex-col h-[100dvh] bg-background">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-border/50 bg-white z-50">
+      <div className="flex-shrink-0 border-b border-border/50 bg-background z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl bg-purple flex items-center justify-center shadow-md shadow-purple/20">
