@@ -130,20 +130,20 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
       className="px-5 pt-4 pb-3 animate-[sectionSlide_0.45s_ease-out_forwards]"
       style={{ opacity: 0, animationDelay: '300ms' }}
     >
-      <Card className="border-border/30 shadow-sm overflow-hidden">
-        <CardContent className="p-0 divide-y divide-border/30">
+      <Card className="bg-white border-0 shadow-card overflow-hidden">
+        <CardContent className="p-0 divide-y divide-border/40">
           {restaurant.address && (
             <a
               href={`https://maps.google.com?q=${encodeURIComponent(restaurant.address + (restaurant.city ? ', ' + restaurant.city : ''))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+              className="flex items-center gap-3 px-4 h-12 hover:bg-secondary/40 transition-colors"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-                <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+                <MapPin className="h-4 w-4 text-foreground" strokeWidth={1.75} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] text-foreground truncate">{restaurant.address}{restaurant.city ? `, ${restaurant.city}` : ''}</p>
+                <p className="text-[13px] font-medium text-foreground truncate">{restaurant.address}{restaurant.city ? `, ${restaurant.city}` : ''}</p>
               </div>
               {restaurant.distance && (
                 <span className="text-[11px] text-muted-foreground font-medium flex-shrink-0">{restaurant.distance}</span>
@@ -186,38 +186,38 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
           {restaurant.phone && (
             <a
               href={`tel:${restaurant.phone}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+              className="flex items-center gap-3 px-4 h-12 hover:bg-secondary/40 transition-colors"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-                <Phone className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+                <Phone className="h-4 w-4 text-foreground" strokeWidth={1.75} />
               </div>
-              <p className="text-[13px] text-foreground flex-1">{restaurant.phone}</p>
+              <p className="text-[13px] font-medium text-foreground flex-1">{restaurant.phone}</p>
               <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
             </a>
           )}
 
           <QuickInfoHoursRow status={status} todayDisplay={todayDisplay} openingHours={restaurant.openingHours} />
 
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-[13px] font-bold text-purple">{restaurant.priceLevel?.[0] || '£'}</span>
+          <div className="flex items-center gap-3 px-4 h-12">
+            <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+              <span className="text-[13px] font-bold text-foreground">{restaurant.priceLevel?.[0] || '£'}</span>
             </div>
-            <p className="text-[13px] text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
+            <p className="text-[13px] font-medium text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
           </div>
 
           {priceStats && (
-            <div className="flex items-center gap-3 px-4 py-3">
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 h-12">
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
                 <span className="text-[13px]">💰</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] text-foreground">
-                  From <span className="font-semibold">£{priceStats.min.toFixed(2)}</span> · Avg <span className="font-semibold">£{priceStats.avg.toFixed(2)}</span> per dish
+                <p className="text-[13px] font-medium text-foreground">
+                  From <span className="font-semibold">£{priceStats.min.toFixed(2)}</span> · Avg <span className="font-semibold">£{priceStats.avg.toFixed(2)}</span>
                 </p>
               </div>
               {fitsbudget && (
                 <span className="text-[10px] font-semibold text-green-600 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
-                  Fits your budget ✓
+                  Fits budget ✓
                 </span>
               )}
             </div>
