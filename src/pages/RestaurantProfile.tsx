@@ -312,7 +312,15 @@ const RestaurantProfile = () => {
             signatureDishes: [],
             logoUrl: data.logo_url || "",
             heroImage: (data as any).cover_image_url || galleryUrls[0] || data.logo_url || "",
-            galleryImages: galleryUrls.length > 0 ? galleryUrls : (data.logo_url ? [data.logo_url] : []),
+            galleryImages: (() => {
+              const cover = (data as any).cover_image_url as string | null;
+              const combined = [
+                ...(cover ? [cover] : []),
+                ...galleryUrls.filter(u => u !== cover),
+              ];
+              if (combined.length > 0) return combined;
+              return data.logo_url ? [data.logo_url] : [];
+            })(),
             galleryTheme: "light",
             rating: 4.5,
             distance: "1.0 km",
