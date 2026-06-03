@@ -749,7 +749,7 @@ const RestaurantProfile = () => {
       {/* ─── 5. MENU ─── */}
       <div className="animate-[sectionSlide_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '640ms' }}>
         {restaurant.menu.length > 0 ? (
-          <MenuSection menu={restaurant.menu} signatureDishes={restaurant.signatureDishes} onAddToOrder={handleAddToOrder} />
+          <MenuSection menu={restaurant.menu as any} signatureDishes={restaurant.signatureDishes ?? []} onAddToOrder={handleAddToOrder as any} />
         ) : (
           <div className="px-5 py-8 text-center">
             <UtensilsCrossed className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
