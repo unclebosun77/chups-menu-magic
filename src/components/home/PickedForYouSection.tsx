@@ -36,15 +36,15 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("id, name, cuisine_type, description, logo_url, gallery_images, address, city, is_open, hours, is_temporarily_closed")
+          .select("id, name, cuisine_type, description, logo_url, cover_image_url, gallery_images, address, city, is_open, hours, is_temporarily_closed")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        const items: PickItem[] = (data || []).map(r => {
+        const items: PickItem[] = (data || []).map((r: any) => {
           const galleryImages = Array.isArray(r.gallery_images) ? r.gallery_images : [];
-          const heroImage = (galleryImages[0] as string) || r.logo_url || "";
+          const imageUrl = r.cover_image_url || (galleryImages[0] as string) || "";
           return {
             id: r.id,
             name: r.name,
@@ -58,7 +58,7 @@ const PickedForYouSection = ({ refreshKey = 0 }: { refreshKey?: number }) => {
             distance: "Nearby",
             rating: 4.5,
             logoUrl: r.logo_url || "",
-            imageUrl: heroImage,
+            imageUrl,
           };
         });
 
