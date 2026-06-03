@@ -27,11 +27,20 @@ const tierColors: Record<string, string> = {
   platinum: "text-purple",
 };
 
+const tierBadgeStyles: Record<string, string> = {
+  bronze: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  silver: "bg-gray-400/10 text-gray-500 border-gray-400/20",
+  gold: "bg-yellow-400/10 text-yellow-600 border-yellow-400/20",
+  platinum: "bg-purple/10 text-purple border-purple/20",
+};
+
 interface UserRestaurant {
   id: string;
   name: string;
   logo_url: string | null;
   status: string;
+  cuisine_type: string | null;
+  city: string | null;
 }
 
 const Account = () => {
@@ -44,6 +53,7 @@ const Account = () => {
   const [upcomingBookings, setUpcomingBookings] = useState(0);
   const [rewardsData, setRewardsData] = useState<{ tier: string; points_balance: number } | null>(null);
   const [userRestaurant, setUserRestaurant] = useState<UserRestaurant | null>(null);
+  const [bio, setBio] = useState<string | null>(null);
   const [isLoadingRole, setIsLoadingRole] = useState(true);
 
   useEffect(() => {
@@ -73,13 +83,19 @@ const Account = () => {
         .maybeSingle(),
       supabase
         .from("restaurants")
-        .select("id, name, logo_url, status")
+        .select("id, name, logo_url, status, cuisine_type, city")
         .eq("user_id", user.id)
         .maybeSingle(),
-    ]).then(([bookingsRes, rewardsRes, restaurantRes]) => {
+      supabase
+        .from("profiles")
+        .select("bio")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]).then(([bookingsRes, rewardsRes, restaurantRes, profileRes]) => {
       setUpcomingBookings(bookingsRes.count || 0);
       setRewardsData(rewardsRes.data);
       setUserRestaurant(restaurantRes.data);
+      setBio(profileRes.data?.bio || null);
       setIsLoadingRole(false);
     });
   }, [user]);
@@ -91,6 +107,7 @@ const Account = () => {
   };
 
   const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
   const tier = rewardsData?.tier || "bronze";
   const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1) + " Member";
   const isRestaurantOwner = !!userRestaurant;
