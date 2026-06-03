@@ -66,16 +66,19 @@ interface SettingsTabProps {
 const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const { toast } = useToast();
 
+  // Safe view of restaurant — never undefined for downstream hook logic
+  const r = restaurant || ({} as SettingsTabProps["restaurant"]);
+
   // ─── Section 1: Profile ───
   const [profile, setProfile] = useState({
-    name: restaurant.name,
-    cuisine_type: restaurant.cuisine_type,
-    description: restaurant.description || "",
-    phone: restaurant.phone || "",
-    address: restaurant.address || "",
-    city: restaurant.city || "",
-    price_range: restaurant.price_range || "",
-    website: restaurant.website || "",
+    name: r.name || "",
+    cuisine_type: r.cuisine_type || "",
+    description: r.description || "",
+    phone: r.phone || "",
+    address: r.address || "",
+    city: r.city || "",
+    price_range: r.price_range || "",
+    website: r.website || "",
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
@@ -109,16 +112,18 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const [logoUrl, setLogoUrl] = useState(restaurant.logo_url || "");
-  const [coverUrl, setCoverUrl] = useState(restaurant.cover_image_url || "");
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(
-    (restaurant.gallery_images || []).map((u, i) => ({
-      id: `${i}-${u}`,
-      url: u,
-      status: "ready" as const,
-      progress: 100,
-    }))
-  );
+  const [logoUrl, setLogoUrl] = useState(r.logo_url || "");
+  const [coverUrl, setCoverUrl] = useState(r.cover_image_url || "");
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => {
+    const raw = Array.isArray(r.gallery_images) ? r.gallery_images : [];
+    return raw
+      .map((u: any, i: number) => {
+        const url = typeof u === "string" ? u : (u && typeof u === "object" ? (u.url || "") : "");
+        if (!url) return null;
+        return { id: `${i}-${url}`, url, status: "ready" as const, progress: 100 };
+      })
+      .filter(Boolean) as GalleryItem[];
+  });
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoSavedFlash, setLogoSavedFlash] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
@@ -298,7 +303,7 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
     return result;
   };
 
-  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(restaurant.hours));
+  const [hoursData, setHoursData] = useState<Record<string, DayHours>>(parseHours(r.hours));
   const [isSavingHours, setIsSavingHours] = useState(false);
 
   const saveHours = async () => {
@@ -316,8 +321,8 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
   };
 
   // ─── Section 4: Atmosphere & Mood ───
-  const [mood, setMood] = useState<string[]>(restaurant.mood || []);
-  const [vibes, setVibes] = useState<string[]>(restaurant.vibes || []);
+  const [mood, setMood] = useState<string[]>(Array.isArray(r.mood) ? r.mood : []);
+  const [vibes, setVibes] = useState<string[]>(Array.isArray(r.vibes) ? r.vibes : []);
   const [isSavingAtmos, setIsSavingAtmos] = useState(false);
 
   const saveAtmosphere = async () => {
@@ -328,6 +333,11 @@ const SettingsTab = ({ restaurant, onUpdate }: SettingsTabProps) => {
     toast({ title: "Atmosphere saved ✓" });
     onUpdate();
   };
+
+  // Loading guard — render placeholder until full restaurant object is available
+  if (!restaurant || !restaurant.id) {
+    return <div className="p-4 text-muted-foreground">Loading settings...</div>;
+  }
 
   return (
     <div className="space-y-8">
