@@ -43,6 +43,13 @@ const ReviewAndSubmit = () => {
       const userId = session.user.id;
       const { restaurant, menu, gallery } = compiled;
       const coverUrl = restaurant.cover_url || null;
+      const resolvedCover = (compiled as any).branding?.coverPhoto || coverUrl || null;
+      const resolvedGallery = gallery.length > 0
+        ? gallery.map((img: any) => typeof img === 'string' ? img : img?.url).filter(Boolean)
+        : null;
+
+      console.log('[ReviewAndSubmit] cover_image_url being saved:', resolvedCover);
+      console.log('[ReviewAndSubmit] gallery being saved:', resolvedGallery);
 
       // Insert restaurant into Supabase
       const { data: restaurantData, error: restaurantError } = await supabase
@@ -61,8 +68,8 @@ const ReviewAndSubmit = () => {
           latitude: restaurant.latitude ? Number(restaurant.latitude) : null,
           longitude: restaurant.longitude ? Number(restaurant.longitude) : null,
           logo_url: restaurant.logo_url || null,
-          cover_image_url: (compiled as any).branding?.coverPhoto || coverUrl || null,
-          gallery_images: gallery.length > 0 ? gallery.map(img => img.url) : null,
+          cover_image_url: resolvedCover,
+          gallery_images: resolvedGallery,
           hours: restaurant.hours as any || null,
           tags: restaurant.tags?.length > 0 ? restaurant.tags : null,
           is_open: true,

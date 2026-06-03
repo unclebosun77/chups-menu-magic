@@ -264,7 +264,7 @@ const RestaurantProfile = () => {
       try {
         const { data, error } = await supabase
           .from("restaurants")
-          .select("*, is_temporarily_closed, crowd_level, crowd_updated_at, vibes")
+          .select("id, name, description, cuisine_type, address, city, phone, website, logo_url, cover_image_url, gallery_images, is_open, is_temporarily_closed, hours, crowd_level, crowd_updated_at, vibes, mood, price_range, latitude, longitude, created_at")
           .eq("id", supabaseId)
           .maybeSingle();
 
