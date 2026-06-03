@@ -144,6 +144,7 @@ const RestaurantDashboard = () => {
   };
 
   const loadOrdersAndInsights = async (restaurantId: string) => {
+    console.log('[Dashboard] Loading orders for restaurantId:', restaurantId);
     setIsLoadingInsights(true);
     try {
       const { data, error } = await supabase
@@ -151,6 +152,8 @@ const RestaurantDashboard = () => {
         .select("*")
         .eq("restaurant_id", restaurantId)
         .order("created_at", { ascending: false });
+
+      console.log('[Dashboard] Orders query result:', { data, error, count: data?.length });
 
       if (error) throw error;
 
