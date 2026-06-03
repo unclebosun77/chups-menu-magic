@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isRestaurantOpen } from "@/utils/openingHours";
 import { Skeleton } from "@/components/ui/skeleton";
