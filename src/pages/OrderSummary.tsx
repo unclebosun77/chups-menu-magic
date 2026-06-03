@@ -57,13 +57,40 @@ const OrderSummary = () => {
   const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  const sanitizeName = (v: string) => v.trim().replace(/[<>]/g, "").slice(0, 100);
+
   const validateOrder = () => {
-    if (!customerName.trim()) {
+    const cleanName = sanitizeName(customerName);
+    if (!cleanName) {
       toast.error("Please enter your name");
       return false;
     }
+    if (cleanName !== customerName) setCustomerName(cleanName);
     if (orderItems.length === 0) {
       toast.error("Please add items to your order");
+      return false;
+    }
+    if (customerPhone && !/^[\d\s\+\-\(\)]{7,20}$/.test(customerPhone.trim())) {
+      toast.error("Please enter a valid phone number");
+      return false;
+    }
+    if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
+      toast.error("Please enter a valid email");
+      return false;
+    }
+    return true;
+  };
+
+  const checkRateLimit = async (): Promise<boolean> => {
+    if (!user?.id) return true;
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { count } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", fiveMinutesAgo);
+    if (count && count >= 3) {
+      toast.error("Too many orders placed recently. Please wait a moment.");
       return false;
     }
     return true;
@@ -75,9 +102,9 @@ const OrderSummary = () => {
       id: orderId,
       restaurant_id: restaurantId,
       user_id: user?.id || null,
-      customer_name: customerName,
-      customer_email: customerEmail || null,
-      customer_phone: customerPhone || null,
+      customer_name: sanitizeName(customerName),
+      customer_email: customerEmail.trim() || null,
+      customer_phone: customerPhone.trim() || null,
       items: orderItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
       total: totalAmount,
       status: "pending",
@@ -100,6 +127,7 @@ const OrderSummary = () => {
 
   const handlePayAtTable = async () => {
     if (!validateOrder()) return;
+    if (!(await checkRateLimit())) return;
     setIsSubmitting(true);
     try {
       const data = await createOrder();
@@ -124,6 +152,7 @@ const OrderSummary = () => {
 
   const handlePayNow = async () => {
     if (!validateOrder()) return;
+    if (!(await checkRateLimit())) return;
     setPaymentProcessing(true);
     try {
       const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;

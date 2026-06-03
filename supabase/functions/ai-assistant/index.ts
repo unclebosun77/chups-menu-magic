@@ -29,7 +29,24 @@ serve(async (req) => {
       });
     }
 
-    const { messages, restaurantContext } = await req.json();
+    const body = await req.json();
+    let { messages } = body;
+    const { restaurantContext } = body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: 'messages must be an array' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (messages.length > 50) {
+      messages = messages.slice(-50);
+    }
+    messages = messages.map((m: any) => ({
+      ...m,
+      content: typeof m?.content === 'string' && m.content.length > 2000
+        ? m.content.slice(0, 2000)
+        : m?.content,
+    }));
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
