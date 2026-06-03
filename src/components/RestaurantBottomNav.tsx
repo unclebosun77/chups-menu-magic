@@ -1,4 +1,4 @@
-import { ChefHat, Utensils, Calendar, BarChart3 } from "lucide-react";
+import { ChefHat, Utensils, Calendar, BarChart3, Settings } from "lucide-react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,7 @@ const tabs = [
   { key: "menu", icon: Utensils, label: "Menu", path: "/restaurant/dashboard", tab: "menu" },
   { key: "bookings", icon: Calendar, label: "Bookings", path: "/restaurant/dashboard", tab: "bookings" },
   { key: "insights", icon: BarChart3, label: "Insights", path: "/restaurant/dashboard", tab: "insights" },
+  { key: "settings", icon: Settings, label: "Settings", path: "/restaurant/dashboard", tab: "settings" },
 ];
 
 const RestaurantBottomNav = () => {
