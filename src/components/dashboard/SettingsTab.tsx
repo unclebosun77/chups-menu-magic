@@ -370,8 +370,8 @@ const SettingsTabInner = ({ restaurant, onUpdate }: SettingsTabProps) => {
   };
 
   // ─── Section 4: Atmosphere & Mood ───
-  const [mood, setMood] = useState<string[]>(Array.isArray(r.mood) ? r.mood : []);
-  const [vibes, setVibes] = useState<string[]>(Array.isArray(r.vibes) ? r.vibes : []);
+  const [mood, setMood] = useState<string[]>(Array.isArray(r.mood) ? r.mood.map(m => String(m)) : []);
+  const [vibes, setVibes] = useState<string[]>(Array.isArray(r.vibes) ? r.vibes.map(v => String(v)) : []);
   const [isSavingAtmos, setIsSavingAtmos] = useState(false);
 
   const saveAtmosphere = async () => {
