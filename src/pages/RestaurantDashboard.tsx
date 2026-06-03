@@ -131,6 +131,26 @@ const RestaurantDashboard = () => {
     checkAuth();
   }, [navigate]);
 
+  // Global realtime subscription so kitchen receives new orders regardless of active tab
+  useEffect(() => {
+    if (!restaurant?.id) return;
+    const channel = supabase
+      .channel(`dashboard-orders-${restaurant.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurant.id}` },
+        (payload) => {
+          console.log("[Dashboard] Realtime order event:", payload.eventType);
+          loadOrdersAndInsights(restaurant.id);
+          if (payload.eventType === "INSERT") {
+            toast({ title: "New order received 🔔", description: `£${Number((payload.new as any).total).toFixed(2)}` });
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [restaurant?.id]);
+
   const loadMenuItems = async (restaurantId: string) => {
     const { data, error } = await supabase
       .from("menu_items")
