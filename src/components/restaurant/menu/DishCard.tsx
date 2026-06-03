@@ -26,83 +26,78 @@ const DishCard = ({ dish, onSelect }: DishCardProps) => {
   const isDisabled = isUnavailable || isSoldOut;
 
   return (
-    <div 
-      className={`bg-card rounded-2xl border border-border/40 shadow-sm transition-all duration-200 overflow-hidden group ${
-        isUnavailable ? "opacity-40" : isSoldOut ? "opacity-60" : "hover:shadow-lg hover:border-purple/30 cursor-pointer"
+    <div
+      className={`bg-white rounded-2xl shadow-card border-0 transition-all duration-200 overflow-hidden group ${
+        isUnavailable ? "opacity-40" : isSoldOut ? "opacity-60" : "hover:shadow-hover cursor-pointer"
       }`}
       onClick={() => !isDisabled && onSelect(dish)}
     >
-      <div className="flex gap-3 p-4">
+      <div className="flex gap-3 p-3">
+        {/* Image */}
+        {dish.image && (
+          <div className={`w-20 h-20 aspect-square rounded-xl overflow-hidden flex-shrink-0 ${isUnavailable ? "grayscale" : ""}`}>
+            <img
+              src={dish.image}
+              alt={dish.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
+
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-2 mb-1.5">
-            <div className="flex items-center gap-2 min-w-0">
-              <h3 className={`font-semibold text-[15px] leading-tight truncate ${
-                isDisabled ? "text-muted-foreground" : "text-foreground group-hover:text-purple transition-colors"
-              }`}>
-                {dish.name}
-              </h3>
-              {isUnavailable && (
-                <Badge variant="destructive" className="text-[10px] px-1.5 py-0 flex-shrink-0">Unavailable</Badge>
-              )}
-              {isSoldOut && (
-                <Badge className="text-[10px] px-1.5 py-0 flex-shrink-0 bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20">
-                  Sold out today
-                </Badge>
-              )}
-            </div>
-            <span className={`font-semibold text-base flex-shrink-0 ${isDisabled ? "text-muted-foreground" : "text-purple"}`}>
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-start justify-between gap-2 mb-0.5">
+            <h3 className={`text-[14px] font-semibold leading-tight truncate ${
+              isDisabled ? "text-muted-foreground" : "text-foreground"
+            }`}>
+              {dish.name}
+            </h3>
+            <span className={`text-[15px] font-bold flex-shrink-0 ${isDisabled ? "text-muted-foreground" : "text-foreground"}`}>
               £{Number(dish.price).toFixed(2)}
             </span>
           </div>
 
-          {/* Description */}
+          {(isUnavailable || isSoldOut) && (
+            <div className="flex gap-1 mb-1">
+              {isUnavailable && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Unavailable</Badge>}
+              {isSoldOut && <Badge className="text-[10px] px-1.5 py-0 bg-amber-500/15 text-amber-700 border-amber-500/30 hover:bg-amber-500/20">Sold out</Badge>}
+            </div>
+          )}
+
           {dish.description && (
-            <p className="text-[12px] text-muted-foreground/70 line-clamp-2 mb-2 leading-relaxed">
+            <p className="text-[12px] text-muted-foreground line-clamp-2 leading-relaxed">
               {dish.description}
             </p>
           )}
 
-          {/* Tags */}
-          {dish.tags && dish.tags.length > 0 && (
-            <div className="flex gap-1.5 flex-wrap">
-              {dish.tags.map((tag) => (
-                <span 
-                  key={tag} 
-                  className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/80 bg-secondary/50 px-1.5 py-0.5 rounded-full"
-                >
-                  <span>{getTagEmoji(tag)}</span>
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+          <div className="flex items-end justify-between gap-2 mt-auto pt-2">
+            {dish.tags && dish.tags.length > 0 ? (
+              <div className="flex gap-1 flex-wrap">
+                {dish.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-full"
+                  >
+                    <span>{getTagEmoji(tag)}</span>
+                  </span>
+                ))}
+              </div>
+            ) : <span />}
 
-        {/* Image + Add button */}
-        <div className="relative flex-shrink-0">
-          {dish.image && (
-            <div className={`w-24 h-24 rounded-xl overflow-hidden ring-1 ring-border/30 ${isUnavailable ? "grayscale" : ""}`}>
-              <img 
-                src={dish.image} 
-                alt={dish.name} 
-                className={`w-full h-full object-cover ${isDisabled ? "" : "group-hover:scale-105"} transition-transform duration-300`}
-                loading="lazy"
-              />
-            </div>
-          )}
-          {/* Floating Add button */}
-          {!isDisabled && (
-            <button
-              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-purple text-white shadow-sm flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(dish);
-              }}
-            >
-              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            </button>
-          )}
+            {!isDisabled && (
+              <button
+                className="w-8 h-8 rounded-full bg-purple text-white flex items-center justify-center hover:bg-purple/90 active:scale-95 transition-all flex-shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(dish);
+                }}
+                aria-label={`Add ${dish.name}`}
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

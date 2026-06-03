@@ -130,20 +130,20 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
       className="px-5 pt-4 pb-3 animate-[sectionSlide_0.45s_ease-out_forwards]"
       style={{ opacity: 0, animationDelay: '300ms' }}
     >
-      <Card className="border-border/30 shadow-sm overflow-hidden">
-        <CardContent className="p-0 divide-y divide-border/30">
+      <Card className="bg-white border-0 shadow-card overflow-hidden">
+        <CardContent className="p-0 divide-y divide-border/40">
           {restaurant.address && (
             <a
               href={`https://maps.google.com?q=${encodeURIComponent(restaurant.address + (restaurant.city ? ', ' + restaurant.city : ''))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+              className="flex items-center gap-3 px-4 h-12 hover:bg-secondary/40 transition-colors"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-                <MapPin className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+                <MapPin className="h-4 w-4 text-foreground" strokeWidth={1.75} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] text-foreground truncate">{restaurant.address}{restaurant.city ? `, ${restaurant.city}` : ''}</p>
+                <p className="text-[13px] font-medium text-foreground truncate">{restaurant.address}{restaurant.city ? `, ${restaurant.city}` : ''}</p>
               </div>
               {restaurant.distance && (
                 <span className="text-[11px] text-muted-foreground font-medium flex-shrink-0">{restaurant.distance}</span>
@@ -186,38 +186,38 @@ const QuickInfoSection = ({ restaurant, priceStats }: { restaurant: DemoRestaura
           {restaurant.phone && (
             <a
               href={`tel:${restaurant.phone}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
+              className="flex items-center gap-3 px-4 h-12 hover:bg-secondary/40 transition-colors"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-                <Phone className="h-4 w-4 text-purple" strokeWidth={1.5} />
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+                <Phone className="h-4 w-4 text-foreground" strokeWidth={1.75} />
               </div>
-              <p className="text-[13px] text-foreground flex-1">{restaurant.phone}</p>
+              <p className="text-[13px] font-medium text-foreground flex-1">{restaurant.phone}</p>
               <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
             </a>
           )}
 
           <QuickInfoHoursRow status={status} todayDisplay={todayDisplay} openingHours={restaurant.openingHours} />
 
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-[13px] font-bold text-purple">{restaurant.priceLevel?.[0] || '£'}</span>
+          <div className="flex items-center gap-3 px-4 h-12">
+            <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+              <span className="text-[13px] font-bold text-foreground">{restaurant.priceLevel?.[0] || '£'}</span>
             </div>
-            <p className="text-[13px] text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
+            <p className="text-[13px] font-medium text-foreground flex-1">Price level: <span className="font-semibold">{restaurant.priceLevel || '££'}</span></p>
           </div>
 
           {priceStats && (
-            <div className="flex items-center gap-3 px-4 py-3">
-              <div className="w-8 h-8 rounded-lg bg-purple/10 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 h-12">
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
                 <span className="text-[13px]">💰</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] text-foreground">
-                  From <span className="font-semibold">£{priceStats.min.toFixed(2)}</span> · Avg <span className="font-semibold">£{priceStats.avg.toFixed(2)}</span> per dish
+                <p className="text-[13px] font-medium text-foreground">
+                  From <span className="font-semibold">£{priceStats.min.toFixed(2)}</span> · Avg <span className="font-semibold">£{priceStats.avg.toFixed(2)}</span>
                 </p>
               </div>
               {fitsbudget && (
                 <span className="text-[10px] font-semibold text-green-600 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
-                  Fits your budget ✓
+                  Fits budget ✓
                 </span>
               )}
             </div>
@@ -585,38 +585,28 @@ const RestaurantProfile = () => {
           }
 
           return (
-            <div className="relative h-80 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
+            <div className="relative h-64 overflow-hidden cursor-pointer animate-[bannerReveal_0.6s_ease-out_forwards]" style={{ opacity: 0 }} onClick={() => setShowFullGallery(true)}>
               <img src={currentImage} alt={restaurant.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               {restaurant.galleryImages.length > 1 && (
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute top-4 right-4 flex gap-1.5">
                   {restaurant.galleryImages.slice(0, 5).map((_, idx) => (
-                    <button key={idx} onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }} className={`h-2 rounded-full transition-all duration-300 ${idx === galleryIndex ? "bg-white w-6 shadow-lg" : "bg-white/50 w-2 hover:bg-white/70"}`} />
+                    <button key={idx} onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }} className={`h-1.5 rounded-full transition-all duration-300 ${idx === galleryIndex ? "bg-white w-5" : "bg-white/50 w-1.5 hover:bg-white/70"}`} />
                   ))}
                 </div>
               )}
               <div className="absolute bottom-0 left-0 right-0 p-5 animate-[titleReveal_0.5s_ease-out_forwards]" style={{ opacity: 0, animationDelay: '200ms' }}>
-                <div className="flex items-end gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-background shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] p-1.5 border border-border/50 flex-shrink-0">
-                    <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-contain rounded-xl" />
-                  </div>
-                  <div className="flex-1 pb-1">
-                    <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">{restaurant.name}</h1>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-[14px] text-muted-foreground/80">{restaurant.cuisine}</p>
+                <div className="flex items-end justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-[24px] font-bold text-white tracking-tight leading-tight drop-shadow-sm">{restaurant.name}</h1>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="bg-white/20 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-full">{restaurant.cuisine}</span>
                       {effectiveCrowdLevel && <CrowdPill level={effectiveCrowdLevel} />}
                     </div>
-                    {restaurant.vibe?.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {restaurant.vibe.slice(0, 5).map(v => (
-                          <span key={v} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple/10 text-purple border border-purple/20">{v}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                  <div className="flex items-center gap-1.5 bg-purple/15 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple/20 shadow-sm">
-                    <Star className="h-4 w-4 text-purple fill-purple" strokeWidth={1.5} />
-                    <span className="text-[14px] font-bold text-purple">{restaurant.rating}</span>
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <Star className="h-4 w-4 text-white fill-white" strokeWidth={1.5} />
+                    <span className="text-[14px] font-bold text-white">{restaurant.rating}</span>
                   </div>
                 </div>
               </div>
