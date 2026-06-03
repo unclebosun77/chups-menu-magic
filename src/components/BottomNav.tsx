@@ -47,8 +47,8 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 shadow-soft backdrop-blur-lg bg-card/95">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-border/50 z-50">
+      <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = tab.path === "/restaurant/dashboard"
@@ -62,18 +62,12 @@ const BottomNav = () => {
               key={tab.key}
               onClick={() => navigate(tab.path)}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative",
-                isPrimary && !isActive && "text-purple",
-                isActive ? "text-purple" : !isPrimary ? "text-muted-foreground hover:text-foreground" : ""
+                "flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all relative",
+                isActive ? "text-foreground" : "text-muted-foreground/60 hover:text-foreground"
               )}
             >
               {isPrimary ? (
-                <div className={cn(
-                  "w-11 h-11 -mt-5 rounded-2xl flex items-center justify-center shadow-lg transition-transform",
-                  isActive
-                    ? "bg-purple shadow-purple/30 scale-110"
-                    : "bg-purple/90 shadow-purple/20"
-                )}>
+                <div className="w-12 h-12 -mt-5 rounded-2xl flex items-center justify-center bg-purple shadow-lg">
                   {Icon && <Icon className="h-5 w-5 text-white" />}
                 </div>
               ) : isRestaurantTab ? (
@@ -84,15 +78,12 @@ const BottomNav = () => {
                       alt={restaurantData.name}
                       className={cn(
                         "w-6 h-6 rounded-full object-cover border transition-transform",
-                        isActive ? "border-purple scale-110" : "border-purple/30"
+                        isActive ? "border-foreground scale-105" : "border-border"
                       )}
                       onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
                     />
                   ) : (
-                    <div className={cn(
-                      "w-6 h-6 rounded-full bg-purple flex items-center justify-center transition-transform",
-                      isActive && "scale-110"
-                    )}>
+                    <div className="w-6 h-6 rounded-full bg-purple flex items-center justify-center">
                       <span className="text-white text-[10px] font-bold">
                         {restaurantData?.name?.charAt(0)?.toUpperCase() || "R"}
                       </span>
@@ -101,7 +92,7 @@ const BottomNav = () => {
                 </div>
               ) : (
                 <div className="relative">
-                  {Icon && <Icon className={cn("h-6 w-6 transition-transform", isActive && "scale-110")} />}
+                  {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />}
                   {tab.badge > 0 && (
                     <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-purple text-white text-[9px] font-bold flex items-center justify-center">
                       {tab.badge}
@@ -109,9 +100,9 @@ const BottomNav = () => {
                   )}
                 </div>
               )}
-              <span className={cn("text-[10px] font-medium", isPrimary && "-mt-0.5")}>{tab.label}</span>
+              <span className={cn("text-[10px] font-medium tracking-wide", isPrimary && "-mt-0.5")}>{tab.label}</span>
               {isActive && !isPrimary && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-warm rounded-full shadow-glow" />
+                <div className="w-1 h-1 rounded-full bg-purple mt-0.5" />
               )}
             </button>
           );
