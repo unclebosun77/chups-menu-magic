@@ -285,7 +285,7 @@ const RestaurantProfile = () => {
   const [order, setOrder] = useState<OrderItem[]>([]);
   const [showAskOuta, setShowAskOuta] = useState(false);
   const [showFullGallery, setShowFullGallery] = useState(false);
-  const [restaurant, setRestaurant] = useState<DemoRestaurant | null>(null);
+  const [restaurant, setRestaurant] = useState<RestaurantData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
