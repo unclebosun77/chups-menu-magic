@@ -438,28 +438,28 @@ const RestaurantDashboard = () => {
 
         {/* Order Management Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <div className="overflow-x-auto -mx-4 px-4">
-            <TabsList className="mb-4 inline-flex w-auto min-w-full sm:min-w-0">
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="bookings" className="flex items-center gap-1.5">
+          <div className="overflow-x-auto -mx-4 px-4 border-b border-border bg-background">
+            <TabsList className="mb-0 inline-flex w-auto min-w-full sm:min-w-0 bg-transparent p-0 h-auto gap-1 rounded-none">
+              <TabsTrigger value="orders" className="rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">Orders</TabsTrigger>
+              <TabsTrigger value="bookings" className="flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">
                 Bookings
                 {pendingBookingsCount > 0 && (
                   <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">{pendingBookingsCount}</span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="reviews" className="flex items-center gap-1.5">
+              <TabsTrigger value="reviews" className="flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">
                 Reviews
                 {unansweredReviewsCount > 0 && (
                   <span className="ml-1 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{unansweredReviewsCount}</span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="menu">Menu</TabsTrigger>
-              <TabsTrigger value="tables" className="flex items-center gap-1.5">
+              <TabsTrigger value="menu" className="rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">Menu</TabsTrigger>
+              <TabsTrigger value="tables" className="flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">
                 <QrCode className="h-3.5 w-3.5" />
                 Tables
               </TabsTrigger>
-              <TabsTrigger value="insights">Insights</TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-1.5">
+              <TabsTrigger value="insights" className="rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">Insights</TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:border-purple data-[state=active]:shadow-none">
                 <Settings className="h-3.5 w-3.5" />
                 Settings
               </TabsTrigger>
