@@ -10,6 +10,9 @@ interface AuthContextType {
   isLoading: boolean;
   userRole: UserRole;
   restaurantId: string | null;
+  consumerMode: boolean;
+  enableConsumerMode: () => void;
+  disableConsumerMode: () => void;
   signOut: () => Promise<void>;
 }
 
@@ -21,6 +24,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [consumerMode, setConsumerMode] = useState(false);
+
+  const enableConsumerMode = () => setConsumerMode(true);
+  const disableConsumerMode = () => setConsumerMode(false);
 
   const resolveRole = async (u: User | null) => {
     if (!u) {
@@ -74,10 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSession(null);
     setUserRole(null);
     setRestaurantId(null);
+    setConsumerMode(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, userRole, restaurantId, signOut }}>
+    <AuthContext.Provider value={{ user, session, isLoading, userRole, restaurantId, consumerMode, enableConsumerMode, disableConsumerMode, signOut }}>
       {children}
     </AuthContext.Provider>
   );

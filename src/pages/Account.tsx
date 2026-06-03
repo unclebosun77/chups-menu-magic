@@ -37,7 +37,7 @@ interface UserRestaurant {
 const Account = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, signOut, userRole } = useAuth();
+  const { user, signOut, userRole, consumerMode } = useAuth();
   const [showTasteDialog, setShowTasteDialog] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -47,10 +47,10 @@ const Account = () => {
   const [isLoadingRole, setIsLoadingRole] = useState(true);
 
   useEffect(() => {
-    if (userRole === 'restaurant') {
+    if (userRole === 'restaurant' && !consumerMode) {
       navigate('/restaurant/dashboard', { replace: true });
     }
-  }, [userRole, navigate]);
+  }, [userRole, consumerMode, navigate]);
 
   useEffect(() => {
     if (!user) {

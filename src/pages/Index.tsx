@@ -17,14 +17,14 @@ const sectionAnim = (delay: number) => ({
 });
 
 const Index = () => {
-  const { userRole } = useAuth();
+  const { userRole, consumerMode } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userRole === 'restaurant') {
+    if (userRole === 'restaurant' && !consumerMode) {
       navigate('/restaurant/dashboard', { replace: true });
     }
-  }, [userRole, navigate]);
+  }, [userRole, consumerMode, navigate]);
 
   const [refreshKey, setRefreshKey] = useState(0);
   const handleRefresh = useCallback(async () => {
