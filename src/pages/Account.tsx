@@ -322,16 +322,16 @@ const Account = () => {
           <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Settings</h3>
           <div className="space-y-2">
             {[
-              { icon: Settings, label: "Preferences", subtitle: "App customisation", action: () => setShowPreferences(true) },
+              { icon: Settings, label: "Preferences", subtitle: "Theme, haptics & language", action: () => setShowPreferences(true) },
               { icon: Bell, label: "Notifications", subtitle: "Alerts & updates", action: () => setShowPreferences(true) },
-              { icon: Shield, label: "Privacy & Security", subtitle: "Account protection", comingSoon: true },
+              { icon: Shield, label: "Privacy & Security", subtitle: "Password & account", action: () => navigate("/reset-password") },
             ].map((item) => {
               const Icon = item.icon;
               return (
                 <Card
                   key={item.label}
-                  className={`glass-card transition-all ${item.comingSoon ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:shadow-lg hover:border-purple/20 active:scale-[0.98]"}`}
-                  onClick={item.comingSoon ? undefined : item.action}
+                  className="glass-card cursor-pointer hover:shadow-lg hover:border-purple/20 active:scale-[0.98] transition-all"
+                  onClick={item.action}
                 >
                   <CardContent className="flex items-center gap-4 p-4">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple/10 to-secondary flex items-center justify-center">
