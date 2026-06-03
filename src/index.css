@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,64 +16,51 @@ html {
 
 @layer base {
   :root {
-    --background: 270 20% 98%;
-    --foreground: 260 20% 10%;
+    --background: 0 0% 100%;
+    --foreground: 220 15% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 260 20% 10%;
+    --card-foreground: 220 15% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 260 20% 10%;
+    --popover-foreground: 220 15% 10%;
 
-    --primary: 270 100% 60%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 270 100% 50%;
+    --primary-hover: 262 83% 50%;
 
-    --secondary: 270 30% 96%;
-    --secondary-foreground: 260 20% 10%;
-    --secondary-hover: 270 30% 92%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 15% 10%;
+    --secondary-hover: 220 14% 92%;
 
-    --accent: 270 100% 60%;
+    --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --neon-pink: 330 100% 60%;
+    --neon-pink: 330 85% 55%;
     --neon-pink-foreground: 0 0% 100%;
-    --neon-blue: 195 100% 45%;
+    --neon-blue: 200 95% 42%;
     --neon-blue-foreground: 0 0% 100%;
 
-    --purple: 270 100% 60%;
+    --purple: 262 83% 58%;
     --purple-foreground: 0 0% 100%;
-    --purple-hover: 270 100% 50%;
+    --purple-hover: 262 83% 50%;
 
-    --muted: 270 20% 94%;
-    --muted-foreground: 260 10% 45%;
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 10% 46%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 20% 90%;
-    --input: 270 20% 90%;
-    --ring: 270 100% 60%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262 83% 58%;
 
-    --radius: 0.75rem;
-    
-    --gradient-warm: linear-gradient(135deg, hsl(270 100% 60%), hsl(330 100% 60%));
-    --gradient-fresh: linear-gradient(135deg, hsl(195 100% 45%), hsl(270 100% 60%));
-    --gradient-social: linear-gradient(135deg, hsl(330 100% 60%), hsl(270 100% 60%));
-    --gradient-app-bg: linear-gradient(180deg, hsl(270 20% 98%) 0%, hsl(270 25% 96%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(270 100% 60% / 0.08) 0%, hsl(270 20% 98%) 100%);
-    --gradient-purple-glow: linear-gradient(135deg, hsl(270 100% 60% / 0.1), hsl(270 100% 60% / 0.03));
-    --gradient-neon: linear-gradient(135deg, hsl(270 100% 60%), hsl(330 100% 60%));
-    --gradient-premium: linear-gradient(180deg, hsl(260 20% 8%) 0%, hsl(270 40% 12%) 50%, hsl(260 20% 8%) 100%);
-    --gradient-premium-card: linear-gradient(145deg, hsl(260 30% 15%) 0%, hsl(270 25% 10%) 100%);
-    --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(270 100% 60% / 0.1) 50%, transparent 100%);
-    --shadow-soft: 0 2px 8px -2px hsl(270 30% 50% / 0.06);
-    --shadow-hover: 0 6px 20px -4px hsl(270 100% 60% / 0.12);
-    --shadow-glow: 0 0 12px hsl(270 100% 60% / 0.15), 0 0 24px hsl(330 100% 60% / 0.06);
-    --shadow-neon: 0 0 10px hsl(270 100% 60% / 0.18);
-    --shadow-card: 0 2px 12px -2px hsl(270 30% 50% / 0.06);
-    --shadow-pill: 0 1px 4px hsl(270 30% 50% / 0.08);
-    --shadow-premium: 0 8px 32px -8px hsl(270 100% 20% / 0.3), 0 4px 16px -4px hsl(270 100% 60% / 0.1);
+    --radius: 0.875rem;
+
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+    --shadow-card: 0 2px 8px -2px rgb(0 0 0 / 0.08), 0 0 0 1px rgb(0 0 0 / 0.03);
+    --shadow-hover: 0 8px 24px -6px rgb(0 0 0 / 0.12);
+    --shadow-pill: 0 1px 4px rgb(0 0 0 / 0.06);
   }
 
   .dark {
