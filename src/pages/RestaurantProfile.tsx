@@ -799,7 +799,7 @@ const RestaurantProfile = () => {
 
       {/* Modals */}
       <FullGalleryModal images={restaurant.galleryImages} open={showFullGallery} onOpenChange={setShowFullGallery} restaurantName={restaurant.name} initialIndex={galleryIndex} />
-      <AskOutaModal open={showAskOuta} onOpenChange={setShowAskOuta} restaurantName={restaurant.name} menu={restaurant.menu} onAddToOrder={handleAddToOrder} />
+      <AskOutaModal open={showAskOuta} onOpenChange={setShowAskOuta} restaurantName={restaurant.name} menu={restaurant.menu as any} onAddToOrder={handleAddToOrder as any} />
 
       <style>{`
         @keyframes pageEnter { from { opacity: 0; } to { opacity: 1; } }
