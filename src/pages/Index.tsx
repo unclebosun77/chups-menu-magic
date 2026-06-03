@@ -52,10 +52,6 @@ const Index = () => {
           <HomeHeader />
         </div>
 
-        {/* Section 2 — Quick Action Pills */}
-        <div className="mt-4 animate-[fadeIn_0.4s_ease-out_forwards]" style={sectionAnim(120)}>
-          <QuickActionPills />
-        </div>
 
         {/* Section 3 — Nearby & Open Now */}
         <div className="mt-5 animate-[fadeIn_0.5s_ease-out_forwards]" style={sectionAnim(200)}>
