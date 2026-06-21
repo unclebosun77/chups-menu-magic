@@ -309,8 +309,8 @@ const InsightsTab = ({ restaurantId }: { restaurantId: string }) => {
                     </div>
                   ))}
                   {DAY_LABELS.map((label, d) => (
-                    <>
-                      <div key={`l-${d}`} className="text-[10px] text-muted-foreground pr-2 leading-[14px]">
+                    <Fragment key={`row-${d}`}>
+                      <div className="text-[10px] text-muted-foreground pr-2 leading-[14px]">
                         {label}
                       </div>
                       {Array.from({ length: 24 }).map((_, h) => (
@@ -321,7 +321,7 @@ const InsightsTab = ({ restaurantId }: { restaurantId: string }) => {
                           title={`${DAY_LABELS[d]} ${peakHourLabel(h)} — ${heatmap.grid[d][h]} orders`}
                         />
                       ))}
-                    </>
+                    </Fragment>
                   ))}
                 </div>
               </div>
