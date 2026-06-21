@@ -24,6 +24,7 @@ import BookingsTab from "@/components/dashboard/BookingsTab";
 import ReviewsSection from "@/components/ReviewsSection";
 import RestaurantActivityFeed from "@/components/dashboard/RestaurantActivityFeed";
 import SettingsTab from "@/components/dashboard/SettingsTab";
+import InsightsTab from "@/components/dashboard/InsightsTab";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Restaurant = {
@@ -623,6 +624,9 @@ const RestaurantDashboard = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Deeper analytics: heatmap, repeat rate, AOV trend, bookings, menu perf, new vs returning, prep time */}
+              <InsightsTab restaurantId={restaurant.id} />
             </>
           )}
         </div>
